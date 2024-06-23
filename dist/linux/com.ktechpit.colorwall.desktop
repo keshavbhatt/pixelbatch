@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=ColorWall
+GenericName[it]=Negozio di sfondi Ultra HD
+GenericName=Ultra HD wallpaper store
+Comment[it]=Negozio di sfondi desktop e utilità di gestione
+Comment=Desktop wallpaper store & manager utility
+Icon=com.ktechpit.colorwall
+Exec=colorwall %u
+Terminal=false
+Type=Application
+Categories=Utility;Settings;Qt;
+Keywords=Color;Wallpaper;Image;Desktop;Background;
+StartupWMClass=colorwall
+StartupNotify=true
+MimeType=x-scheme-handler/colorwall;
+X-GNOME-UsesNotifications=true

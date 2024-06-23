@@ -1,0 +1,97 @@
+name: colorwall
+version: '2.1'
+summary: Ultra HD wallpaper store
+description: |
+  ColorWall is a desktop wallpaper store/manager utility that allows you to browse download and apply wallpaper from huge collection of wallpapers.
+
+grade: stable
+confinement: strict
+icon: snap/gui/icon.svg
+base: core22
+compression: lzo
+
+architectures:
+  - build-on: [amd64]
+    build-for: [amd64]
+
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/qt5-core22
+
+apps:
+  colorwall:
+    command: bin/desktop-launch $SNAP/usr/bin/colorwall
+    environment:
+       IS_SNAP: 1
+       LANG: en_US.UTF-8 # UMD issue 7,21
+       NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
+    desktop: usr/share/applications/com.ktechpit.colorwall.desktop
+    plugs:
+        - desktop
+        - desktop-legacy
+        - gsettings
+        - home
+        - mount-observe
+        - network
+        - opengl
+        - removable-media
+        - unity7
+        - x11
+        - wayland
+plugs:
+  gsettings:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+  qt5-core22:
+    interface: content
+    target: $SNAP/qt5-core22
+    default-provider: qt5-core22
+
+parts:
+   build-src:
+     plugin: nil
+     source: .
+     source-subdir: src/
+     build-packages:
+        - build-essential
+        - qtbase5-dev # also contains dev headers for libqt5sql5 there is no libqt5sql5-dev
+        - libqt5svg5-dev
+        - libgl1-mesa-dev
+        - libgumbo-dev
+     override-build: |
+            craftctl default
+            qmake PREFIX=${CRAFT_PART_INSTALL}/usr src
+            make -j4
+            make install
+     override-prime: |
+            craftctl default
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.colorwall.desktop
+
+   gumbo:
+     plugin: nil
+     stage-packages:
+         - libgumbo1
+
+   desktop-data-packages:
+     plugin: nil
+     stage-packages:
+         - mate-desktop-common
+         - cinnamon-desktop-data
+
+   desktop-launch:
+     plugin: nil
+     source: https://github.com/keshavbhatt/qt5-core22.git
+     after: [build-src]
+     override-build: |
+            craftctl default
+            mkdir -p ${CRAFT_PART_INSTALL}/bin/
+            cp -rf ${CRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${CRAFT_PART_INSTALL}/bin/

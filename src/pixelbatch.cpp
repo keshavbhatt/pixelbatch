@@ -10,6 +10,10 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   ui->setupUi(this);
 
+  setWindowTitle(QApplication::applicationName() + " | v" + VERSIONSTR);
+
+  setWindowIcon(QIcon(":/icons/app/icon-64.png"));
+
   initTaskWidget();
   setupStatusBar();
 }
@@ -50,9 +54,12 @@ void PixelBatch::initTaskWidget() {
     m_taskWidget->setItemDelegateForColumn(1, elideItemDelegate);
     m_taskWidget->setWordWrap(false);
 
-    //connections
+    // connections
     connect(m_taskWidget, &TaskWidget::setStatusRequested, this,
             &PixelBatch::setStatus);
+
+    connect(m_taskWidget, &TaskWidget::toggleShowStatusBarAddButton, this,
+            &PixelBatch::toggleShowStatusBarAddButton);
 
     ui->taskWidgetLayout->addWidget(m_taskWidget);
   }
@@ -74,19 +81,22 @@ void PixelBatch::setupStatusBar() {
     // add images button
     m_statusBarAddButton = new QPushButton("Add Images", this);
     connect(m_statusBarAddButton, &QPushButton::clicked, this, [=]() {
-      qDebug("Status button clicked!");
-      statusBar()->showMessage("Hello");
+
     });
     layout->addWidget(m_statusBarAddButton);
 
     permanentWidget->setLayout(layout);
     statusBar()->addPermanentWidget(permanentWidget);
 
-    setStatus(QString("Welcome to %1 ver: %2")
-                  .arg(qApp->applicationName(), VERSIONSTR));
+    statusBar()->showMessage(QString("Welcome to %1 ver: %2")
+                                 .arg(qApp->applicationName(), VERSIONSTR));
   }
 }
 
 void PixelBatch::setStatus(const QString &message) {
   m_permanentStatusbarMessageLabel->setText(message);
+}
+
+void PixelBatch::toggleShowStatusBarAddButton(const bool visible) {
+  m_statusBarAddButton->setVisible(visible);
 }

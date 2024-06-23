@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- appstreamcli validate com.ktechpit.colorwall.metainfo.xml -->
+<component type="desktop-application">
+  <id>com.ktechpit.colorwall</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary=https://raw.githubusercontent.com/keshavbhatt/colorwall-issue-tracker/main/LICENSE</project_license>
+  <developer_name>Keshav Bhatt</developer_name>
+  <name>ColorWall</name>
+  <summary>The Ultimate Desktop Wallpaper Application</summary>
+  <description>
+    <p>ColorWall is a powerful desktop wallpaper store, manager, downloader, and application that provides users with a vast selection of high-quality wallpapers to choose from.</p>
+    <p>Key features of ColorWall:</p>
+    <ul>
+      <li>Comprehensive search: search using Colors, Tags, Categories, Resolution, Popularity, Views...</li>
+      <li>Large collection of Wallpapers: boasts the world's largest collection of online 4k, 8k and Ultra HD wallpapers</li>
+      <li>Cross-platform support/Multiple backend support: windows, cinnamon, deepin, lxqt, mate, pantheon, kde-plasma-5, unity, xfce4, and even FEH and WAL</li>
+      <li>Highly optimized browsing experience: infinity-scrollable wallpaper browsing viewport</li>
+      <li>Built-in Image viewer: preview wallpapers before downloading them</li>
+      <li>Multithreaded download manager: download multiple wallpapers simultaneously</li>
+      <li>Smart multiple wallpaper selection mode: select multiple wallpapers you want to download at once</li>
+      <li>Smart Image metadata extraction: extracts Dominant color, Subject/Theme of wallpaper</li>
+      <li>Content filtering: including an powerful age filter,to filter wallpaper search</li>
+    </ul>
+  </description>
+  <keywords>
+      <keyword translate="no">ColorWall</keyword>
+      <keyword>Wallpaper</keyword>
+      <keyword>Desktop Wallpaper</keyword>
+      <keyword>Gnome Wallpaper</keyword>
+      <keyword>Picture</keyword>
+      <keyword>Desktop Background</keyword>
+      <keyword>SlideShow</keyword>
+      <keyword>UnSplash</keyword>
+      <keyword>Bing Wallpaper</keyword>
+      <keyword>Image Search</keyword>
+      <keyword>Foto Search</keyword>
+      <keyword>Image Fondo</keyword>
+      <keyword>Color Wallpaper</keyword>
+      <keyword>Wallpaper Store</keyword>
+      <keyword>Monitor Wallpaper</keyword>
+      <keyword xml:lang="de">Behang</keyword>
+      <keyword xml:lang="de">Bureaubladachtergrond</keyword>
+      <keyword xml:lang="de">Gnome Bureaubladachtergrond</keyword>
+      <keyword xml:lang="de">Afbeelding</keyword>
+      <keyword xml:lang="de">Bureaubladachtergrond</keyword>
+      <keyword xml:lang="de">Diavoorstelling</keyword>
+      <keyword xml:lang="de">UnSplash</keyword>
+      <keyword xml:lang="de">Bing Bureaubladachtergrond</keyword>
+      <keyword xml:lang="de">Afbeelding Zoeken</keyword>
+      <keyword xml:lang="de">Foto Zoeken</keyword>
+      <keyword xml:lang="de">Afbeelding Achtergrond</keyword>
+      <keyword xml:lang="de">Kleur Behang</keyword>
+      <keyword xml:lang="de">Behangwinkel</keyword>
+      <keyword xml:lang="de">Monitor Bureaubladachtergrond</keyword>
+      <keyword xml:lang="pt">Papel de Parede</keyword>
+      <keyword xml:lang="pt">Papel de Parede do Desktop</keyword>
+      <keyword xml:lang="pt">Papel de Parede do Gnome</keyword>
+      <keyword xml:lang="pt">Imagem</keyword>
+      <keyword xml:lang="pt">Fundo de Tela do Desktop</keyword>
+      <keyword xml:lang="pt">Apresentação de Slides</keyword>
+      <keyword xml:lang="pt">UnSplash</keyword>
+      <keyword xml:lang="pt">Papel de Parede do Bing</keyword>
+      <keyword xml:lang="pt">Busca de Imagens</keyword>
+      <keyword xml:lang="pt">Busca de Fotos</keyword>
+      <keyword xml:lang="pt">Fundo de Tela</keyword>
+      <keyword xml:lang="pt">Papel de Parede Colorido</keyword>
+      <keyword xml:lang="pt">Loja de Papel de Parede</keyword>
+      <keyword xml:lang="pt">Papel de Parede do Monitor</keyword>
+      <keyword xml:lang="fr">Fond d'écran</keyword>
+      <keyword xml:lang="fr">Fond d'écran de bureau</keyword>
+      <keyword xml:lang="fr">Fond d'écran Gnome</keyword>
+      <keyword xml:lang="fr">Image</keyword>
+      <keyword xml:lang="fr">Arrière-plan de bureau</keyword>
+      <keyword xml:lang="fr">Diaporama</keyword>
+      <keyword xml:lang="fr">UnSplash</keyword>
+      <keyword xml:lang="fr">Fond d'écran Bing</keyword>
+      <keyword xml:lang="fr">Recherche d'images</keyword>
+      <keyword xml:lang="fr">Recherche de photos</keyword>
+      <keyword xml:lang="fr">Fond d'écran couleur</keyword>
+      <keyword xml:lang="fr">Boutique de fonds d'écran</keyword>
+      <keyword xml:lang="fr">Fond d'écran du moniteur</keyword>
+  </keywords>
+  <categories>
+    <category>Utility</category>
+    <category>Graphics</category>
+    <category>DesktopSettings</category>
+    <category>Qt</category>
+  </categories>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/keshavbhatt/colorwall-issue-tracker/blob/main/images/1.jpeg?raw=true</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/keshavbhatt/colorwall-issue-tracker/blob/main/images/2.jpeg?raw=true</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/keshavbhatt/colorwall-issue-tracker/blob/main/images/3.jpeg?raw=true</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/keshavbhatt/colorwall-issue-tracker/blob/main/images/4.jpeg?raw=true</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/keshavbhatt/colorwall-issue-tracker</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/colorwall-issue-tracker/issues</url>
+  <url type="donation">https://www.paypal.me/keshavnrj/10</url>
+  <update_contact>98378sub@gmail.com</update_contact>
+  <launchable type="desktop-id">com.ktechpit.colorwall.desktop</launchable>
+   <content_rating type="oars-1.1" />
+  <releases>
+  <release version="2.1" date="2024-03-02" type="stable" urgency="high">
+    <description>
+      <p>
+        Stable release, 2.1-snapshot-21
+        - increase daily data usage limit.
+      </p>
+    </description>
+  </release>
+  <release version="1.8" date="2023-05-23" type="stable" urgency="high">
+    <description>
+      <p>
+        Stable release, 1.8-snapshot-16
+        - persist filter across tabs when performing similar image searches.
+      </p>
+    </description>
+  </release>
+  <release version="1.7" date="2023-05-15" type="stable" urgency="high">
+    <description>
+      <p>Stable release, 1.7-snapshot-14</p>
+    </description>
+  </release>
+  <release version="1.6" date="2023-05-11" type="stable" urgency="high">
+    <description>
+      <p>Stable release, 1.6-snapshot-9</p>
+    </description>
+  </release>
+  <release version="1.5" date="2023-05-08" type="stable" urgency="high">
+    <description>
+      <p>Stable release, 1.5-snapshot-6</p>
+    </description>
+  </release>
+  </releases>
+</component>

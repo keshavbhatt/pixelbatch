@@ -16,6 +16,7 @@ public:
 
 signals:
   void setStatusRequested(const QString &message);
+  void toggleShowStatusBarAddButton(const bool visible);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;

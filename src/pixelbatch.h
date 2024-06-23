@@ -23,6 +23,8 @@ public:
 private slots:
   void setStatus(const QString &message);
 
+  void toggleShowStatusBarAddButton(const bool visible);
+
 private:
   Ui::PixelBatch *ui;
 
