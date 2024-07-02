@@ -1,0 +1,11 @@
+# pngout
+    https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=pngout
+    https://www.advsys.net/ken/util/pngout.htm
+
+# jpegoptim
+    https://github.com/tjko/jpegoptim
+    https://www.kokkonen.net/tjko/projects.html
+
+
+# pngquant
+    https://pngquant.org/

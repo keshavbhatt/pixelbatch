@@ -1,6 +1,7 @@
 #ifndef PIXELBATCH_H
 #define PIXELBATCH_H
 
+#include "filehandler.h"
 #include "taskwidget.h"
 
 #include <QLabel>
@@ -30,9 +31,13 @@ private:
 
   TaskWidget *m_taskWidget;
   QPushButton *m_statusBarAddButton;
+  QPushButton *m_statusBarProcessButton;
   QLabel *m_permanentStatusbarMessageLabel;
+  FileHandler *m_fileHandler;
+
 
   void initTaskWidget();
   void setupStatusBar();
+  void initMenuBar();
 };
 #endif // PIXELBATCH_H

@@ -40,14 +40,29 @@ DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_T
 
 SOURCES += \
     elideditemdelegate.cpp \
+    filehandler.cpp \
+    imagestats.cpp \
+    imagetask.cpp \
     main.cpp \
     pixelbatch.cpp \
-    taskwidget.cpp
+    taskwidget.cpp \
+    worker/imageworkerfactory.cpp \
+    worker/jpegoptimworker.cpp \
+    worker/pngoutworker.cpp \
+    worker/pngquantworker.cpp
 
 HEADERS += \
     elideditemdelegate.h \
+    filehandler.h \
+    imagestats.h \
+    imagetask.h \
     pixelbatch.h \
-    taskwidget.h
+    taskwidget.h \
+    worker/ImageWorker.h \
+    worker/imageworkerfactory.h \
+    worker/jpegoptimworker.h \
+    worker/pngoutworker.h \
+    worker/pngquantworker.h
 
 FORMS += \
     pixelbatch.ui
