@@ -141,13 +141,13 @@ void PixelBatch::initMenuBar() {
 
   // EDIT MENU
   QAction *removeFinishedAction =
-      new QAction(tr("Remove Finished Operations"), editMenu);
+      new QAction(tr("Remove Finished Tasks"), editMenu);
   removeFinishedAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
   connect(removeFinishedAction, &QAction::triggered, this,
           &PixelBatch::removeFinishedOperations);
   editMenu->addAction(removeFinishedAction);
 
-  QAction *clearAction = new QAction(tr("Cancel All Operations"), editMenu);
+  QAction *clearAction = new QAction(tr("Cancel All Tasks"), editMenu);
   clearAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
   connect(clearAction, &QAction::triggered, this,
           &PixelBatch::clearAllOperations);

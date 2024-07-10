@@ -119,27 +119,28 @@ void TaskWidget::updateTaskWidgetHeader(const bool &contentLoaded) {
 }
 
 void TaskWidget::processImages() {
-  for (const ImageTask &imageTask : qAsConst(m_imageTasks)) {
-    ImageWorker *worker = nullptr;
-    try {
-      // ensure destination dir exists
-      QFileInfo destinationInfo(imageTask.optimizedPath);
-      QDir().mkpath(destinationInfo.absoluteDir().absolutePath());
+    for (const ImageTask &imageTask : qAsConst(m_imageTasks)) {
+        try {
+            // Ensure destination dir exists
+            QFileInfo destinationInfo(imageTask.optimizedPath);
+            QDir().mkpath(destinationInfo.absoluteDir().absolutePath());
 
-      // process
-      worker = ImageWorkerFactory::getWorker(imageTask.imagePath);
-      connect(worker, &ImageWorker::optimizationFinished, this,
-              &TaskWidget::onOptimizationFinished);
-      connect(worker, &ImageWorker::optimizationError, this,
-              &TaskWidget::onOptimizationError);
-      worker->optimize(imageTask);
-    } catch (const std::exception &e) {
-      // TODO: update imageTask and corresponding row
-      qDebug() << "Error processing " << imageTask.imagePath << ": "
-               << e.what();
-      delete worker;
+            // Process
+            ImageWorker *worker = ImageWorkerFactory::getWorker(imageTask.imagePath);
+            connect(worker, &ImageWorker::optimizationFinished, this, [this, worker](const ImageTask &task,const bool success) {
+                onOptimizationFinished(task, success);
+                worker->deleteLater();
+            });
+            connect(worker, &ImageWorker::optimizationError, this, [this, worker](const ImageTask &task, const QString &errorString) {
+                onOptimizationError(task, errorString);
+                worker->deleteLater();
+            });
+            worker->optimize(imageTask);
+        } catch (const std::exception &e) {
+            // TODO: update imageTask and corresponding row
+            qDebug() << "Error processing " << imageTask.imagePath << ": " << e.what();
+        }
     }
-  }
 }
 
 void TaskWidget::updateTaskStatus(const ImageTask &task, const QString text,
