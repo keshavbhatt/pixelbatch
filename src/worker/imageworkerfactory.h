@@ -2,7 +2,6 @@
 #define IMAGEWORKERFACTORY_H
 
 #include "ImageWorker.h"
-#include "jpegoptimworker.h"
 
 class ImageWorkerFactory {
 public:

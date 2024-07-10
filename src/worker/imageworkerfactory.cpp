@@ -1,5 +1,6 @@
 #include "imageworkerfactory.h"
 
+#include "jpegoptimworker.h"
 #include "pngoutworker.h"
 #include "pngquantworker.h"
 
@@ -14,14 +15,13 @@ ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
     return new JpegoptimWorker(allowLossy, strip, maxQuality);
   }
   else if (ext == "png") {
-      // bool allowLossy = true;  //Allow lossy compression
-      // int maxColors = 256;     //Maximum number of colors
-      // QPair<int, int> qualityRange = qMakePair(0, 100); // Quality range
-      // int speed = 3;           // Speed/quality trade-off
+      bool allowLossy = true;  //Allow lossy compression
+      int maxColors = 256;     //Maximum number of colors
+      QPair<int, int> qualityRange = qMakePair(0, 100); // Quality range
+      int speed = 3;           // Speed/quality trade-off
 
-      // return new PngquantWorker(allowLossy, maxColors, qualityRange, speed);
-
-      return new PngoutWorker(false, 0);
+      return new PngquantWorker(allowLossy, maxColors, qualityRange, speed);
+      // return new PngoutWorker(false, 0);
   }
   // else if (ext == "gif") {
   //   return new GIFProcessor();

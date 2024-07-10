@@ -3,17 +3,34 @@
 #include "elideditemdelegate.h"
 #include "imagestats.h"
 #include "imagetask.h"
+#include "settings.h"
 
 #include <worker/ImageWorker.h>
 #include <worker/imageworkerfactory.h>
 
-TaskWidget::TaskWidget(QWidget *parent) : QTableWidget(parent) {
+#include <QDir>
+#include <QMainWindow>
+
+TaskWidget::TaskWidget(QWidget *parent)
+    : QTableWidget(parent), m_settings(Settings::instance()) {
   setAcceptDrops(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::SingleSelection);
   setMouseTracking(true);
+  setEditTriggers(QAbstractItemView::NoEditTriggers);
 
   updateTaskWidgetHeader(false);
+
+  connect(this->model(), &QAbstractItemModel::rowsInserted, this, &TaskWidget::updateStatusMessage);
+  connect(this->model(), &QAbstractItemModel::rowsRemoved, this, &TaskWidget::updateStatusMessage);
+
+}
+
+void TaskWidget::updateStatusMessage() {
+    int rowCount = this->rowCount();
+    QString message = tr("Loaded %1 items").arg(rowCount);
+
+    emit statusMessageUpdated(message);
 }
 
 void TaskWidget::dragEnterEvent(QDragEnterEvent *event) {
@@ -53,27 +70,34 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   int newRow = rowCount();
   insertRow(newRow);
 
-  // Insert initial status
-  QTableWidgetItem *statusItem = new QTableWidgetItem("Pending");
-  setItem(newRow, 0, statusItem);
-
   // Insert file path
   QTableWidgetItem *fileItem = new QTableWidgetItem(filePath);
-  setItem(newRow, 1, fileItem);
+  setItem(newRow, 0, fileItem);
 
-  // Insert file size
+  // Insert initial status
+  QTableWidgetItem *statusItem = new QTableWidgetItem("Pending");
+  statusItem->setTextAlignment(Qt::AlignCenter);
+  setItem(newRow, 1, statusItem);
+
+  // Insert file size before
   QString formattedSize = m_locale.formattedDataSize(fileSize);
-  QTableWidgetItem *sizeItem = new QTableWidgetItem(formattedSize);
-  setItem(newRow, 2, sizeItem);
+  QTableWidgetItem *sizeBeforeItem = new QTableWidgetItem(formattedSize);
+  sizeBeforeItem->setTextAlignment(Qt::AlignCenter);
+  setItem(newRow, 2, sizeBeforeItem);
 
-  // Placeholder for savings column (you can replace this with actual logic)
+  // Insert file size after
+  QString formattedSizeAfter = m_locale.formattedDataSize(fileSize);
+  QTableWidgetItem *sizeAfterItem = new QTableWidgetItem(formattedSizeAfter);
+  sizeAfterItem->setTextAlignment(Qt::AlignCenter);
+  setItem(newRow, 3, sizeAfterItem);
+
+  // savings
   QTableWidgetItem *savingsItem = new QTableWidgetItem("N/A");
-  setItem(newRow, 3, savingsItem);
+  savingsItem->setTextAlignment(Qt::AlignCenter);
+  setItem(newRow, 4, savingsItem);
 
-  // Map file name to row index
-  fileRowMap[filePath] = newRow;
-
-  images.push_back(filePath);
+  QString destination = m_settings.getOptimizedPath() + m_settings.getOutputFilePrefix() + fileInfo.fileName();
+  m_imageTasks.append(ImageTask(filePath, destination, newRow));
 
   updateTaskWidgetHeader(true);
 }
@@ -82,57 +106,92 @@ void TaskWidget::updateTaskWidgetHeader(const bool &contentLoaded) {
   if (!contentLoaded) {
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   } else {
-    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    // horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
+
+    // horizontalHeader()->setStretchLastSection(true);
   }
 }
 
 void TaskWidget::processImages() {
-    for (const auto &imagePath : images) {
-        QFileInfo fileInfo(imagePath);
-        QString dst = "/tmp/d/optimized_" + fileInfo.fileName();
-        ImageTask task(imagePath, dst, fileRowMap[imagePath]);
-        ImageWorker* worker = nullptr;
-        try {
-            worker = ImageWorkerFactory::getWorker(imagePath);
-            connect(worker, &ImageWorker::optimizationFinished, this, &TaskWidget::onOptimizationFinished);
-            connect(worker, &ImageWorker::optimizationError, this, &TaskWidget::onOptimizationError);
-            worker->optimize(task);
-        } catch (const std::exception &e) {
-            qDebug() << "Error processing " << imagePath << ": " << e.what();
-            delete worker; // Clean up the worker if an exception is thrown
-        }
+  for (const ImageTask &imageTask : qAsConst(m_imageTasks)) {
+    ImageWorker *worker = nullptr;
+    try {
+      // ensure destination dir exists
+      QFileInfo destinationInfo(imageTask.optimizedPath);
+      QDir().mkpath(destinationInfo.absoluteDir().absolutePath());
+
+      // process
+      worker = ImageWorkerFactory::getWorker(imageTask.imagePath);
+      connect(worker, &ImageWorker::optimizationFinished, this,
+              &TaskWidget::onOptimizationFinished);
+      connect(worker, &ImageWorker::optimizationError, this,
+              &TaskWidget::onOptimizationError);
+      worker->optimize(imageTask);
+    } catch (const std::exception &e) {
+      // TODO: update imageTask and corresponding row
+      qDebug() << "Error processing " << imageTask.imagePath << ": "
+               << e.what();
+      delete worker;
     }
+  }
+}
+
+void TaskWidget::updateTaskStatus(const ImageTask &task, const QString text,
+                                  const QString tooltip) {
+  int row = task.rowIndex;
+  QTableWidgetItem *statusItem = item(row, 1);
+
+  statusItem->setToolTip(tooltip);
+  statusItem->setText(text);
+}
+
+void TaskWidget::updateTaskSizeAfter(const ImageTask &task,
+                                     const QString text) {
+  int row = task.rowIndex;
+  QTableWidgetItem *sizeAfterItem = item(row, 3);
+
+  sizeAfterItem->setText(text);
+}
+
+void TaskWidget::updateTaskSaving(const ImageTask &task, const QString text) {
+  int row = task.rowIndex;
+  QTableWidgetItem *savingItem = item(row, 4);
+
+  savingItem->setText(text);
 }
 
 void TaskWidget::onOptimizationFinished(const ImageTask &task, bool success) {
-    int row = task.rowIndex;
-    QTableWidgetItem *statusItem = item(row, 0);
-    QTableWidgetItem *savingsItem = item(row, 3);
+  if (success) {
+    ImageStats stats(task.imagePath, task.optimizedPath);
 
-    if (success) {
-        statusItem->setText("Success");
+    // update saving
+    qint64 savings = stats.getSavings();
+    double compressionPercentage = stats.getCompressionPercentage();
+    QString formattedSavings = m_locale.formattedDataSize(savings);
+    updateTaskSaving(task,
+                     QString("%1 (%2%)")
+                         .arg(formattedSavings,
+                              QString::number(compressionPercentage, 'f', 2)));
 
-        ImageStats stats(task.imagePath, task.optimizedPath); // Adjust based on your ImageStats implementation
+    // update sizeafter
+    qint64 sizeAfter = stats.getOptimizedSize();
+    QString formattedSizeAfter = m_locale.formattedDataSize(sizeAfter);
+    updateTaskSizeAfter(task, formattedSizeAfter);
 
-        qint64 savings = stats.getSavings();
-        double compressionPercentage = stats.getCompressionPercentage();
-
-        QString formattedSavings = m_locale.formattedDataSize(savings);
-
-        savingsItem->setText(QString("%1 (%2%)")
-                                 .arg(formattedSavings, QString::number(compressionPercentage, 'f', 2)));
-    } else {
-        statusItem->setText("Failed");
-    }
+    // update status
+    updateTaskStatus(task, "Success");
+  } else {
+    updateTaskStatus(task, "Falied");
+  }
 }
 
-void TaskWidget::onOptimizationError(const ImageTask &task, const QString &errorString) {
-    int row = task.rowIndex;
-    QTableWidgetItem *statusItem = item(row, 0);
-    statusItem->setText("Error: " + errorString);
+void TaskWidget::onOptimizationError(const ImageTask &task,
+                                     const QString &errorString) {
+  updateTaskStatus(task, "Falied", errorString);
 }

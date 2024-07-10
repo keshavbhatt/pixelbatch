@@ -2,6 +2,7 @@
 #define TASKWIDGET_H
 
 #include "imagetask.h"
+#include "settings.h"
 
 #include <QDragEnterEvent>
 #include <QFileInfo>
@@ -24,6 +25,7 @@ public slots:
 signals:
   void setStatusRequested(const QString &message);
   void toggleShowStatusBarAddButton(const bool visible);
+  void statusMessageUpdated(const QString &message);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -33,13 +35,18 @@ protected:
 private slots:
   void onOptimizationFinished(const ImageTask &task, bool success);
   void onOptimizationError(const ImageTask &task, const QString &errorString);
+  void updateStatusMessage();
 
 private:
-  void updateTaskWidgetHeader(const bool &contentLoaded = false);
-
-  std::vector<QString> images;
-  std::unordered_map<QString, int> fileRowMap; // Maps file names to row indices
+  QList<ImageTask> m_imageTasks;
   QLocale m_locale;
+  Settings &m_settings;
+
+  void updateTaskSizeAfter(const ImageTask &task, const QString text);
+  void updateTaskWidgetHeader(const bool &contentLoaded = false);
+  void updateTaskSaving(const ImageTask &task, const QString text);
+  void updateTaskStatus(const ImageTask &task, const QString text,
+                        const QString tooltip = "");
 };
 
 #endif // TASKWIDGET_H

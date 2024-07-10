@@ -1,11 +1,27 @@
-# pngout
-    https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=pngout
-    https://www.advsys.net/ken/util/pngout.htm
+[] advpng
 
-# jpegoptim
+[] gifsicle
+
+[x] jpegoptim
     https://github.com/tjko/jpegoptim
     https://www.kokkonen.net/tjko/projects.html
 
+[] jpeg-recompress
 
-# pngquant
+[] jpegtran
+
+[] optipng
+
+[] oxipng
+
+[] pngcrush
+
+[x] pngout
+    https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=pngout
+    https://www.advsys.net/ken/util/pngout.htm
+
+
+[x] pngquant
     https://pngquant.org/
+
+[] svgo

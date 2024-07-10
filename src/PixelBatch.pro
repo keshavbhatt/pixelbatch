@@ -39,12 +39,14 @@ BUILD_TIMESTAMP="\\\"$$system(date -u +\""%Y-%m-%dT%H:%M:%SUTC\"")\\\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 SOURCES += \
+    constants.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imagestats.cpp \
     imagetask.cpp \
     main.cpp \
     pixelbatch.cpp \
+    settings.cpp \
     taskwidget.cpp \
     worker/imageworkerfactory.cpp \
     worker/jpegoptimworker.cpp \
@@ -52,11 +54,13 @@ SOURCES += \
     worker/pngquantworker.cpp
 
 HEADERS += \
+    constants.h \
     elideditemdelegate.h \
     filehandler.h \
     imagestats.h \
     imagetask.h \
     pixelbatch.h \
+    settings.h \
     taskwidget.h \
     worker/ImageWorker.h \
     worker/imageworkerfactory.h \

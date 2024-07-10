@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,16 +24,26 @@ public:
 
 private slots:
   void setStatus(const QString &message);
-
   void toggleShowStatusBarAddButton(const bool visible);
+
+  // actions
+  void addImages();
+  void openSettings();
+  void quitApplication();
+  void removeFinishedOperations();
+  void clearAllOperations();
+  void reportIssue();
+  void donate();
+  void showAbout();
 
 private:
   Ui::PixelBatch *ui;
 
   TaskWidget *m_taskWidget;
+  QWidget *m_statusBarPermanentWidget;
   QPushButton *m_statusBarAddButton;
   QPushButton *m_statusBarProcessButton;
-  QLabel *m_permanentStatusbarMessageLabel;
+  QLabel *m_StatusbarPermanentMessageLabel;
   FileHandler *m_fileHandler;
 
 
