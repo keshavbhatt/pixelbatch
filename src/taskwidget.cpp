@@ -86,8 +86,7 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   setItem(newRow, 2, sizeBeforeItem);
 
   // Insert file size after
-  QString formattedSizeAfter = m_locale.formattedDataSize(fileSize);
-  QTableWidgetItem *sizeAfterItem = new QTableWidgetItem(formattedSizeAfter);
+  QTableWidgetItem *sizeAfterItem = new QTableWidgetItem("N/A");
   sizeAfterItem->setTextAlignment(Qt::AlignCenter);
   setItem(newRow, 3, sizeAfterItem);
 
