@@ -19,6 +19,9 @@ public:
 
     QString getOutputFilePrefix() const;
     void setOutputFilePrefix(const QString &prefix);
+    QString getLastOpenedImageDirPath() const;
+    void setLastOpenedImageDirPath(const QString &prefix);
+
 private:
     Settings(QObject *parent = nullptr); // Private constructor
     Settings(const Settings&) = delete; // Disable copy constructor

@@ -6,7 +6,8 @@ PixelBatch::PixelBatch(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::PixelBatch), m_taskWidget(nullptr),
       m_statusBarPermanentWidget(nullptr), m_statusBarAddButton(nullptr),
       m_statusBarProcessButton(nullptr),
-      m_StatusbarPermanentMessageLabel(nullptr), m_fileHandler(nullptr) {
+      m_StatusbarPermanentMessageLabel(nullptr), m_fileHandler(nullptr),
+      m_settings(Settings::instance()){
 
   ui->setupUi(this);
 
@@ -186,7 +187,7 @@ void PixelBatch::toggleShowStatusBarAddButton(const bool visible) {
 
 void PixelBatch::addImages() {
   if (m_fileHandler) {
-    m_fileHandler->addFiles();
+    m_fileHandler->addFiles(m_settings.getLastOpenedImageDirPath());
   } else {
     qWarning() << "Unable to Add files, fileHandler not initialized.";
   }

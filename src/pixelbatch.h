@@ -45,6 +45,7 @@ private:
   QPushButton *m_statusBarProcessButton;
   QLabel *m_StatusbarPermanentMessageLabel;
   FileHandler *m_fileHandler;
+  Settings &m_settings;
 
 
   void initTaskWidget();

@@ -25,3 +25,13 @@ QString Settings::getOutputFilePrefix() const {
 void Settings::setOutputFilePrefix(const QString &prefix) {
     settings.setValue(Constants::OUTPUT_FILE_PREFIX_KEY, prefix);
 }
+
+QString Settings::getLastOpenedImageDirPath() const
+{
+    return settings.value(Constants::INPUT_LAST_IMAGE_DIR_PATH_KEY, Constants::DEFAULT_INPUT_LAST_IMAGE_DIR_PATH_KEY).toString();
+}
+
+void Settings::setLastOpenedImageDirPath(const QString &prefix)
+{
+    settings.setValue(Constants::INPUT_LAST_IMAGE_DIR_PATH_KEY, prefix);
+}
