@@ -8,7 +8,7 @@ class PngoutWorker : public ImageWorker {
 public:
     PngoutWorker(bool copyChunks, int strategy, QObject *parent = nullptr);
 
-    void optimize(const ImageTask &task) override;
+    void optimize(ImageTask *task) override;
 
 private:
     bool copyChunks;

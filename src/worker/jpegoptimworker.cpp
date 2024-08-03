@@ -7,9 +7,9 @@
 JpegoptimWorker::JpegoptimWorker(bool allowLossy, QStringList strip, int maxQuality, QObject *parent)
     : ImageWorker(parent), allowLossy(allowLossy), strip(strip), maxQuality(maxQuality) {}
 
-void JpegoptimWorker::optimize(const ImageTask &task) {
-    QString src = task.imagePath;
-    QString dst = task.optimizedPath;
+void JpegoptimWorker::optimize(ImageTask *task) {
+    QString src = task->imagePath;
+    QString dst = task->optimizedPath;
 
     QFile::copy(src, dst);
 

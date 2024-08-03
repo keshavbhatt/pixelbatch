@@ -9,7 +9,7 @@ class JpegoptimWorker : public ImageWorker {
 public:
     JpegoptimWorker(bool allowLossy, QStringList strip, int maxQuality, QObject *parent = nullptr);
 
-    void optimize(const ImageTask &task) override;
+    void optimize(ImageTask *task) override;
 
 private:
     bool allowLossy;

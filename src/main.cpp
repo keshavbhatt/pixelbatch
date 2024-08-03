@@ -11,6 +11,8 @@ int main(int argc, char *argv[]) {
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
 
+  qRegisterMetaType<ImageTask *>("ImageTask*");
+
   PixelBatch w;
   w.show();
 

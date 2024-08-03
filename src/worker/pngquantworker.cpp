@@ -6,9 +6,9 @@
 PngquantWorker::PngquantWorker(bool allowLossy, int maxColors, QPair<int, int> qualityRange, int speed, QObject *parent)
     : ImageWorker(parent), allowLossy(allowLossy), maxColors(maxColors), qualityRange(qualityRange), speed(speed) {}
 
-void PngquantWorker::optimize(const ImageTask &task) {
-    QString src = task.imagePath;
-    QString dst = task.optimizedPath;
+void PngquantWorker::optimize(ImageTask *task) {
+    QString src = task->imagePath;
+    QString dst = task->optimizedPath;
 
     QStringList args;
     args << "--quality=" + QString::number(qualityRange.first) + "-" + QString::number(qualityRange.second)
@@ -27,3 +27,4 @@ void PngquantWorker::optimize(const ImageTask &task) {
 
     executeProcess("pngquant", args, task);
 }
+

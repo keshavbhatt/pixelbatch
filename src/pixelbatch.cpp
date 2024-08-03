@@ -197,7 +197,9 @@ void PixelBatch::openSettings() { Q_UNIMPLEMENTED(); }
 
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
-void PixelBatch::removeFinishedOperations() { Q_UNIMPLEMENTED(); }
+void PixelBatch::removeFinishedOperations() {
+    m_taskWidget->removeFinishedOperations();
+}
 
 void PixelBatch::clearAllOperations() { Q_UNIMPLEMENTED(); }
 

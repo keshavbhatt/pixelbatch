@@ -11,7 +11,7 @@ public:
   PngquantWorker(bool allowLossy, int maxColors, QPair<int, int> qualityRange,
                  int speed, QObject *parent = nullptr);
 
-  void optimize(const ImageTask &task) override;
+  void optimize(ImageTask *task) override;
 
 private:
   bool allowLossy;

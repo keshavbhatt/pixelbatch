@@ -8,9 +8,9 @@
 PngoutWorker::PngoutWorker(bool copyChunks, int strategy, QObject *parent)
     : ImageWorker(parent), copyChunks(copyChunks), strategy(strategy) {}
 
-void PngoutWorker::optimize(const ImageTask &task) {
-    QString src = task.imagePath;
-    QString dst = task.optimizedPath;
+void PngoutWorker::optimize(ImageTask *task) {
+    QString src = task->imagePath;
+    QString dst = task->optimizedPath;
 
     QStringList args;
     args << "-k" + QString::number(copyChunks ? 1 : 0)
