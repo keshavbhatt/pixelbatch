@@ -150,8 +150,8 @@ void TaskWidget::processNextBatch() {
       // Process
       ImageWorker *worker = ImageWorkerFactory::getWorker(imageTask->imagePath);
       connect(worker, &ImageWorker::optimizationFinished, this,
-              [this, worker](ImageTask &task, bool success) {
-                task.taskStatus =
+              [this, worker](ImageTask *task, bool success) {
+                task->taskStatus =
                     success ? ImageTask::Completed : ImageTask::Error;
                 onOptimizationFinished(task, success);
                 worker->deleteLater();
@@ -159,8 +159,8 @@ void TaskWidget::processNextBatch() {
                 processNextBatch();
               });
       connect(worker, &ImageWorker::optimizationError, this,
-              [this, worker](ImageTask &task, const QString &errorString) {
-                task.taskStatus = ImageTask::Error;
+              [this, worker](ImageTask *task, const QString &errorString) {
+                task->taskStatus = ImageTask::Error;
                 onOptimizationError(task, errorString);
                 worker->deleteLater();
                 m_activeTasks--;
@@ -169,6 +169,7 @@ void TaskWidget::processNextBatch() {
       worker->optimize(imageTask);
     } catch (const std::exception &e) {
       // TODO: update imageTask and corresponding row
+      updateTaskStatus(imageTask, e.what());
       qDebug() << "Error processing " << imageTask->imagePath << ": "
                << e.what();
       m_activeTasks--;
@@ -200,12 +201,16 @@ void TaskWidget::removeTask(ImageTask *task) {
     this->removeRow(row);
 
     delete task;
+  } else {
+    qWarning() << "Unable to remove task, task not found in task table";
   }
 }
 
 int TaskWidget::findRowByImageTask(ImageTask *task) {
   for (int row = 0; row < rowCount(); ++row) {
-    QTableWidgetItem *item = this->item(row, 0); // data is in column 0
+    // ImageTask(task) pointer is mapped with data of QTableWidgetItem in first
+    // column
+    QTableWidgetItem *item = this->item(row, 0);
     if (item) {
       ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
       if (storedTask == task) {
@@ -216,36 +221,41 @@ int TaskWidget::findRowByImageTask(ImageTask *task) {
   return -1;
 }
 
-void TaskWidget::updateTaskStatus(const ImageTask &task,
+void TaskWidget::updateTaskStatus(ImageTask *task,
                                   const QString optionalDetail) {
-  int row = task.rowIndex;
-  QTableWidgetItem *statusItem = item(row, 1);
+  int row = findRowByImageTask(task);
+  if (row >= 0) {
+    QTableWidgetItem *statusItem = item(row, 1);
 
-  statusItem->setToolTip(optionalDetail);
-  statusItem->setText(task.statusToString());
+    statusItem->setToolTip(optionalDetail);
+    statusItem->setText(task->statusToString());
+  }
 }
 
-void TaskWidget::updateTaskSizeAfter(const ImageTask &task,
-                                     const QString text) {
-  int row = task.rowIndex;
-  QTableWidgetItem *sizeAfterItem = item(row, 3);
+void TaskWidget::updateTaskSizeAfter(ImageTask *task, const QString text) {
+  int row = findRowByImageTask(task);
+  if (row >= 0) {
+    QTableWidgetItem *sizeAfterItem = item(row, 3);
 
-  sizeAfterItem->setText(text);
+    sizeAfterItem->setText(text);
+  }
 }
 
-void TaskWidget::updateTaskSaving(const ImageTask &task, const QString text) {
-  int row = task.rowIndex;
-  QTableWidgetItem *savingItem = item(row, 4);
+void TaskWidget::updateTaskSaving(ImageTask *task, const QString text) {
+  int row = findRowByImageTask(task);
+  if (row >= 0) {
+    QTableWidgetItem *savingItem = item(row, 4);
 
-  savingItem->setText(text);
+    savingItem->setText(text);
+  }
 }
 
-void TaskWidget::onOptimizationFinished(ImageTask &task, bool success) {
-  qDebug() << "Optimization finished for" << task.imagePath
+void TaskWidget::onOptimizationFinished(ImageTask *task, bool success) {
+  qDebug() << "Optimization finished for" << task->imagePath
            << "with success:" << success;
 
   if (success) {
-    ImageStats stats(task.imagePath, task.optimizedPath);
+    ImageStats stats(task->imagePath, task->optimizedPath);
 
     // update saving
     qint64 savings = stats.getSavings();
@@ -268,8 +278,8 @@ void TaskWidget::onOptimizationFinished(ImageTask &task, bool success) {
   }
 }
 
-void TaskWidget::onOptimizationError(ImageTask &task,
+void TaskWidget::onOptimizationError(ImageTask *task,
                                      const QString &errorString) {
-  qDebug() << "Optimization error for" << task.imagePath << ":" << errorString;
+  qDebug() << "Optimization error for" << task->imagePath << ":" << errorString;
   updateTaskStatus(task, errorString);
 }

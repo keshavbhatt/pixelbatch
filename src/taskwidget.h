@@ -35,8 +35,8 @@ protected:
   void dropEvent(QDropEvent *event) override;
 
 private slots:
-  void onOptimizationFinished(ImageTask &task, bool success);
-  void onOptimizationError(ImageTask &task, const QString &errorString);
+  void onOptimizationFinished(ImageTask *task, bool success);
+  void onOptimizationError(ImageTask *task, const QString &errorString);
   void updateStatusMessage();
 
 private:
@@ -45,11 +45,10 @@ private:
   QLocale m_locale;
   Settings &m_settings;
 
-  void updateTaskSizeAfter(const ImageTask &task, const QString text);
+  void updateTaskSizeAfter(ImageTask *task, const QString text);
   void updateTaskWidgetHeader(const bool &contentLoaded = false);
-  void updateTaskSaving(const ImageTask &task, const QString text);
-  void updateTaskStatus(const ImageTask &task,
-                        const QString optionalDetail = "");
+  void updateTaskSaving(ImageTask *task, const QString text);
+  void updateTaskStatus(ImageTask *task, const QString optionalDetail = "");
   void processNextBatch();
 
   static const int maxConcurrentTasks =
