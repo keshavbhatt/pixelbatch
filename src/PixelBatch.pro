@@ -43,11 +43,11 @@ SOURCES += \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imagestats.cpp \
-    imagetask.cpp \
     main.cpp \
     pixelbatch.cpp \
     settings.cpp \
     taskwidget.cpp \
+    taskwidgetoverlay.cpp \
     worker/imageworkerfactory.cpp \
     worker/jpegoptimworker.cpp \
     worker/pngoutworker.cpp \
@@ -62,6 +62,7 @@ HEADERS += \
     pixelbatch.h \
     settings.h \
     taskwidget.h \
+    taskwidgetoverlay.h \
     worker/ImageWorker.h \
     worker/imageworkerfactory.h \
     worker/jpegoptimworker.h \
@@ -115,3 +116,6 @@ desktop.files = ../dist/linux/com.ktechpit.pixelbatch.desktop
 
 unix:INSTALLS += target icon16 icon32 icon64 icon128 icon256
 unix:INSTALLS += iconscalable iconsymbolic appstream desktop
+
+RESOURCES += \
+    resources.qrc

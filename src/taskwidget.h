@@ -3,6 +3,7 @@
 
 #include "imagetask.h"
 #include "settings.h"
+#include "taskwidgetoverlay.h"
 
 #include <QDragEnterEvent>
 #include <QFileInfo>
@@ -33,14 +34,17 @@ protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
   void dragMoveEvent(QDragMoveEvent *event) override;
   void dropEvent(QDropEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
 
 private slots:
   void onOptimizationFinished(ImageTask *task, bool success);
   void onOptimizationError(ImageTask *task, const QString &errorString);
-  void updateStatusMessage();
+  void updateOverlay();
 
 private:
   QList<ImageTask *> m_imageTasks;
+
+  TaskWidgetOverlay *m_overlayWidget;
 
   QLocale m_locale;
   Settings &m_settings;
@@ -51,12 +55,14 @@ private:
   void updateTaskStatus(ImageTask *task, const QString optionalDetail = "");
   void processNextBatch();
 
-  static const int maxConcurrentTasks =
-      5; // TODO load and set desired limit from settings
+  int m_maxConcurrentTasks;
   QQueue<ImageTask *> m_imageTaskQueue;
   int m_activeTasks = 0;
   void removeTask(ImageTask *task);
   int findRowByImageTask(ImageTask *task);
+  void removeTasksByStatus(const ImageTask::Status &status);
+  void updateStatusBarMessage(const QString &message);
+  QString getSummaryStatus() const;
 };
 
 #endif // TASKWIDGET_H

@@ -7,7 +7,7 @@ PixelBatch::PixelBatch(QWidget *parent)
       m_statusBarPermanentWidget(nullptr), m_statusBarAddButton(nullptr),
       m_statusBarProcessButton(nullptr),
       m_StatusbarPermanentMessageLabel(nullptr), m_fileHandler(nullptr),
-      m_settings(Settings::instance()){
+      m_settings(Settings::instance()) {
 
   ui->setupUi(this);
 
@@ -112,8 +112,8 @@ void PixelBatch::setupStatusBar() {
     }
   }
 
-  statusBar()->showMessage(QString(tr("Welcome to %1 ver: %2"))
-                               .arg(qApp->applicationName(), VERSIONSTR));
+  statusBar()->showMessage(
+      QString(tr("%1 ver: %2")).arg(qApp->applicationName(), VERSIONSTR));
 }
 
 void PixelBatch::initMenuBar() {
@@ -198,7 +198,7 @@ void PixelBatch::openSettings() { Q_UNIMPLEMENTED(); }
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
 void PixelBatch::removeFinishedOperations() {
-    m_taskWidget->removeFinishedOperations();
+  m_taskWidget->removeFinishedOperations();
 }
 
 void PixelBatch::clearAllOperations() { Q_UNIMPLEMENTED(); }

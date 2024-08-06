@@ -7,9 +7,8 @@
 struct ImageTask {
   QString imagePath;     // Source image path
   QString optimizedPath; // Destination (optimized) image path
-  int rowIndex;          // Row index in TaskWidget table
 
-  enum Status { Pending, Processing, Completed, Error };
+  enum Status { Pending, Queued, Processing, Completed, Error };
 
   Status taskStatus;
 
@@ -17,6 +16,8 @@ struct ImageTask {
     switch (taskStatus) {
     case Pending:
       return "Pending";
+    case Queued:
+      return "Queued";
     case Processing:
       return "Processing";
     case Completed:
@@ -28,7 +29,8 @@ struct ImageTask {
     }
   }
 
-  ImageTask(const QString &src, const QString &dst, int row);
+  ImageTask(const QString &src, const QString &dst)
+      : imagePath(src), optimizedPath(dst), taskStatus(Pending) {}
 };
 
 Q_DECLARE_METATYPE(ImageTask *)

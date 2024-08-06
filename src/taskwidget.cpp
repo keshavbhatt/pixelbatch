@@ -14,7 +14,13 @@
 #include <QThreadPool>
 
 TaskWidget::TaskWidget(QWidget *parent)
-    : QTableWidget(parent), m_settings(Settings::instance()) {
+    : QTableWidget(parent), m_overlayWidget(new TaskWidgetOverlay(this)),
+      m_settings(Settings::instance()),
+      m_maxConcurrentTasks(m_settings.getMaxConcurrentTasks()) {
+
+  m_overlayWidget->setGeometry(this->rect());
+  updateOverlay();
+
   setAcceptDrops(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -23,16 +29,19 @@ TaskWidget::TaskWidget(QWidget *parent)
 
   updateTaskWidgetHeader(false);
 
-  connect(this->model(), &QAbstractItemModel::rowsInserted, this,
-          &TaskWidget::updateStatusMessage);
-  connect(this->model(), &QAbstractItemModel::rowsRemoved, this,
-          &TaskWidget::updateStatusMessage);
+  connect(this, &QTableWidget::itemChanged, this, &TaskWidget::updateOverlay);
+
+  connect(this->model(), &QAbstractItemModel::rowsInserted, this, [=]() {
+    updateStatusBarMessage(tr("%1 items in view").arg(this->rowCount()));
+    updateOverlay();
+  });
+  connect(this->model(), &QAbstractItemModel::rowsRemoved, this, [=]() {
+    updateStatusBarMessage(tr("%1 items in view").arg(this->rowCount()));
+    updateOverlay();
+  });
 }
 
-void TaskWidget::updateStatusMessage() {
-  int rowCount = this->rowCount();
-  QString message = tr("Loaded %1 items").arg(rowCount);
-
+void TaskWidget::updateStatusBarMessage(const QString &message) {
   emit statusMessageUpdated(message);
 }
 
@@ -64,6 +73,11 @@ void TaskWidget::dropEvent(QDropEvent *event) {
   }
 }
 
+void TaskWidget::resizeEvent(QResizeEvent *event) {
+  QTableWidget::resizeEvent(event);
+  m_overlayWidget->setGeometry(this->rect());
+}
+
 void TaskWidget::addFileToTable(const QString &filePath) {
 
   QFileInfo fileInfo(filePath);
@@ -76,7 +90,7 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   insertRow(newRow);
 
   // Insert ImageTask in m_imageTasks list
-  ImageTask *imageTask = new ImageTask(filePath, destination, newRow);
+  ImageTask *imageTask = new ImageTask(filePath, destination);
   imageTask->taskStatus = ImageTask::Pending;
   m_imageTasks.append(imageTask);
 
@@ -116,32 +130,57 @@ void TaskWidget::updateTaskWidgetHeader(const bool &contentLoaded) {
   if (!contentLoaded) {
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   } else {
-    // horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
     horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
     horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
-
-    // horizontalHeader()->setStretchLastSection(true);
   }
 }
 
 void TaskWidget::processImages() {
   for (ImageTask *imageTask : qAsConst(m_imageTasks)) {
+    imageTask->taskStatus = ImageTask::Queued;
     m_imageTaskQueue.enqueue(imageTask);
+    updateTaskStatus(imageTask);
+  }
+
+  if (m_imageTasks.count() > 0) {
+    updateStatusBarMessage(
+        tr("%1 %2 queued")
+            .arg(QString::number(m_imageTasks.count()),
+                 QString(m_imageTasks.count() > 1 ? "item" : "items")));
   }
 
   processNextBatch();
 }
 
+QString TaskWidget::getSummaryStatus() const {
+  int completedCount = 0;
+  int errorCount = 0;
+
+  for (const ImageTask *task : qAsConst(m_imageTasks)) {
+    if (task->taskStatus == ImageTask::Completed) {
+      completedCount++;
+    } else if (task->taskStatus == ImageTask::Error) {
+      errorCount++;
+    }
+  }
+
+  int totalTasks = m_imageTasks.count();
+  QString summary = QString(tr("Success") + ": %1, ").arg(completedCount) +
+                    QString(tr("Error") + ": %1, ").arg(errorCount) +
+                    QString(tr("Total") + ": %1").arg(totalTasks);
+
+  return summary;
+}
+
 void TaskWidget::processNextBatch() {
-  while (m_activeTasks < maxConcurrentTasks && !m_imageTaskQueue.isEmpty()) {
+  while (m_activeTasks < m_maxConcurrentTasks && !m_imageTaskQueue.isEmpty()) {
     ImageTask *imageTask = m_imageTaskQueue.dequeue();
     m_activeTasks++;
     imageTask->taskStatus = ImageTask::Processing;
-
+    updateTaskStatus(imageTask);
     try {
       // Ensure destination dir exists
       QFileInfo destinationInfo(imageTask->optimizedPath);
@@ -168,21 +207,28 @@ void TaskWidget::processNextBatch() {
               });
       worker->optimize(imageTask);
     } catch (const std::exception &e) {
-      // TODO: update imageTask and corresponding row
       updateTaskStatus(imageTask, e.what());
-      qDebug() << "Error processing " << imageTask->imagePath << ": "
-               << e.what();
+      qWarning() << "Error processing " << imageTask->imagePath << ": "
+                 << e.what();
       m_activeTasks--;
       processNextBatch();
     }
+    int processedTasks = m_imageTasks.count() - m_imageTaskQueue.count();
+    updateStatusBarMessage(tr("Processed %1 of %2")
+                               .arg(QString::number(processedTasks),
+                                    QString::number(m_imageTasks.count())));
+  }
+
+  if (m_imageTaskQueue.isEmpty()) {
+    updateStatusBarMessage(getSummaryStatus());
   }
 }
 
-void TaskWidget::removeFinishedOperations() {
+void TaskWidget::removeTasksByStatus(const ImageTask::Status &status) {
   QList<ImageTask *> tasksToRemove;
 
   for (ImageTask *imageTask : qAsConst(m_imageTasks)) {
-    if (imageTask->taskStatus == ImageTask::Completed) {
+    if (imageTask->taskStatus == status) {
       tasksToRemove.append(imageTask);
     }
   }
@@ -190,6 +236,10 @@ void TaskWidget::removeFinishedOperations() {
   for (ImageTask *task : tasksToRemove) {
     removeTask(task);
   }
+}
+
+void TaskWidget::removeFinishedOperations() {
+  removeTasksByStatus(ImageTask::Completed);
 }
 
 void TaskWidget::removeTask(ImageTask *task) {
@@ -251,8 +301,8 @@ void TaskWidget::updateTaskSaving(ImageTask *task, const QString text) {
 }
 
 void TaskWidget::onOptimizationFinished(ImageTask *task, bool success) {
-  qDebug() << "Optimization finished for" << task->imagePath
-           << "with success:" << success;
+  // qDebug() << "Optimization finished for" << task->imagePath
+  //          << "with success:" << success;
 
   if (success) {
     ImageStats stats(task->imagePath, task->optimizedPath);
@@ -280,6 +330,11 @@ void TaskWidget::onOptimizationFinished(ImageTask *task, bool success) {
 
 void TaskWidget::onOptimizationError(ImageTask *task,
                                      const QString &errorString) {
-  qDebug() << "Optimization error for" << task->imagePath << ":" << errorString;
+  qWarning() << "Optimization error for" << task->imagePath << ":"
+             << errorString;
   updateTaskStatus(task, errorString);
+}
+
+void TaskWidget::updateOverlay() {
+  rowCount() == 0 ? m_overlayWidget->show() : m_overlayWidget->hide();
 }
