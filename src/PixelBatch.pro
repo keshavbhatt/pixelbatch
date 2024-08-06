@@ -45,7 +45,9 @@ SOURCES += \
     imagestats.cpp \
     main.cpp \
     pixelbatch.cpp \
+    preferenceswidget.cpp \
     settings.cpp \
+    taskactionwidget.cpp \
     taskwidget.cpp \
     taskwidgetoverlay.cpp \
     worker/imageworkerfactory.cpp \
@@ -60,7 +62,9 @@ HEADERS += \
     imagestats.h \
     imagetask.h \
     pixelbatch.h \
+    preferenceswidget.h \
     settings.h \
+    taskactionwidget.h \
     taskwidget.h \
     taskwidgetoverlay.h \
     worker/ImageWorker.h \
@@ -70,7 +74,9 @@ HEADERS += \
     worker/pngquantworker.h
 
 FORMS += \
-    pixelbatch.ui
+    pixelbatch.ui \
+    preferenceswidget.ui \
+    taskactionwidget.ui
 
 # Default rules for deployment
 isEmpty(PREFIX){

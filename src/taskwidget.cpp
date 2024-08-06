@@ -19,7 +19,7 @@ TaskWidget::TaskWidget(QWidget *parent)
       m_maxConcurrentTasks(m_settings.getMaxConcurrentTasks()) {
 
   m_overlayWidget->setGeometry(this->rect());
-  updateOverlay();
+  updateTaskOverlayWidget();
 
   setAcceptDrops(true);
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -29,15 +29,16 @@ TaskWidget::TaskWidget(QWidget *parent)
 
   updateTaskWidgetHeader(false);
 
-  connect(this, &QTableWidget::itemChanged, this, &TaskWidget::updateOverlay);
-
   connect(this->model(), &QAbstractItemModel::rowsInserted, this, [=]() {
-    updateStatusBarMessage(tr("%1 items in view").arg(this->rowCount()));
-    updateOverlay();
+    updateStatusBarMessage(tr("%1 ").arg(this->rowCount()) +
+                           tr("items in view"));
+    updateTaskOverlayWidget();
   });
+
   connect(this->model(), &QAbstractItemModel::rowsRemoved, this, [=]() {
-    updateStatusBarMessage(tr("%1 items in view").arg(this->rowCount()));
-    updateOverlay();
+    updateStatusBarMessage(tr("%1 ").arg(this->rowCount()) +
+                           tr("items in view"));
+    updateTaskOverlayWidget();
   });
 }
 
@@ -76,6 +77,13 @@ void TaskWidget::dropEvent(QDropEvent *event) {
 void TaskWidget::resizeEvent(QResizeEvent *event) {
   QTableWidget::resizeEvent(event);
   m_overlayWidget->setGeometry(this->rect());
+}
+
+void TaskWidget::selectionChanged(const QItemSelection &selected,
+                                  const QItemSelection &deselected) {
+  QTableWidget::selectionChanged(selected, deselected);
+  emit selectionChangedCustom(this);
+  emit toggleShowTaskActionWidget(selectedItems().count() > 0);
 }
 
 void TaskWidget::addFileToTable(const QString &filePath) {
@@ -242,6 +250,18 @@ void TaskWidget::removeFinishedOperations() {
   removeTasksByStatus(ImageTask::Completed);
 }
 
+void TaskWidget::clearAllOperations() {
+  QList<ImageTask *> tasksToRemove;
+
+  for (ImageTask *imageTask : qAsConst(m_imageTasks)) {
+    tasksToRemove.append(imageTask);
+  }
+
+  for (ImageTask *task : tasksToRemove) {
+    removeTask(task);
+  }
+}
+
 void TaskWidget::removeTask(ImageTask *task) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
@@ -335,6 +355,6 @@ void TaskWidget::onOptimizationError(ImageTask *task,
   updateTaskStatus(task, errorString);
 }
 
-void TaskWidget::updateOverlay() {
+void TaskWidget::updateTaskOverlayWidget() {
   rowCount() == 0 ? m_overlayWidget->show() : m_overlayWidget->hide();
 }

@@ -30,6 +30,9 @@
     <item>
      <layout class="QVBoxLayout" name="taskWidgetLayout"/>
     </item>
+    <item>
+     <layout class="QHBoxLayout" name="taskActionWidgetLayout"/>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

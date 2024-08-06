@@ -2,12 +2,13 @@
 #define PIXELBATCH_H
 
 #include "filehandler.h"
+#include "preferenceswidget.h"
 #include "taskwidget.h"
 
 #include <QLabel>
 #include <QMainWindow>
-#include <QPushButton>
 #include <QMessageBox>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,8 +31,6 @@ private slots:
   void addImages();
   void openSettings();
   void quitApplication();
-  void removeFinishedOperations();
-  void clearAllOperations();
   void reportIssue();
   void donate();
   void showAbout();
@@ -39,17 +38,20 @@ private slots:
 private:
   Ui::PixelBatch *ui;
 
+  Settings &m_settings;
+  PreferencesWidget *m_preferencesWidget;
   TaskWidget *m_taskWidget;
+  TaskActionWidget *m_taskActionWidget;
   QWidget *m_statusBarPermanentWidget;
   QPushButton *m_statusBarAddButton;
   QPushButton *m_statusBarProcessButton;
   QLabel *m_StatusbarPermanentMessageLabel;
   FileHandler *m_fileHandler;
-  Settings &m_settings;
-
 
   void initTaskWidget();
+  void initTaskActionWidget();
   void setupStatusBar();
   void initMenuBar();
+  void initPreferencesWidget();
 };
 #endif // PIXELBATCH_H

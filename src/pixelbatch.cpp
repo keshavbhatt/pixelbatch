@@ -2,12 +2,24 @@
 #include "elideditemdelegate.h"
 #include "ui_pixelbatch.h"
 
+#include <QDesktopWidget>
+#include <QScreen>
+
 PixelBatch::PixelBatch(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::PixelBatch), m_taskWidget(nullptr),
-      m_statusBarPermanentWidget(nullptr), m_statusBarAddButton(nullptr),
-      m_statusBarProcessButton(nullptr),
-      m_StatusbarPermanentMessageLabel(nullptr), m_fileHandler(nullptr),
-      m_settings(Settings::instance()) {
+    : QMainWindow(parent), ui(new Ui::PixelBatch),
+      m_settings(Settings::instance()),
+      m_preferencesWidget(new PreferencesWidget(this)),
+      m_taskWidget(new TaskWidget(this)),
+      m_taskActionWidget(new TaskActionWidget(this)),
+      m_statusBarPermanentWidget(new QWidget(this->statusBar())),
+      m_statusBarAddButton(
+          new QPushButton(QIcon(":/resources/icons/image-add-line.png"),
+                          tr("Add Images"), this)),
+      m_statusBarProcessButton(
+          new QPushButton(QIcon(":/resources/icons/bubble-chart-line.png"),
+                          tr("Process Images"), this)),
+      m_StatusbarPermanentMessageLabel(new QLabel(this)),
+      m_fileHandler(new FileHandler(this)) {
 
   ui->setupUi(this);
 
@@ -17,52 +29,51 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   initTaskWidget();
 
+  initTaskActionWidget();
+
   setupStatusBar();
 
   initMenuBar();
+
+  initPreferencesWidget();
 }
 
 PixelBatch::~PixelBatch() { delete ui; }
 
 void PixelBatch::initTaskWidget() {
 
-  if (m_taskWidget == nullptr) {
+  m_taskWidget->setColumnCount(5);
 
-    m_taskWidget = new TaskWidget(this);
+  QStringList horizontalHeaders;
+  horizontalHeaders << tr("File")        // 0
+                    << tr("Status")      // 1
+                    << tr("Size Before") // 2
+                    << tr("Size After")  // 3
+                    << tr("Savings");    // 4
+  m_taskWidget->setHorizontalHeaderLabels(horizontalHeaders);
 
-    m_taskWidget->setColumnCount(5);
+  m_taskWidget->setAlternatingRowColors(true);
 
-    QStringList horizontalHeaders;
-    horizontalHeaders << tr("File")        // 0
-                      << tr("Status")      // 1
-                      << tr("Size Before") // 2
-                      << tr("Size After")  // 3
-                      << tr("Savings");    // 4
-    m_taskWidget->setHorizontalHeaderLabels(horizontalHeaders);
+  // status column will have fixed size
+  int firstColumnWidth = 56;
+  m_taskWidget->setColumnWidth(1, firstColumnWidth);
 
-    m_taskWidget->setAlternatingRowColors(true);
+  // filenames can be long string, elide them
+  ElidedItemDelegate *elideItemDelegate = new ElidedItemDelegate(this);
+  m_taskWidget->setItemDelegateForColumn(0, elideItemDelegate);
+  m_taskWidget->setWordWrap(false);
 
-    // status column will have fixed size
-    int firstColumnWidth = 56;
-    m_taskWidget->setColumnWidth(1, firstColumnWidth);
+  // connections
+  connect(m_taskWidget, &TaskWidget::setStatusRequested, this,
+          &PixelBatch::setStatus);
 
-    // filenames can be long string, elide them
-    ElidedItemDelegate *elideItemDelegate = new ElidedItemDelegate(this);
-    m_taskWidget->setItemDelegateForColumn(0, elideItemDelegate);
-    m_taskWidget->setWordWrap(false);
+  connect(m_taskWidget, &TaskWidget::toggleShowStatusBarAddButton, this,
+          &PixelBatch::toggleShowStatusBarAddButton);
 
-    // connections
-    connect(m_taskWidget, &TaskWidget::setStatusRequested, this,
-            &PixelBatch::setStatus);
+  connect(m_taskWidget, &TaskWidget::statusMessageUpdated, this,
+          &PixelBatch::setStatus);
 
-    connect(m_taskWidget, &TaskWidget::toggleShowStatusBarAddButton, this,
-            &PixelBatch::toggleShowStatusBarAddButton);
-
-    connect(m_taskWidget, &TaskWidget::statusMessageUpdated, this,
-            &PixelBatch::setStatus);
-
-    ui->taskWidgetLayout->addWidget(m_taskWidget);
-  }
+  ui->taskWidgetLayout->addWidget(m_taskWidget);
 }
 
 void PixelBatch::setupStatusBar() {
@@ -70,49 +81,34 @@ void PixelBatch::setupStatusBar() {
   statusBar()->setSizeGripEnabled(false);
 
   // init m_fielHandler
-  if (m_fileHandler == nullptr) {
-    m_fileHandler = new FileHandler(this);
-    connect(m_fileHandler, &FileHandler::addFileToTable, m_taskWidget,
-            &TaskWidget::addFileToTable);
-  }
-
-  if (m_statusBarPermanentWidget == nullptr) {
-    m_statusBarPermanentWidget = new QWidget(this->statusBar());
-  }
+  connect(m_fileHandler, &FileHandler::addFileToTable, m_taskWidget,
+          &TaskWidget::addFileToTable);
 
   // init m_statusBarAddButton
-  if (m_statusBarAddButton == nullptr) {
-    QHBoxLayout *layout = new QHBoxLayout(m_statusBarPermanentWidget);
-    layout->setSpacing(3);
-    layout->setContentsMargins(6, 6, 6, 6);
 
-    if (m_StatusbarPermanentMessageLabel == nullptr) {
-      m_StatusbarPermanentMessageLabel = new QLabel(this);
-    }
-    layout->addWidget(m_StatusbarPermanentMessageLabel);
+  QHBoxLayout *layout = new QHBoxLayout(m_statusBarPermanentWidget);
+  layout->setSpacing(3);
+  layout->setContentsMargins(6, 6, 6, 6);
 
-    // add "Add Images" button
-    m_statusBarAddButton = new QPushButton(
-        QIcon(":/resources/icons/image-add-line.png"), tr("Add Images"), this);
-    connect(m_statusBarAddButton, &QPushButton::clicked, this,
-            &PixelBatch::addImages);
-    layout->addWidget(m_statusBarAddButton);
-
-    m_statusBarPermanentWidget->setLayout(layout);
-    statusBar()->addPermanentWidget(m_statusBarPermanentWidget);
+  if (m_StatusbarPermanentMessageLabel == nullptr) {
+    m_StatusbarPermanentMessageLabel = new QLabel(this);
   }
+  layout->addWidget(m_StatusbarPermanentMessageLabel);
+
+  // init "Add Images" button
+  connect(m_statusBarAddButton, &QPushButton::clicked, this,
+          &PixelBatch::addImages);
+  layout->addWidget(m_statusBarAddButton);
+
+  m_statusBarPermanentWidget->setLayout(layout);
+  statusBar()->addPermanentWidget(m_statusBarPermanentWidget);
 
   // init m_statusBarAddButton
-  if (m_statusBarProcessButton == nullptr) {
-    m_statusBarProcessButton =
-        new QPushButton(QIcon(":/resources/icons/bubble-chart-line.png"),
-                        tr("Process Images"), this);
-    connect(m_statusBarProcessButton, &QPushButton::clicked, m_taskWidget,
-            &TaskWidget::processImages);
+  connect(m_statusBarProcessButton, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::processImages);
 
-    if (m_statusBarPermanentWidget) {
-      m_statusBarPermanentWidget->layout()->addWidget(m_statusBarProcessButton);
-    }
+  if (m_statusBarPermanentWidget) {
+    m_statusBarPermanentWidget->layout()->addWidget(m_statusBarProcessButton);
   }
 
   statusBar()->showMessage(
@@ -144,18 +140,18 @@ void PixelBatch::initMenuBar() {
   // END FILE MENU
 
   // EDIT MENU
-  QAction *removeFinishedAction =
+  QAction *removeAllFinishedTasksAction =
       new QAction(tr("Remove Finished Tasks"), editMenu);
-  removeFinishedAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-  connect(removeFinishedAction, &QAction::triggered, this,
-          &PixelBatch::removeFinishedOperations);
-  editMenu->addAction(removeFinishedAction);
+  removeAllFinishedTasksAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+  connect(removeAllFinishedTasksAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::removeFinishedOperations);
+  editMenu->addAction(removeAllFinishedTasksAction);
 
-  QAction *clearAction = new QAction(tr("Cancel All Tasks"), editMenu);
-  clearAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-  connect(clearAction, &QAction::triggered, this,
-          &PixelBatch::clearAllOperations);
-  editMenu->addAction(clearAction);
+  QAction *removeAllTasksAction = new QAction(tr("Remove All Tasks"), editMenu);
+  removeAllTasksAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+  connect(removeAllTasksAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::clearAllOperations);
+  editMenu->addAction(removeAllTasksAction);
   // END EDIT MENU
 
   // ABOUT MENU
@@ -180,6 +176,26 @@ void PixelBatch::initMenuBar() {
   menuBar()->addMenu(aboutMenu);
 }
 
+void PixelBatch::initPreferencesWidget() {
+
+  m_preferencesWidget->setWindowFlags(Qt::Dialog);
+  m_preferencesWidget->setWindowTitle(QApplication::applicationName() + " | " +
+                                      tr("Preferences"));
+}
+
+void PixelBatch::initTaskActionWidget() {
+
+  QObject::connect(m_taskWidget, &TaskWidget::selectionChangedCustom,
+                   m_taskActionWidget, &TaskActionWidget::updateActions);
+
+  QObject::connect(m_taskWidget, &TaskWidget::toggleShowTaskActionWidget,
+                   m_taskActionWidget, &TaskActionWidget::setVisible);
+
+  ui->taskActionWidgetLayout->addWidget(m_taskActionWidget);
+
+  m_taskActionWidget->setVisible(false);
+}
+
 void PixelBatch::setStatus(const QString &message) {
   m_StatusbarPermanentMessageLabel->setText(message);
 }
@@ -196,15 +212,19 @@ void PixelBatch::addImages() {
   }
 }
 
-void PixelBatch::openSettings() { Q_UNIMPLEMENTED(); }
-
-void PixelBatch::quitApplication() { QApplication::quit(); }
-
-void PixelBatch::removeFinishedOperations() {
-  m_taskWidget->removeFinishedOperations();
+void PixelBatch::openSettings() {
+  if (m_preferencesWidget && m_preferencesWidget->isVisible() == false) {
+    int screenNumber = qApp->desktop()->screenNumber(this);
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    if (!screenRect.contains(m_preferencesWidget->pos())) {
+      m_preferencesWidget->move(screenRect.center() -
+                                m_preferencesWidget->rect().center());
+    }
+    m_preferencesWidget->show();
+  }
 }
 
-void PixelBatch::clearAllOperations() { Q_UNIMPLEMENTED(); }
+void PixelBatch::quitApplication() { QApplication::quit(); }
 
 void PixelBatch::reportIssue() { Q_UNIMPLEMENTED(); }
 
