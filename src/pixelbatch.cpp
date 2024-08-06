@@ -92,7 +92,8 @@ void PixelBatch::setupStatusBar() {
     layout->addWidget(m_StatusbarPermanentMessageLabel);
 
     // add "Add Images" button
-    m_statusBarAddButton = new QPushButton(tr("Add Images"), this);
+    m_statusBarAddButton = new QPushButton(
+        QIcon(":/resources/icons/image-add-line.png"), tr("Add Images"), this);
     connect(m_statusBarAddButton, &QPushButton::clicked, this,
             &PixelBatch::addImages);
     layout->addWidget(m_statusBarAddButton);
@@ -103,7 +104,9 @@ void PixelBatch::setupStatusBar() {
 
   // init m_statusBarAddButton
   if (m_statusBarProcessButton == nullptr) {
-    m_statusBarProcessButton = new QPushButton(tr("Process Images"), this);
+    m_statusBarProcessButton =
+        new QPushButton(QIcon(":/resources/icons/bubble-chart-line.png"),
+                        tr("Process Images"), this);
     connect(m_statusBarProcessButton, &QPushButton::clicked, m_taskWidget,
             &TaskWidget::processImages);
 

@@ -26,5 +26,7 @@ void TaskWidgetOverlay::paintEvent(QPaintEvent *event) {
   QRect textRect(0, yOffset + iconSize + spacing, width(), textHeight);
 
   painter.drawPixmap(iconRect, dropIcon);
+
+  painter.setPen(QColor(Qt::gray));
   painter.drawText(textRect, Qt::AlignCenter, textLabel);
 }
