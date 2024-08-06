@@ -16,9 +16,15 @@ public:
 
   QString getOutputFilePrefix() const;
   void setOutputFilePrefix(const QString &prefix);
+
   QString getLastOpenedImageDirPath() const;
   void setLastOpenedImageDirPath(const QString &prefix);
+
   int getMaxConcurrentTasks() const;
+  void setMaxConcurrentTasks(const int &maxConcurrentTasks);
+
+  bool getRememberOpenLastOpenedPath() const;
+  void setRememberOpenLastOpenedPath(const bool &remember);
 
 private:
   Settings(QObject *parent = nullptr);            // Private constructor

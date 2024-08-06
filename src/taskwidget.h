@@ -60,7 +60,6 @@ private:
   void updateTaskStatus(ImageTask *task, const QString optionalDetail = "");
   void processNextBatch();
 
-  int m_maxConcurrentTasks;
   QQueue<ImageTask *> m_imageTaskQueue;
   int m_activeTasks = 0;
   void removeTask(ImageTask *task);

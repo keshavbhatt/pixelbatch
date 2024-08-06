@@ -45,3 +45,20 @@ int Settings::getMaxConcurrentTasks() const {
              Constants::DEFAULT_TASK_MAX_CONCURRENT_TASKS)
       .toInt();
 }
+
+void Settings::setMaxConcurrentTasks(const int &maxConcurrentTasks) {
+  settings.setValue(Constants::TASK_MAX_CONCURRENT_TASKS_KEY,
+                    maxConcurrentTasks);
+}
+
+bool Settings::getRememberOpenLastOpenedPath() const {
+  return settings
+      .value(Constants::INPUT_REMEMBER_LAST_IMAGE_DIR_PATH_KEY,
+             Constants::DEFAULT_INPUT_REMEMBER_LAST_IMAGE_DIR_PATH)
+      .toBool();
+}
+
+void Settings::setRememberOpenLastOpenedPath(const bool &remember) {
+  settings.setValue(Constants::INPUT_REMEMBER_LAST_IMAGE_DIR_PATH_KEY,
+                    remember);
+}

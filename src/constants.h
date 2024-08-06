@@ -10,8 +10,13 @@ public:
 
   static const QString OUTPUT_FILE_PREFIX_KEY;
   static const QString DEFAULT_OUTPUT_FILE_PREFIX;
+
   static const QString INPUT_LAST_IMAGE_DIR_PATH_KEY;
   static const QString DEFAULT_INPUT_LAST_IMAGE_DIR_PATH;
+
+  static const QString INPUT_REMEMBER_LAST_IMAGE_DIR_PATH_KEY;
+  static const bool DEFAULT_INPUT_REMEMBER_LAST_IMAGE_DIR_PATH;
+
   static const QString TASK_MAX_CONCURRENT_TASKS_KEY;
   static const int DEFAULT_TASK_MAX_CONCURRENT_TASKS;
 

@@ -15,8 +15,7 @@
 
 TaskWidget::TaskWidget(QWidget *parent)
     : QTableWidget(parent), m_overlayWidget(new TaskWidgetOverlay(this)),
-      m_settings(Settings::instance()),
-      m_maxConcurrentTasks(m_settings.getMaxConcurrentTasks()) {
+      m_settings(Settings::instance()) {
 
   m_overlayWidget->setGeometry(this->rect());
   updateTaskOverlayWidget();
@@ -184,7 +183,8 @@ QString TaskWidget::getSummaryStatus() const {
 }
 
 void TaskWidget::processNextBatch() {
-  while (m_activeTasks < m_maxConcurrentTasks && !m_imageTaskQueue.isEmpty()) {
+  int maxConcurrentTasks = m_settings.getMaxConcurrentTasks();
+  while (m_activeTasks < maxConcurrentTasks && !m_imageTaskQueue.isEmpty()) {
     ImageTask *imageTask = m_imageTaskQueue.dequeue();
     m_activeTasks++;
     imageTask->taskStatus = ImageTask::Processing;

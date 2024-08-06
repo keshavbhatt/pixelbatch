@@ -13,6 +13,10 @@ const QString Constants::INPUT_LAST_IMAGE_DIR_PATH_KEY =
 const QString Constants::DEFAULT_INPUT_LAST_IMAGE_DIR_PATH =
     QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
 
+const QString Constants::INPUT_REMEMBER_LAST_IMAGE_DIR_PATH_KEY =
+    "file/remember_last_opened_image_dir_path";
+const bool Constants::DEFAULT_INPUT_REMEMBER_LAST_IMAGE_DIR_PATH = true;
+
 const QString Constants::TASK_MAX_CONCURRENT_TASKS_KEY =
     "task/max_concurrent_tasks";
 const int Constants::DEFAULT_TASK_MAX_CONCURRENT_TASKS = 1;
