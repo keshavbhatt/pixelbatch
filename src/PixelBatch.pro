@@ -42,6 +42,7 @@ SOURCES += \
     constants.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
+    imageformatprefwidget.cpp \
     imagestats.cpp \
     main.cpp \
     pixelbatch.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     constants.h \
     elideditemdelegate.h \
     filehandler.h \
+    imageformatprefwidget.h \
     imagestats.h \
     imagetask.h \
     pixelbatch.h \
@@ -74,6 +76,7 @@ HEADERS += \
     worker/pngquantworker.h
 
 FORMS += \
+    imageformatprefwidget.ui \
     pixelbatch.ui \
     preferenceswidget.ui \
     taskactionwidget.ui

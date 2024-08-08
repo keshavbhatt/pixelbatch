@@ -1,8 +1,11 @@
 #include "preferenceswidget.h"
+#include "imageformatprefwidget.h"
 #include "ui_preferenceswidget.h"
 
 #include <QAction>
 #include <QIcon>
+
+#include <worker/imageworkerfactory.h>
 
 PreferencesWidget::PreferencesWidget(QWidget *parent)
     : QWidget(parent), ui(new Ui::PreferencesWidget),
@@ -36,6 +39,16 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
       resetFilepickerLastOpenedPathAction, QLineEdit::TrailingPosition);
   // TODO add trigger binding
 
+  ui->concurrentTasksSpinBox->setRange(1, 20);
+  ui->concurrentTasksSpinBox->setToolTip(
+      tr("Number of tasks that can be processed in parallel.<br><br>") +
+      QString("Range Min: %1; Max: %2")
+          .arg(ui->concurrentTasksSpinBox->minimum())
+          .arg(ui->concurrentTasksSpinBox->maximum()));
+
+  ui->filepickerLastOpenedPathLineEdit->setReadOnly(true);
+  ui->outputDirPathLineEdit->setReadOnly(true);
+
   // LOAD SETTINGS AND BIND
   ui->outputDirPathLineEdit->setText(m_settings.getOptimizedPath());
   // todo BIND
@@ -57,6 +70,15 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
       m_settings.getRememberOpenLastOpenedPath());
   connect(ui->filepickerRememberLastPathCheckBox, &QCheckBox::toggled, this,
           [=](bool arg1) { m_settings.setRememberOpenLastOpenedPath(arg1); });
+
+  auto supportedImageFormats = ImageWorkerFactory::getSupportedFormats();
+  for (int i = 0; i < supportedImageFormats.count(); ++i) {
+    auto formatName = supportedImageFormats.at(i).toUpper();
+    auto optimizers = ImageWorkerFactory::getOptimizersForFormat(formatName);
+    auto prefWidget = new ImageFormatPrefWidget(this, formatName, optimizers);
+    prefWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->formatPrefVerticalLayout->addWidget(prefWidget);
+  }
 }
 
 PreferencesWidget::~PreferencesWidget() { delete ui; }

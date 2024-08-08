@@ -27,6 +27,8 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   setWindowIcon(QIcon(":/icons/app/icon-64.png"));
 
+  setMinimumSize(350, 300);
+
   initTaskWidget();
 
   initTaskActionWidget();
