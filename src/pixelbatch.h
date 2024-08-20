@@ -25,7 +25,8 @@ public:
 
 private slots:
   void setStatus(const QString &message);
-  void toggleShowStatusBarAddButton(const bool visible);
+  void updateStatusBarButtons(bool processing = false);
+  void updateMenuActions(bool processing = false);
 
   // actions
   void addImages();

@@ -26,18 +26,19 @@ TaskWidget::TaskWidget(QWidget *parent)
   setMouseTracking(true);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-  updateTaskWidgetHeader(false);
+  updateTableHeader(false);
 
   connect(this->model(), &QAbstractItemModel::rowsInserted, this, [=]() {
-    updateStatusBarMessage(tr("%1 ").arg(this->rowCount()) +
-                           tr("items in view"));
+    // we are updating the status button and message in addFileToTable method
+    // since the insertRow event is emited before actually adding the ImageTask
+    // to the table
     updateTaskOverlayWidget();
   });
 
   connect(this->model(), &QAbstractItemModel::rowsRemoved, this, [=]() {
-    updateStatusBarMessage(tr("%1 ").arg(this->rowCount()) +
-                           tr("items in view"));
+    updateStatusBarMessage(getSummaryAndUpdateView());
     updateTaskOverlayWidget();
+    emit isProcessingChanged(false); // force update buttons
   });
 }
 
@@ -81,7 +82,7 @@ void TaskWidget::resizeEvent(QResizeEvent *event) {
 void TaskWidget::selectionChanged(const QItemSelection &selected,
                                   const QItemSelection &deselected) {
   QTableWidget::selectionChanged(selected, deselected);
-  emit selectionChangedCustom(this);
+  emit selectionChangedCustom();
   emit toggleShowTaskActionWidget(selectedItems().count() > 0);
 }
 
@@ -130,10 +131,14 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   savingsItem->setTextAlignment(Qt::AlignCenter);
   setItem(newRow, 4, savingsItem);
 
-  updateTaskWidgetHeader(true);
+  updateStatusBarMessage(getSummaryAndUpdateView());
+
+  emit isProcessingChanged(false); // force update buttons
+
+  updateTableHeader(true);
 }
 
-void TaskWidget::updateTaskWidgetHeader(const bool &contentLoaded) {
+void TaskWidget::updateTableHeader(const bool &contentLoaded) {
   if (!contentLoaded) {
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   } else {
@@ -147,12 +152,15 @@ void TaskWidget::updateTaskWidgetHeader(const bool &contentLoaded) {
 
 void TaskWidget::processImages() {
   for (ImageTask *imageTask : qAsConst(m_imageTasks)) {
-    imageTask->taskStatus = ImageTask::Queued;
-    m_imageTaskQueue.enqueue(imageTask);
-    updateTaskStatus(imageTask);
+    if (imageTask->taskStatus == ImageTask::Pending) {
+      imageTask->taskStatus = ImageTask::Queued;
+      m_imageTaskQueue.enqueue(imageTask);
+      updateTaskStatus(imageTask);
+    }
   }
 
   if (m_imageTasks.count() > 0) {
+    setIsProcessing(true);
     updateStatusBarMessage(
         tr("%1 %2 queued")
             .arg(QString::number(m_imageTasks.count()),
@@ -162,24 +170,42 @@ void TaskWidget::processImages() {
   processNextBatch();
 }
 
-QString TaskWidget::getSummaryStatus() const {
-  int completedCount = 0;
-  int errorCount = 0;
+ImageTask::TaskStatusCounts TaskWidget::getTaskStatusCounts() const {
+  ImageTask::TaskStatusCounts counts;
 
   for (const ImageTask *task : qAsConst(m_imageTasks)) {
     if (task->taskStatus == ImageTask::Completed) {
-      completedCount++;
+      counts.completedCount++;
     } else if (task->taskStatus == ImageTask::Error) {
-      errorCount++;
+      counts.errorCount++;
+    } else if (task->taskStatus == ImageTask::Pending) {
+      counts.pendingCount++;
+    } else if (task->taskStatus == ImageTask::Queued) {
+      counts.queuedCount++;
     }
   }
 
-  int totalTasks = m_imageTasks.count();
-  QString summary = QString(tr("Success") + ": %1, ").arg(completedCount) +
-                    QString(tr("Error") + ": %1, ").arg(errorCount) +
-                    QString(tr("Total") + ": %1").arg(totalTasks);
+  counts.totalTasks = m_imageTasks.count();
+  return counts;
+}
+
+bool TaskWidget::isProcessing() const { return m_isProcessing; }
+
+QString
+TaskWidget::generateSummary(const ImageTask::TaskStatusCounts &counts) const {
+  QString summary =
+      QString(tr("Pending") + ": %1, ").arg(counts.pendingCount) +
+      QString(tr("Queued") + ": %1, ").arg(counts.queuedCount) +
+      QString(tr("Success") + ": %1, ").arg(counts.completedCount) +
+      QString(tr("Error") + ": %1, ").arg(counts.errorCount) +
+      QString(tr("Total") + ": %1").arg(counts.totalTasks);
 
   return summary;
+}
+
+QString TaskWidget::getSummaryAndUpdateView() {
+  auto taskStatusCounts = getTaskStatusCounts();
+  return generateSummary(taskStatusCounts);
 }
 
 void TaskWidget::processNextBatch() {
@@ -228,7 +254,8 @@ void TaskWidget::processNextBatch() {
   }
 
   if (m_imageTaskQueue.isEmpty()) {
-    updateStatusBarMessage(getSummaryStatus());
+    updateStatusBarMessage(getSummaryAndUpdateView());
+    setIsProcessing(false);
   }
 }
 
@@ -276,6 +303,27 @@ void TaskWidget::removeTask(ImageTask *task) {
   }
 }
 
+void TaskWidget::removeSelectedRow() {
+
+  ImageTask *task = getImageTaskFromRow(this->currentRow());
+
+  if (task) {
+    removeTask(task);
+  }
+}
+
+void TaskWidget::openOptimizedImageInFileManagerForSelectedTask() {
+  Q_UNIMPLEMENTED();
+}
+
+void TaskWidget::openOptimizedImageInImageViewerForSelectedTask() {
+  Q_UNIMPLEMENTED();
+}
+
+void TaskWidget::openOriginalImageInImageViewerForSelectedTask() {
+  Q_UNIMPLEMENTED();
+}
+
 int TaskWidget::findRowByImageTask(ImageTask *task) {
   for (int row = 0; row < rowCount(); ++row) {
     // ImageTask(task) pointer is mapped with data of QTableWidgetItem in first
@@ -289,6 +337,15 @@ int TaskWidget::findRowByImageTask(ImageTask *task) {
     }
   }
   return -1;
+}
+
+ImageTask *TaskWidget::getImageTaskFromRow(int row) {
+  QTableWidgetItem *item = this->item(row, 0);
+  if (item) {
+    ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
+    return storedTask;
+  }
+  return nullptr;
 }
 
 void TaskWidget::updateTaskStatus(ImageTask *task,
@@ -355,6 +412,18 @@ void TaskWidget::onOptimizationError(ImageTask *task,
   updateTaskStatus(task, errorString);
 }
 
+void TaskWidget::setIsProcessing(bool value) {
+  if (m_isProcessing != value) {
+    m_isProcessing = value;
+    emit isProcessingChanged(m_isProcessing);
+  }
+}
+
 void TaskWidget::updateTaskOverlayWidget() {
   rowCount() == 0 ? m_overlayWidget->show() : m_overlayWidget->hide();
+}
+
+bool TaskWidget::hasSelection() {
+  QList<QTableWidgetItem *> selectedItems = this->selectedItems();
+  return !selectedItems.isEmpty();
 }

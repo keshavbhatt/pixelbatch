@@ -10,7 +10,7 @@ PixelBatch::PixelBatch(QWidget *parent)
       m_settings(Settings::instance()),
       m_preferencesWidget(new PreferencesWidget(this)),
       m_taskWidget(new TaskWidget(this)),
-      m_taskActionWidget(new TaskActionWidget(this)),
+      m_taskActionWidget(new TaskActionWidget(this, m_taskWidget)),
       m_statusBarPermanentWidget(new QWidget(this->statusBar())),
       m_statusBarAddButton(
           new QPushButton(QIcon(":/resources/icons/image-add-line.png"),
@@ -38,6 +38,8 @@ PixelBatch::PixelBatch(QWidget *parent)
   initMenuBar();
 
   initPreferencesWidget();
+
+  updateStatusBarButtons(); // keep it last
 }
 
 PixelBatch::~PixelBatch() { delete ui; }
@@ -69,11 +71,11 @@ void PixelBatch::initTaskWidget() {
   connect(m_taskWidget, &TaskWidget::setStatusRequested, this,
           &PixelBatch::setStatus);
 
-  connect(m_taskWidget, &TaskWidget::toggleShowStatusBarAddButton, this,
-          &PixelBatch::toggleShowStatusBarAddButton);
-
   connect(m_taskWidget, &TaskWidget::statusMessageUpdated, this,
           &PixelBatch::setStatus);
+
+  connect(m_taskWidget, &TaskWidget::isProcessingChanged, this,
+          &PixelBatch::updateStatusBarButtons);
 
   ui->taskWidgetLayout->addWidget(m_taskWidget);
 }
@@ -202,8 +204,22 @@ void PixelBatch::setStatus(const QString &message) {
   m_StatusbarPermanentMessageLabel->setText(message);
 }
 
-void PixelBatch::toggleShowStatusBarAddButton(const bool visible) {
-  m_statusBarAddButton->setVisible(visible);
+void PixelBatch::updateStatusBarButtons(bool processing) {
+  if (m_taskWidget) {
+    auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
+    m_statusBarProcessButton->setEnabled(taskStatusCounts.pendingCount > 0 &&
+                                         !processing);
+    m_statusBarAddButton->setEnabled(!processing);
+  }
+}
+
+void PixelBatch::updateMenuActions(bool processing) {
+  if (m_taskWidget) {
+    auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
+    m_statusBarProcessButton->setEnabled(taskStatusCounts.pendingCount > 0 &&
+                                         !processing);
+    m_statusBarAddButton->setEnabled(!processing);
+  }
 }
 
 void PixelBatch::addImages() {

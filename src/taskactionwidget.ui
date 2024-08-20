@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
-    <height>44</height>
+    <width>495</width>
+    <height>76</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="actionWidget" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
@@ -30,16 +30,46 @@
        <number>0</number>
       </property>
       <item row="0" column="0">
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="removeFromListPb">
         <property name="text">
-         <string>PushButton</string>
+         <string>Remove from List</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/resources/icons/subtract-fill.png</normaloff>:/resources/icons/subtract-fill.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="openOriginalPb">
+        <property name="text">
+         <string>Open Original</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/resources/icons/image-2-line.png</normaloff>:/resources/icons/image-2-line.png</iconset>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="openOptimizedInFilesPb">
         <property name="text">
-         <string>PushButton</string>
+         <string>Open Optimized in File Manager</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/resources/icons/folder-image-line.png</normaloff>:/resources/icons/folder-image-line.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="openOptimizedPb">
+        <property name="text">
+         <string>Open Optimized</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/resources/icons/image-line.png</normaloff>:/resources/icons/image-line.png</iconset>
         </property>
        </widget>
       </item>
@@ -48,6 +78,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

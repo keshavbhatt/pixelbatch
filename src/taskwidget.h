@@ -18,10 +18,24 @@ class TaskWidget : public QTableWidget {
 
   Q_OBJECT
 
+  Q_PROPERTY(bool isProcessing READ isProcessing WRITE setIsProcessing NOTIFY
+                 isProcessingChanged)
+
 public:
   explicit TaskWidget(QWidget *parent = nullptr);
+  ImageTask::TaskStatusCounts getTaskStatusCounts() const;
+
+  bool isProcessing() const;
+  bool hasSelection();
 
 public slots:
+
+  // taskactionwidget slots
+  void removeSelectedRow();
+  void openOptimizedImageInFileManagerForSelectedTask();
+  void openOptimizedImageInImageViewerForSelectedTask();
+  void openOriginalImageInImageViewerForSelectedTask();
+
   void addFileToTable(const QString &filePath);
   void processImages();
   void removeFinishedOperations();
@@ -29,10 +43,10 @@ public slots:
 
 signals:
   void setStatusRequested(const QString &message);
-  void toggleShowStatusBarAddButton(const bool visible);
   void statusMessageUpdated(const QString &message);
-  void selectionChangedCustom(QTableWidget *);
+  void selectionChangedCustom();
   void toggleShowTaskActionWidget(bool visible);
+  void isProcessingChanged(bool processing);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -54,8 +68,11 @@ private:
   QLocale m_locale;
   Settings &m_settings;
 
+  bool m_isProcessing;
+  void setIsProcessing(bool value);
+
   void updateTaskSizeAfter(ImageTask *task, const QString text);
-  void updateTaskWidgetHeader(const bool &contentLoaded = false);
+  void updateTableHeader(const bool &contentLoaded = false);
   void updateTaskSaving(ImageTask *task, const QString text);
   void updateTaskStatus(ImageTask *task, const QString optionalDetail = "");
   void processNextBatch();
@@ -66,9 +83,11 @@ private:
   int findRowByImageTask(ImageTask *task);
   void removeTasksByStatus(const ImageTask::Status &status);
   void updateStatusBarMessage(const QString &message);
-  QString getSummaryStatus() const;
+  QString getSummaryAndUpdateView();
+  ImageTask *getImageTaskFromRow(int row);
 
   void updateTaskOverlayWidget();
+  QString generateSummary(const ImageTask::TaskStatusCounts &counts) const;
 };
 
 #endif // TASKWIDGET_H

@@ -1,24 +1,35 @@
 #include "taskactionwidget.h"
 #include "ui_taskactionwidget.h"
 
-TaskActionWidget::TaskActionWidget(QWidget *parent)
-    : QWidget(parent), ui(new Ui::TaskActionWidget) {
+TaskActionWidget::TaskActionWidget(QWidget *parent, TaskWidget *taskWidget)
+    : QWidget(parent), ui(new Ui::TaskActionWidget), m_taskWidget(taskWidget) {
   ui->setupUi(this);
+
+  connect(ui->removeFromListPb, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::removeSelectedRow);
+
+  connect(ui->openOptimizedInFilesPb, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::openOptimizedImageInFileManagerForSelectedTask);
+
+  connect(ui->openOptimizedPb, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::openOptimizedImageInImageViewerForSelectedTask);
+
+  connect(ui->openOriginalPb, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::openOriginalImageInImageViewerForSelectedTask);
 }
 
 TaskActionWidget::~TaskActionWidget() { delete ui; }
 
-void TaskActionWidget::updateActions(QTableWidget *taskWidget) {
-  QList<QTableWidgetItem *> selectedItems = taskWidget->selectedItems();
-  bool hasSelection = !selectedItems.isEmpty();
+void TaskActionWidget::updateActions() {
 
-  ui->pushButton->setEnabled(hasSelection);
-  ui->pushButton_2->setDisabled(hasSelection);
+  if (!m_taskWidget) {
+    return;
+  }
 
-  // if (hasSelection) {
-  //   QTableWidgetItem *item = selectedItems.first();
-  //   detailsLabel->setText("Details: " + item->text());
-  // } else {
-  //   detailsLabel->setText("Details: ");
-  // }
+  bool hasSelection = m_taskWidget->hasSelection();
+
+  ui->removeFromListPb->setEnabled(hasSelection);
+  ui->openOptimizedInFilesPb->setEnabled(hasSelection);
+  ui->openOptimizedPb->setEnabled(hasSelection);
+  ui->openOriginalPb->setEnabled(hasSelection);
 }

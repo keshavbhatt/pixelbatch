@@ -10,6 +10,14 @@ struct ImageTask {
 
   enum Status { Pending, Queued, Processing, Completed, Error };
 
+  struct TaskStatusCounts {
+    int completedCount = 0;
+    int pendingCount = 0;
+    int errorCount = 0;
+    int queuedCount = 0;
+    int totalTasks = 0;
+  };
+
   Status taskStatus;
 
   QString statusToString() const {
