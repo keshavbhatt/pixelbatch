@@ -4,66 +4,64 @@
 #include "pngoutworker.h"
 #include "pngquantworker.h"
 
-QMap<QString, ImageWorkerFactory::ImageType> ImageWorkerFactory::extensionMap =
-    ImageWorkerFactory::createExtensionMap();
-QList<QString> ImageWorkerFactory::extensionList =
-    ImageWorkerFactory::createExtensionList();
-QMap<QString, QStringList> ImageWorkerFactory::optimizersMap =
-    ImageWorkerFactory::createOptimizersMap();
+QList<ImageOptimizer> ImageWorkerFactory::registeredImageOptimizers =
+    ImageWorkerFactory::createImageOptimizers();
 
-QMap<QString, ImageWorkerFactory::ImageType>
-ImageWorkerFactory::createExtensionMap() {
-  QMap<QString, ImageType> map;
-  map["jpg"] = ImageType::JPG;
-  map["jpeg"] = ImageType::JPG;
-  map["png"] = ImageType::PNG;
-  map["gif"] = ImageType::GIF;
-  map["svg"] = ImageType::SVG;
-  return map;
-}
-
-QList<QString> ImageWorkerFactory::createExtensionList() {
-  return QList<QString>{"jpg/jpeg", "png", "gif", "svg"};
-}
-
-ImageWorkerFactory::ImageType
-ImageWorkerFactory::getImageType(const QString &extension) {
-  auto it = extensionMap.find(extension.toLower());
-  if (it != extensionMap.end()) {
-    return it.value();
-  } else {
-    return ImageType::Unsupported;
+ImageType
+ImageWorkerFactory::getImageTypeByExtension(const QString &extension) {
+  foreach (auto optimizer, registeredImageOptimizers) {
+    foreach (auto ext, optimizer.getSupportedFormats()) {
+      if (ext.toLower() == extension.toLower()) {
+        return optimizer.getImageType();
+      }
+    }
   }
+  return ImageType::Unsupported;
 }
 
-QMap<QString, QStringList> ImageWorkerFactory::createOptimizersMap() {
-  QMap<QString, QStringList> map;
-  map["jpg/jpeg"] = QStringList{"Jpegoptim"};
-  map["png"] = QStringList{"Pngquant", "Pngout"};
-  map["gif"] = QStringList{"GIFProcessor"};
-  map["svg"] = QStringList{"SVGProcessor"};
-  return map;
+QList<ImageOptimizer> ImageWorkerFactory::getRegisteredImageOptimizers() {
+  return registeredImageOptimizers;
 }
 
-QStringList
+QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
+  QList<ImageOptimizer> optimizers;
+
+  optimizers.append(
+      ImageOptimizer("Jpegoptim", QStringList{"jpg", "jpeg"}, ImageType::JPG));
+  optimizers.append(
+      ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
+  optimizers.append(
+      ImageOptimizer("Pngout", QStringList{"png"}, ImageType::PNG));
+  optimizers.append(
+      ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
+  optimizers.append(
+      ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
+
+  return optimizers;
+}
+
+QList<ImageOptimizer>
 ImageWorkerFactory::getOptimizersForFormat(const QString &formatName) {
-  auto it = optimizersMap.find(formatName.toLower());
-  if (it != optimizersMap.end()) {
-    return it.value();
+  QList<ImageOptimizer> matches;
+  foreach (auto optimizer, registeredImageOptimizers) {
+    if (optimizer.getSupportedFormats().contains(formatName,
+                                                 Qt::CaseInsensitive)) {
+      matches.append(optimizer);
+    }
+  }
+
+  if (matches.isEmpty() == false) {
+    return matches;
   } else {
     qWarning() << "Unsupported format: " + formatName;
     throw std::runtime_error("Unsupported format: " + formatName.toStdString());
   }
 }
 
-QStringList ImageWorkerFactory::getSupportedFormats() {
-  return QStringList(extensionList);
-}
-
 ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
   QFileInfo fileInfo(filePath);
   QString ext = fileInfo.suffix().toLower();
-  ImageType type = getImageType(ext);
+  ImageType type = getImageTypeByExtension(ext);
 
   switch (type) {
   case ImageType::JPG: {

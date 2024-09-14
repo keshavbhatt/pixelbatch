@@ -71,11 +71,13 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
   connect(ui->filepickerRememberLastPathCheckBox, &QCheckBox::toggled, this,
           [=](bool arg1) { m_settings.setRememberOpenLastOpenedPath(arg1); });
 
-  auto supportedImageFormats = ImageWorkerFactory::getSupportedFormats();
-  for (int i = 0; i < supportedImageFormats.count(); ++i) {
-    auto formatName = supportedImageFormats.at(i).toUpper();
-    auto optimizers = ImageWorkerFactory::getOptimizersForFormat(formatName);
-    auto prefWidget = new ImageFormatPrefWidget(this, formatName, optimizers);
+  QList<ImageType> supportedImageTypes =
+      ImageTypeUtils::getSupportedImageTypes();
+  foreach (auto imageType, supportedImageTypes) {
+    auto formatName = ImageTypeUtils::imageTypeToString(imageType);
+    auto prefWidget = new ImageFormatPrefWidget(
+        this, formatName,
+        ImageWorkerFactory::getOptimizersForFormat(formatName));
     prefWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->formatPrefVerticalLayout->addWidget(prefWidget);
   }

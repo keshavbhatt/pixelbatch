@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include <worker/imageoptimizer.h>
+
 namespace Ui {
 class ImageFormatPrefWidget;
 }
@@ -11,20 +13,21 @@ class ImageFormatPrefWidget : public QWidget {
   Q_OBJECT
 
 public:
-  explicit ImageFormatPrefWidget(QWidget *parent = nullptr,
-                                 QString formatName = QString(),
-                                 QStringList optimizers = QStringList());
+  explicit ImageFormatPrefWidget(
+      QWidget *parent = nullptr, QString formatName = QString(),
+      QList<ImageOptimizer> optimizers = QList<ImageOptimizer>());
   ~ImageFormatPrefWidget();
 
   QString getFormatName() const;
 
-  QStringList formatOptimizers() const;
+  QList<ImageOptimizer> formatOptimizers() const;
 
 private:
   Ui::ImageFormatPrefWidget *ui;
   QString m_formatName;
-  QStringList m_formatOptimizers;
+  QList<ImageOptimizer> m_formatOptimizers;
   void optimizerChanged(int);
+  ImageOptimizer getOptimizerByName(const QString &name);
 };
 
 #endif // IMAGEFORMATPREFWIDGET_H

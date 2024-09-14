@@ -43,6 +43,7 @@ SOURCES += \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imageformatprefwidget.cpp \
+    imageformatprefwidgetfactory.cpp \
     imagestats.cpp \
     main.cpp \
     pixelbatch.cpp \
@@ -51,6 +52,7 @@ SOURCES += \
     taskactionwidget.cpp \
     taskwidget.cpp \
     taskwidgetoverlay.cpp \
+    worker/imageoptimizer.cpp \
     worker/imageworkerfactory.cpp \
     worker/jpegoptimworker.cpp \
     worker/pngoutworker.cpp \
@@ -61,8 +63,10 @@ HEADERS += \
     elideditemdelegate.h \
     filehandler.h \
     imageformatprefwidget.h \
+    imageformatprefwidgetfactory.h \
     imagestats.h \
     imagetask.h \
+    imagetype.h \
     pixelbatch.h \
     preferenceswidget.h \
     settings.h \
@@ -70,6 +74,7 @@ HEADERS += \
     taskwidget.h \
     taskwidgetoverlay.h \
     worker/ImageWorker.h \
+    worker/imageoptimizer.h \
     worker/imageworkerfactory.h \
     worker/jpegoptimworker.h \
     worker/pngoutworker.h \

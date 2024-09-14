@@ -2,26 +2,23 @@
 #define IMAGEWORKERFACTORY_H
 
 #include "ImageWorker.h"
+#include "imageoptimizer.h"
+#include "imagetype.h"
 
 class ImageWorkerFactory {
 public:
-  enum class ImageType { JPG, PNG, GIF, SVG, Unsupported };
-
   static ImageWorker *getWorker(const QString &filePath);
 
-  static QStringList getSupportedFormats();
+  static ImageType getImageTypeByExtension(const QString &extension);
 
-  static ImageType getImageType(const QString &extension);
+  static QList<ImageOptimizer>
+  getOptimizersForFormat(const QString &formatName);
 
-  static QStringList getOptimizersForFormat(const QString &formatName);
+  static QList<ImageOptimizer> getRegisteredImageOptimizers();
 
 private:
-  static QMap<QString, ImageType> createExtensionMap();
-  static QMap<QString, ImageType> extensionMap;
-  static QList<QString> createExtensionList();
-  static QList<QString> extensionList;
-  static QMap<QString, QStringList> optimizersMap;
-  static QMap<QString, QStringList> createOptimizersMap();
+  static QList<ImageOptimizer> registeredImageOptimizers;
+  static QList<ImageOptimizer> createImageOptimizers();
 };
 
 #endif // IMAGEWORKERFACTORY_H
