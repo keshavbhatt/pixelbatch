@@ -1,5 +1,5 @@
 #include "imageformatprefwidget.h"
-#include "imageformatprefwidgetfactory.h"
+#include "OptimizerPrefWidgets/imageformatprefwidgetfactory.h"
 #include "ui_imageformatprefwidget.h"
 
 #include <QDebug>
@@ -27,13 +27,21 @@ ImageFormatPrefWidget::ImageFormatPrefWidget(QWidget *parent,
   connect(ui->formatSettingsPushButton, &QPushButton::clicked, this, [=]() {
     auto optimizer = getOptimizerByName(ui->optimizersComboBox->currentText());
     if (optimizer.isValid()) {
-      ImageFormatPrefWidgetFactory::openPrefWidgetFor(optimizer);
+      ImageFormatPrefWidgetFactory::instance().openPrefWidgetFor(optimizer);
     } else {
       qWarning() << "No Valid Optimizer found, cannot open Pref dialog.";
     }
   });
 
+  bool hasWidget = !formatOptimizers().isEmpty() &&
+                   formatOptimizers().at(0).isValid() &&
+                   ImageFormatPrefWidgetFactory::instance().hasPrefWidgetFor(
+                       formatOptimizers().at(0));
+
+  ui->formatSettingsPushButton->setEnabled(hasWidget);
   ui->formatName->setText(formatName);
+
+  updateFotmatSettingPBTooltip();
 }
 
 ImageOptimizer ImageFormatPrefWidget::getOptimizerByName(const QString &name) {
@@ -53,7 +61,12 @@ QList<ImageOptimizer> ImageFormatPrefWidget::formatOptimizers() const {
   return m_formatOptimizers;
 }
 
-void ImageFormatPrefWidget::optimizerChanged(int) {
+void ImageFormatPrefWidget::optimizerChanged(int index) {
+  Q_UNUSED(index);
+  updateFotmatSettingPBTooltip();
+}
+
+void ImageFormatPrefWidget::updateFotmatSettingPBTooltip() {
   ui->formatSettingsPushButton->setToolTip(
       ui->optimizersComboBox->currentText() + " " + tr("Preferences"));
 }

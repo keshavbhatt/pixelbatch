@@ -77,7 +77,7 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
     auto formatName = ImageTypeUtils::imageTypeToString(imageType);
     auto prefWidget = new ImageFormatPrefWidget(
         this, formatName,
-        ImageWorkerFactory::getOptimizersForFormat(formatName));
+        ImageWorkerFactory::instance().getOptimizersForFormat(formatName));
     prefWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->formatPrefVerticalLayout->addWidget(prefWidget);
   }

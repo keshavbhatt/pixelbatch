@@ -4,21 +4,29 @@
 #include "ImageWorker.h"
 #include "imageoptimizer.h"
 #include "imagetype.h"
+#include <QFileInfo>
+#include <QList>
+#include <QMap>
+#include <QString>
 
 class ImageWorkerFactory {
 public:
-  static ImageWorker *getWorker(const QString &filePath);
+  static ImageWorkerFactory &instance();
 
-  static ImageType getImageTypeByExtension(const QString &extension);
+  ImageWorkerFactory(const ImageWorkerFactory &) = delete;
+  ImageWorkerFactory &operator=(const ImageWorkerFactory &) = delete;
 
-  static QList<ImageOptimizer>
-  getOptimizersForFormat(const QString &formatName);
-
-  static QList<ImageOptimizer> getRegisteredImageOptimizers();
+  ImageWorker *getWorker(const QString &filePath);
+  ImageType getImageTypeByExtension(const QString &extension);
+  QList<ImageOptimizer> getOptimizersForFormat(const QString &formatName);
+  QList<ImageOptimizer> getRegisteredImageOptimizers();
 
 private:
-  static QList<ImageOptimizer> registeredImageOptimizers;
+  ImageWorkerFactory();
+
   static QList<ImageOptimizer> createImageOptimizers();
+
+  QList<ImageOptimizer> registeredImageOptimizers;
 };
 
 #endif // IMAGEWORKERFACTORY_H

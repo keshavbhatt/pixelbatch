@@ -39,11 +39,13 @@ BUILD_TIMESTAMP="\\\"$$system(date -u +\""%Y-%m-%dT%H:%M:%SUTC\"")\\\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 SOURCES += \
+    OptimizerPrefWidgets/imageformatprefwidgetfactory.cpp \
+    OptimizerPrefWidgets/imageoptimizerprefwidget.cpp \
+    OptimizerPrefWidgets/jpegoptimprefwidget.cpp \
     constants.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imageformatprefwidget.cpp \
-    imageformatprefwidgetfactory.cpp \
     imagestats.cpp \
     main.cpp \
     pixelbatch.cpp \
@@ -59,11 +61,13 @@ SOURCES += \
     worker/pngquantworker.cpp
 
 HEADERS += \
+    OptimizerPrefWidgets/imageformatprefwidgetfactory.h \
+    OptimizerPrefWidgets/imageoptimizerprefwidget.h \
+    OptimizerPrefWidgets/jpegoptimprefwidget.h \
     constants.h \
     elideditemdelegate.h \
     filehandler.h \
     imageformatprefwidget.h \
-    imageformatprefwidgetfactory.h \
     imagestats.h \
     imagetask.h \
     imagetype.h \
@@ -81,6 +85,7 @@ HEADERS += \
     worker/pngquantworker.h
 
 FORMS += \
+    OptimizerPrefWidgets/jpegoptimprefwidget.ui \
     imageformatprefwidget.ui \
     pixelbatch.ui \
     preferenceswidget.ui \

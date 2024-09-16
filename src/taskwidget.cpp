@@ -221,7 +221,8 @@ void TaskWidget::processNextBatch() {
       QDir().mkpath(destinationInfo.absoluteDir().absolutePath());
 
       // Process
-      ImageWorker *worker = ImageWorkerFactory::getWorker(imageTask->imagePath);
+      ImageWorker *worker =
+          ImageWorkerFactory::instance().getWorker(imageTask->imagePath);
       connect(worker, &ImageWorker::optimizationFinished, this,
               [this, worker](ImageTask *task, bool success) {
                 task->taskStatus =

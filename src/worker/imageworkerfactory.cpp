@@ -1,11 +1,33 @@
 #include "imageworkerfactory.h"
-
 #include "jpegoptimworker.h"
-#include "pngoutworker.h"
 #include "pngquantworker.h"
+#include <QDebug>
+#include <stdexcept>
 
-QList<ImageOptimizer> ImageWorkerFactory::registeredImageOptimizers =
-    ImageWorkerFactory::createImageOptimizers();
+ImageWorkerFactory &ImageWorkerFactory::instance() {
+  static ImageWorkerFactory factoryInstance;
+  return factoryInstance;
+}
+
+ImageWorkerFactory::ImageWorkerFactory() {
+  registeredImageOptimizers = createImageOptimizers();
+}
+
+QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
+  QList<ImageOptimizer> optimizers;
+  optimizers.append(
+      ImageOptimizer("Jpegoptim", QStringList{"jpg", "jpeg"}, ImageType::JPG));
+  optimizers.append(
+      ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
+  optimizers.append(
+      ImageOptimizer("Pngout", QStringList{"png"}, ImageType::PNG));
+  optimizers.append(
+      ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
+  optimizers.append(
+      ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
+
+  return optimizers;
+}
 
 ImageType
 ImageWorkerFactory::getImageTypeByExtension(const QString &extension) {
@@ -23,23 +45,6 @@ QList<ImageOptimizer> ImageWorkerFactory::getRegisteredImageOptimizers() {
   return registeredImageOptimizers;
 }
 
-QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
-  QList<ImageOptimizer> optimizers;
-
-  optimizers.append(
-      ImageOptimizer("Jpegoptim", QStringList{"jpg", "jpeg"}, ImageType::JPG));
-  optimizers.append(
-      ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
-  optimizers.append(
-      ImageOptimizer("Pngout", QStringList{"png"}, ImageType::PNG));
-  optimizers.append(
-      ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
-  optimizers.append(
-      ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
-
-  return optimizers;
-}
-
 QList<ImageOptimizer>
 ImageWorkerFactory::getOptimizersForFormat(const QString &formatName) {
   QList<ImageOptimizer> matches;
@@ -50,7 +55,7 @@ ImageWorkerFactory::getOptimizersForFormat(const QString &formatName) {
     }
   }
 
-  if (matches.isEmpty() == false) {
+  if (!matches.isEmpty()) {
     return matches;
   } else {
     qWarning() << "Unsupported format: " + formatName;

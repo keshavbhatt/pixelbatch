@@ -26,8 +26,9 @@ private:
   Ui::ImageFormatPrefWidget *ui;
   QString m_formatName;
   QList<ImageOptimizer> m_formatOptimizers;
-  void optimizerChanged(int);
+  void optimizerChanged(int index);
   ImageOptimizer getOptimizerByName(const QString &name);
+  void updateFotmatSettingPBTooltip();
 };
 
 #endif // IMAGEFORMATPREFWIDGET_H
