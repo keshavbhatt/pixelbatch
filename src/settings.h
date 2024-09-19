@@ -11,6 +11,8 @@ class Settings : public QObject {
 public:
   static Settings &instance();
 
+  const QSettings &getSettings() const;
+
   QString getOptimizedPath() const;
   void setOptimizedPath(const QString &path);
 

@@ -5,6 +5,8 @@ Settings &Settings::instance() {
   return instance;
 }
 
+const QSettings &Settings::getSettings() const { return settings; }
+
 Settings::Settings(QObject *parent) : QObject(parent), settings() {}
 
 QString Settings::getOptimizedPath() const {

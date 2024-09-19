@@ -44,6 +44,7 @@ protected:
                 << serializeProcessError(process, exitCode, exitStatus);
             emit optimizationError(task, "Process failed with exit code: " +
                                              QString::number(exitCode));
+            QFile::remove(task->optimizedPath);
           }
           process->deleteLater();
         });
@@ -56,6 +57,7 @@ protected:
               emit optimizationError(
                   task, "ErrorString: " + process->errorString() +
                             " ErrorCode: " + QString::number(error));
+              QFile::remove(task->optimizedPath);
               process->deleteLater();
             });
 

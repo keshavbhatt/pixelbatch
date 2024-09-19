@@ -70,10 +70,7 @@ ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
 
   switch (type) {
   case ImageType::JPG: {
-    bool allowLossy = true;
-    auto strip = QStringList{"all"};
-    int maxQuality = 100;
-    return new JpegoptimWorker(allowLossy, strip, maxQuality);
+    return new JpegoptimWorker();
   }
   case ImageType::PNG: {
     bool allowLossy = true;

@@ -2,19 +2,14 @@
 #define JPEGOPTIMWORKER_H
 
 #include "ImageWorker.h"
-#include <QStringList>
+#include "settings.h"
 
 class JpegoptimWorker : public ImageWorker {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    JpegoptimWorker(bool allowLossy, QStringList strip, int maxQuality, QObject *parent = nullptr);
+  JpegoptimWorker(QObject *parent = nullptr);
 
-    void optimize(ImageTask *task) override;
-
-private:
-    bool allowLossy;
-    QStringList strip;
-    int maxQuality;
+  void optimize(ImageTask *task) override;
 };
 
 #endif // JPEGOPTIMWORKER_H

@@ -68,5 +68,5 @@ void ImageFormatPrefWidget::optimizerChanged(int index) {
 
 void ImageFormatPrefWidget::updateFotmatSettingPBTooltip() {
   ui->formatSettingsPushButton->setToolTip(
-      ui->optimizersComboBox->currentText() + " " + tr("Preferences"));
+      ui->optimizersComboBox->currentText() + " | " + tr("Preferences"));
 }

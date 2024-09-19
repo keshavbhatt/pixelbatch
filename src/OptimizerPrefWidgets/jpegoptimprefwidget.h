@@ -2,6 +2,7 @@
 #define JPEGOPTIMPREFWIDGET_H
 
 #include "imageoptimizerprefwidget.h"
+#include "settings.h"
 
 #include <QWidget>
 
@@ -19,9 +20,11 @@ public:
 private:
   Ui::JpegOptimPrefWidget *ui;
 
-    // ImageOptimizerPrefWidget interface
+  Settings &m_settings;
+
+  // ImageOptimizerPrefWidget interface
 public:
-    void loadSettings();
+  void loadSettings();
 };
 
 #endif // JPEGOPTIMPREFWIDGET_H
