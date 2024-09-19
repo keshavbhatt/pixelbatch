@@ -1,5 +1,5 @@
-name: colorwall
-version: '2.1'
+name: pixelbatch
+version: '1.0'
 summary: Ultra HD wallpaper store
 description: |
   ColorWall is a desktop wallpaper store/manager utility that allows you to browse download and apply wallpaper from huge collection of wallpapers.
@@ -18,13 +18,13 @@ environment:
   SNAP_DESKTOP_RUNTIME: $SNAP/qt5-core22
 
 apps:
-  colorwall:
-    command: bin/desktop-launch $SNAP/usr/bin/colorwall
+  pixelbatch:
+    command: bin/desktop-launch $SNAP/usr/bin/pixelbatch
     environment:
        IS_SNAP: 1
        LANG: en_US.UTF-8 # UMD issue 7,21
        NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
-    desktop: usr/share/applications/com.ktechpit.colorwall.desktop
+    desktop: usr/share/applications/com.ktechpit.pixelbatch.desktop
     plugs:
         - desktop
         - desktop-legacy
@@ -74,7 +74,7 @@ parts:
             make install
      override-prime: |
             craftctl default
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.colorwall.desktop
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
 
    gumbo:
      plugin: nil
