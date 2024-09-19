@@ -1,0 +1,3 @@
+
+[] update snap
+[] create flatpak
