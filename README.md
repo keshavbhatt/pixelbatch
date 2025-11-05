@@ -97,12 +97,17 @@ snap install pixelbatch
    - Set output directory for optimized images
    - Configure file naming prefix
    - Adjust concurrent task limit
+   - Customize optimizer settings (Edit → Optimizer Settings)
 4. **Start Processing**:
    - Click "Process Images" button
    - Watch real-time progress for each image
 5. **View Results**:
    - See file size reduction statistics
    - Right-click tasks for quick actions (open, view, remove)
+6. **Re-process Images** (optional):
+   - Change optimizer settings if needed
+   - Click "Re-process Images" to optimize again with new settings
+   - Useful for testing different quality/compression levels
 
 ### Supported Image Formats
 
@@ -363,9 +368,13 @@ pixelbatch --dir /path/to/images
 
 1. **Organize First**: Group similar images for consistent optimization settings
 2. **Test Settings**: Process a few images first to verify optimization quality
-3. **Monitor Progress**: Watch for error status to catch problematic files
-4. **Check Results**: Compare before/after sizes and quality
-5. **Backup Important Files**: Keep originals of critical images
+3. **Re-process with Different Settings**: 
+   - After processing, adjust optimizer settings
+   - Click "Re-process Images" to try different quality/compression levels
+   - Compare results to find optimal settings
+4. **Monitor Progress**: Watch for error status to catch problematic files
+5. **Check Results**: Compare before/after sizes and quality
+6. **Backup Important Files**: Keep originals of critical images
 
 ### Performance Optimization
 

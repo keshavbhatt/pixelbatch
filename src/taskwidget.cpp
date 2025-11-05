@@ -242,20 +242,38 @@ void TaskWidget::updateTableHeader(const bool &contentLoaded) {
 }
 
 void TaskWidget::processImages() {
+  int queuedCount = 0;
+
   for (ImageTask *imageTask : qAsConst(m_imageTasks)) {
+    // Process pending tasks
     if (imageTask->taskStatus == ImageTask::Pending) {
       imageTask->taskStatus = ImageTask::Queued;
       m_imageTaskQueue.enqueue(imageTask);
       updateTaskStatus(imageTask);
+      queuedCount++;
+    }
+    // Re-process completed or error tasks
+    else if (imageTask->taskStatus == ImageTask::Completed ||
+             imageTask->taskStatus == ImageTask::Error) {
+      // Reset status to Queued for re-processing
+      imageTask->taskStatus = ImageTask::Queued;
+      m_imageTaskQueue.enqueue(imageTask);
+      updateTaskStatus(imageTask);
+
+      // Clear previous results
+      updateTaskSizeAfter(imageTask, "—");
+      updateTaskSaving(imageTask, "—");
+
+      queuedCount++;
     }
   }
 
-  if (m_imageTasks.count() > 0) {
+  if (queuedCount > 0) {
     setIsProcessing(true);
     updateStatusBarMessage(
-        tr("%1 %2 queued")
-            .arg(QString::number(m_imageTasks.count()),
-                 QString(m_imageTasks.count() > 1 ? "item" : "items")));
+        tr("%1 %2 queued for processing")
+            .arg(QString::number(queuedCount),
+                 QString(queuedCount > 1 ? "items" : "item")));
   }
 
   processNextBatch();

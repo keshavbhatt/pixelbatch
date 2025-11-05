@@ -207,8 +207,21 @@ void PixelBatch::setStatus(const QString &message) {
 void PixelBatch::updateStatusBarButtons(bool processing) {
   if (m_taskWidget) {
     auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
-    m_statusBarProcessButton->setEnabled(taskStatusCounts.pendingCount > 0 &&
-                                         !processing);
+
+    // Enable process button if there are pending tasks OR completed/error tasks (for re-processing)
+    bool hasTasksToProcess = taskStatusCounts.pendingCount > 0 ||
+                             taskStatusCounts.completedCount > 0 ||
+                             taskStatusCounts.errorCount > 0;
+
+    m_statusBarProcessButton->setEnabled(hasTasksToProcess && !processing);
+
+    // Update button text based on state
+    if (taskStatusCounts.pendingCount > 0) {
+      m_statusBarProcessButton->setText(tr("Process Images"));
+    } else if (taskStatusCounts.completedCount > 0 || taskStatusCounts.errorCount > 0) {
+      m_statusBarProcessButton->setText(tr("Re-process Images"));
+    }
+
     m_statusBarAddButton->setEnabled(!processing);
   }
 }
@@ -216,8 +229,13 @@ void PixelBatch::updateStatusBarButtons(bool processing) {
 void PixelBatch::updateMenuActions(bool processing) {
   if (m_taskWidget) {
     auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
-    m_statusBarProcessButton->setEnabled(taskStatusCounts.pendingCount > 0 &&
-                                         !processing);
+
+    // Enable process button if there are pending tasks OR completed/error tasks (for re-processing)
+    bool hasTasksToProcess = taskStatusCounts.pendingCount > 0 ||
+                             taskStatusCounts.completedCount > 0 ||
+                             taskStatusCounts.errorCount > 0;
+
+    m_statusBarProcessButton->setEnabled(hasTasksToProcess && !processing);
     m_statusBarAddButton->setEnabled(!processing);
   }
 }
