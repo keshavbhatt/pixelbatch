@@ -345,9 +345,73 @@ Version information is embedded at compile time:
 - Qt5Widgets
 
 **External Tools (runtime):**
-- jpegoptim
+- jpegoptim (v1.5.6+)
 - pngquant
 - pngout
+
+### JPEG Optimization Settings
+
+The application uses **jpegoptim v1.5.6** for JPEG compression. Users can configure the following options through the JPEG preferences widget:
+
+#### Quality Settings
+- **Maximum Quality (0-100)**: Controls compression level
+  - 100 = Lossless optimization (default)
+  - < 100 = Lossy optimization with specified quality
+  - Setting Key: `jpegoptim/maxQuality`
+  
+- **Target Size (KB)**: Optimize to specific file size
+  - 0 = No target (default)
+  - > 0 = Target size in kilobytes
+  - Setting Key: `jpegoptim/targetSize`
+  
+- **Compression Threshold (%)**: Minimum savings to keep optimized file
+  - 0 = Always optimize (default)
+  - > 0 = Keep original if savings below threshold
+  - Setting Key: `jpegoptim/compressionThreshold`
+
+#### Metadata Handling
+Configurable metadata stripping options:
+- **Mode 0**: Keep all metadata (default) - `--strip-none`
+- **Mode 1**: Strip all metadata - `--strip-all`
+- **Mode 2**: Keep EXIF only - `--strip-all --keep-exif`
+- **Mode 3**: Keep ICC profile only - `--strip-all --keep-icc`
+- **Mode 4**: Keep EXIF + ICC - `--strip-all --keep-exif --keep-icc`
+- Setting Key: `jpegoptim/metadataMode`
+
+#### Output Format
+- **Mode 0**: Auto mode (default) - `--auto-mode` - Chooses progressive/baseline automatically
+- **Mode 1**: Force progressive JPEG - `--all-progressive`
+- **Mode 2**: Force baseline JPEG - `--all-normal`
+- Setting Key: `jpegoptim/outputMode`
+
+#### Additional Options
+- **Force Optimization**: Force optimization even if already optimized
+  - Setting Key: `jpegoptim/force`
+  - Default: false
+  
+- **Preserve Timestamps**: Keep original file modification times
+  - Setting Key: `jpegoptim/preserveTimes`
+  - Default: true
+  
+- **Retry**: Recursively optimize until no improvement
+  - Setting Key: `jpegoptim/retry`
+  - Default: false
+
+#### Performance
+- **Parallel Threads**: Number of threads jpegoptim uses per image
+  - Range: 1-16
+  - Default: 1
+  - Setting Key: `jpegoptim/maxWorkers`
+  - Note: This is per-image parallelism, separate from PixelBatch's task concurrency
+
+### jpegoptim Command Construction
+
+The worker builds commands like:
+```bash
+jpegoptim --quiet --max=90 --strip-all --keep-exif --auto-mode --preserve -- output.jpg
+```
+
+See `worker/jpegoptimworker.cpp` for full implementation details.
 
 ## Development Workflow
 

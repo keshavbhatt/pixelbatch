@@ -129,9 +129,48 @@ Access settings through **Preferences** menu:
 ### Format-Specific Settings
 
 #### JPEG Optimization
-- Quality level preservation
-- Metadata stripping options
-- Progressive JPEG encoding
+
+Access JPEG settings through **Edit → Optimizer Settings → JPEG**:
+
+**Quality Settings:**
+- **Maximum Quality** (0-100):
+  - 100 = Lossless optimization (no quality loss)
+  - 90-99 = High quality with some compression
+  - 75-89 = Good quality, balanced compression
+  - Below 75 = Higher compression, noticeable quality reduction
+  - Recommendation: 90-95 for web, 100 for archival
+
+- **Target Size**: Optimize images to a specific file size in KB
+  - Useful for meeting file size requirements
+  - Example: Set to 100 KB for profile pictures
+  - Note: Overrides quality setting
+
+- **Compression Threshold**: Skip optimization if savings are below this percentage
+  - Example: Setting to 5% skips files with less than 5% size reduction
+  - Helps avoid processing already-optimized images
+
+**Metadata Handling:**
+- **Keep All Metadata**: Preserves camera info, GPS, copyright (larger files)
+- **Strip All Metadata**: Removes all metadata (smallest files)
+- **Keep EXIF Only**: Preserves camera settings, dates
+- **Keep ICC Profile Only**: Preserves color profile for accurate display
+- **Keep EXIF + ICC**: Best balance for photographers
+- Note: Stripping metadata can reduce file size by 5-30%
+
+**Output Format:**
+- **Auto Mode** (Recommended): Automatically chooses best format
+- **Force Progressive**: Better for web (loads gradually)
+- **Force Baseline**: Better compatibility with older software
+
+**Additional Options:**
+- **Force Optimization**: Re-optimize even if already optimized
+- **Preserve Timestamps**: Keep original file dates
+- **Retry Until No Improvement**: Multiple optimization passes (slower but better compression)
+
+**Performance:**
+- **Parallel Threads**: CPU threads per image (1-16)
+  - More threads = faster but more CPU usage
+  - Recommended: 1-2 for most users
 
 #### PNG Optimization
 - Color palette reduction

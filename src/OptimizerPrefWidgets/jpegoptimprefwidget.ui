@@ -6,13 +6,305 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>480</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>JPEG Optimization Settings</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="qualityGroupBox">
+     <property name="title">
+      <string>Quality Settings</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="maxQualityLabel">
+        <property name="text">
+         <string>Maximum Quality:</string>
+        </property>
+        <property name="toolTip">
+         <string>Set maximum image quality factor (0-100). Values &lt; 100 enable lossy optimization.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="maxQualityLayout">
+        <item>
+         <widget class="QSpinBox" name="maxQualitySpinBox">
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="toolTip">
+           <string>100 = lossless, lower values = more compression</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="maxQualityValueLabel">
+          <property name="text">
+           <string>(Lossless)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="targetSizeLabel">
+        <property name="text">
+         <string>Target Size (KB):</string>
+        </property>
+        <property name="toolTip">
+         <string>Try to optimize file to given size in kilobytes. 0 = disabled.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="targetSizeSpinBox">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>99999</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="suffix">
+         <string> KB</string>
+        </property>
+        <property name="toolTip">
+         <string>0 = no target size limit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="thresholdLabel">
+        <property name="text">
+         <string>Compression Threshold:</string>
+        </property>
+        <property name="toolTip">
+         <string>Keep old file if the gain is below this percentage (0-100)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="thresholdSpinBox">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="toolTip">
+         <string>0 = always optimize regardless of savings</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="metadataGroupBox">
+     <property name="title">
+      <string>Metadata Handling</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QComboBox" name="metadataComboBox">
+        <property name="toolTip">
+         <string>Choose which metadata to keep or strip from images</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Keep All Metadata</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Strip All Metadata</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Keep EXIF Only</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Keep ICC Profile Only</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Keep EXIF + ICC Profile</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="metadataHintLabel">
+        <property name="text">
+         <string>Note: Stripping metadata reduces file size but removes camera/photo info</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="outputFormatGroupBox">
+     <property name="title">
+      <string>Output Format</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="autoModeRadio">
+        <property name="text">
+         <string>Auto Mode (recommended)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Automatically select normal or progressive based on which produces smaller file</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="progressiveRadio">
+        <property name="text">
+         <string>Force Progressive JPEG</string>
+        </property>
+        <property name="toolTip">
+         <string>Progressive JPEGs load gradually, better for web</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="normalRadio">
+        <property name="text">
+         <string>Force Baseline (Normal) JPEG</string>
+        </property>
+        <property name="toolTip">
+         <string>Standard JPEG format, better compatibility</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="optionsGroupBox">
+     <property name="title">
+      <string>Additional Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="forceCheckBox">
+        <property name="text">
+         <string>Force optimization (even if already optimized)</string>
+        </property>
+        <property name="toolTip">
+         <string>Force optimization even if the file is already optimized</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="preserveTimesCheckBox">
+        <property name="text">
+         <string>Preserve file timestamps</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Keep original file modification timestamps</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="retryCheckBox">
+        <property name="text">
+         <string>Retry optimization until no improvement</string>
+        </property>
+        <property name="toolTip">
+         <string>Recursively optimize until file size does not change anymore</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="performanceGroupBox">
+     <property name="title">
+      <string>Performance</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="workersLabel">
+        <property name="text">
+         <string>Parallel Threads:</string>
+        </property>
+        <property name="toolTip">
+         <string>Maximum number of parallel threads for jpegoptim (per image)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="workersSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>16</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+        <property name="toolTip">
+         <string>More threads may speed up processing but use more CPU</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

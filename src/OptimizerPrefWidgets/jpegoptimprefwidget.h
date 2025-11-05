@@ -17,14 +17,15 @@ public:
   explicit JpegOptimPrefWidget(QWidget *parent = nullptr);
   ~JpegOptimPrefWidget();
 
+  void loadSettings() override;
+
+private slots:
+  void saveSettings();
+  void updateQualityLabel(int quality);
+
 private:
   Ui::JpegOptimPrefWidget *ui;
-
   Settings &m_settings;
-
-  // ImageOptimizerPrefWidget interface
-public:
-  void loadSettings();
 };
 
 #endif // JPEGOPTIMPREFWIDGET_H
