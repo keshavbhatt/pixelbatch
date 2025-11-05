@@ -360,6 +360,7 @@ Version information is embedded at compile time:
 **External Tools (runtime):**
 - jpegoptim (v1.5.6+)
 - pngquant (v3.0.3+ recommended)
+- gifsicle (v1.95+)
 
 ### JPEG Optimization Settings
 
@@ -490,6 +491,97 @@ pngquant --quality=65-80 --speed=4 --output=out.png --force --strip --skip-if-la
 - Smart skip-if-larger protection
 
 See `worker/pngquantworker.cpp` for full implementation details.
+
+### GIF Optimization Settings
+
+The application uses **gifsicle v1.95** for GIF compression. gifsicle supports both lossless and lossy compression for static and animated GIFs, achieving 10-80% file size reduction.
+
+#### Optimization Level
+- **Level**: Controls optimization depth
+  - 1 = Basic optimization (default: -O1, fast)
+  - 2 = Normal optimization (default, balanced)
+  - 3 = Maximum optimization (-O3, slower but best)
+  - Setting Key: `gifsicle/optimizationLevel`
+  - CLI: `-O1`, `-O2`, or `-O3`
+
+#### Compression Type
+- **Type**: Lossless or Lossy
+  - 0 = Lossless (no quality loss, 10-30% reduction)
+  - 1 = Lossy (quality trade-off, 30-60% reduction)
+  - Setting Key: `gifsicle/compressionType`
+  
+- **Lossy Level**: Controls compression aggressiveness
+  - Range: 1-200 (default: 80)
+  - Lower = better quality, larger file
+  - Higher = more compression, artifacts
+  - Setting Key: `gifsicle/lossyLevel`
+  - CLI: `--lossy=N` (when type=1)
+
+#### Color Reduction
+- **Reduce Colors**: Enable palette reduction
+  - Setting Key: `gifsicle/reduceColors` (default: false)
+  - CLI: `--colors=N`
+  
+- **Color Count**: Maximum palette colors
+  - Range: 2-256 (default: 256)
+  - Setting Key: `gifsicle/colorCount`
+  - CLI: `--colors=N`
+  
+- **Color Method**: Algorithm for choosing colors
+  - 0 = diversity (default, best overall)
+  - 1 = blend-diversity (smooth gradients)
+  - 2 = median-cut (traditional)
+  - Setting Key: `gifsicle/colorMethod`
+  - CLI: `--color-method=METHOD`
+
+#### Dithering
+- **Enable Dithering**: Apply when reducing colors
+  - Setting Key: `gifsicle/enableDithering` (default: true)
+  - CLI: `-f` or `--dither`
+  - Improves gradient appearance
+
+#### Additional Options
+- **Crop Transparency**: Remove transparent borders
+  - Setting Key: `gifsicle/cropTransparency` (default: true)
+  - CLI: `--crop-transparency`
+  
+- **Interlace**: Progressive loading
+  - Setting Key: `gifsicle/interlace` (default: false)
+  - CLI: `-i` or `--interlace`
+  
+- **Threads**: Multi-threaded processing
+  - Range: 1-16 (default: 4)
+  - Setting Key: `gifsicle/threads`
+  - CLI: `-j` or `--threads=N`
+
+### gifsicle Command Construction
+
+The worker builds commands like:
+
+**Lossless Level 3:**
+```bash
+gifsicle -O3 --crop-transparency -j4 -o output.gif input.gif
+```
+
+**Lossy Level 3 (lossy=80):**
+```bash
+gifsicle -O3 --lossy=80 --crop-transparency -j4 -o output.gif input.gif
+```
+
+**Lossy + Color Reduction:**
+```bash
+gifsicle -O3 --lossy=80 --colors=256 --color-method=diversity -f --crop-transparency -j4 -o output.gif input.gif
+```
+
+**Why gifsicle?**
+- Purpose-built for GIF optimization
+- Both lossless and lossy compression
+- Animation-aware optimization
+- Multi-threading support
+- Mature, proven, reliable (since 1995)
+- Color palette reduction capabilities
+
+See `worker/gifsicleworker.cpp` for full implementation details.
 
 ## Development Workflow
 

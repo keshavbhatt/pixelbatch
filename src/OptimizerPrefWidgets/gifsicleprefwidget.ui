@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GifsiclePrefWidget</class>
+ <widget class="QWidget" name="GifsiclePrefWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>482</width>
+    <height>848</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GIF Optimization Settings</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="optimizationGroupBox">
+     <property name="title">
+      <string>Optimization Level</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="level1Radio">
+        <property name="toolTip">
+         <string>Basic optimization. Fast processing, safe for all GIFs.</string>
+        </property>
+        <property name="text">
+         <string>Level 1 - Basic (fast, safe)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="level2Radio">
+        <property name="toolTip">
+         <string>Normal optimization. Good balance of speed and compression.</string>
+        </property>
+        <property name="text">
+         <string>Level 2 - Normal (balanced, recommended)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="level3Radio">
+        <property name="toolTip">
+         <string>Maximum optimization. Slower but achieves best compression.</string>
+        </property>
+        <property name="text">
+         <string>Level 3 - Maximum (slower, best compression)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="optimizationHintLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Higher levels take more time but produce smaller files. Level 2 is recommended for most cases.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="compressionGroupBox">
+     <property name="title">
+      <string>Compression Type</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="losslessRadio">
+        <property name="toolTip">
+         <string>Optimize without losing quality. Safe for all GIFs.</string>
+        </property>
+        <property name="text">
+         <string>Lossless - No quality loss (larger files)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="lossyRadio">
+        <property name="toolTip">
+         <string>Allow some quality loss to achieve better compression.</string>
+        </property>
+        <property name="text">
+         <string>Lossy - Quality trade-off for smaller files</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="lossyControlsWidget" native="true">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lossyLevelLabel">
+           <property name="toolTip">
+            <string>Higher values = more compression but lower quality (1-200)</string>
+           </property>
+           <property name="text">
+            <string>Lossy Level:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="lossyLevelLayout">
+           <item>
+            <widget class="QSlider" name="lossyLevelSlider">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>200</number>
+             </property>
+             <property name="value">
+              <number>80</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="tickPosition">
+              <enum>QSlider::TickPosition::TicksBelow</enum>
+             </property>
+             <property name="tickInterval">
+              <number>20</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lossyLevelValueLabel">
+             <property name="text">
+              <string>80</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="lossyHintLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string>color: #666; font-size: 9pt;</string>
+           </property>
+           <property name="text">
+            <string>Lower values = better quality, larger files. Higher values = more compression, possible artifacts.</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="colorGroupBox">
+     <property name="title">
+      <string>Color Optimization</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="reduceColorsCheckBox">
+        <property name="toolTip">
+         <string>Reduce the number of colors in the GIF for smaller file size</string>
+        </property>
+        <property name="text">
+         <string>Reduce color palette</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="colorControlsWidget" native="true">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="colorCountLabel">
+           <property name="text">
+            <string>Maximum Colors:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="colorCountSpinBox">
+           <property name="toolTip">
+            <string>Maximum number of colors in the palette (2-256)</string>
+           </property>
+           <property name="minimum">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <number>256</number>
+           </property>
+           <property name="value">
+            <number>256</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="colorMethodLabel">
+           <property name="text">
+            <string>Color Method:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="colorMethodComboBox">
+           <property name="toolTip">
+            <string>Algorithm for choosing reduced colors</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Diversity (default)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Blend Diversity</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Median Cut</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ditheringGroupBox">
+     <property name="title">
+      <string>Dithering</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QCheckBox" name="ditheringCheckBox">
+        <property name="toolTip">
+         <string>Dithering creates smoother gradients when reducing colors</string>
+        </property>
+        <property name="text">
+         <string>Apply dithering when reducing colors</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="ditheringHintLabel">
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Dithering improves appearance when reducing colors. Disable for pixel art or simple graphics.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="additionalGroupBox">
+     <property name="title">
+      <string>Additional Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QCheckBox" name="cropTransparencyCheckBox">
+        <property name="toolTip">
+         <string>Remove transparent borders to reduce file size</string>
+        </property>
+        <property name="text">
+         <string>Crop transparent borders</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="interlaceCheckBox">
+        <property name="toolTip">
+         <string>Interlaced GIFs load progressively. Good for web but slightly larger files.</string>
+        </property>
+        <property name="text">
+         <string>Enable interlacing (progressive loading)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="performanceGroupBox">
+     <property name="title">
+      <string>Performance</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="threadsLabel">
+        <property name="toolTip">
+         <string>Number of threads for parallel processing</string>
+        </property>
+        <property name="text">
+         <string>Threads:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="threadsSpinBox">
+        <property name="toolTip">
+         <string>More threads = faster processing but higher CPU usage</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>16</number>
+        </property>
+        <property name="value">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

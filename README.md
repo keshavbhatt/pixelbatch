@@ -42,9 +42,9 @@ Make sure you have the following dependencies installed:
 sudo apt-get install qt5-default build-essential
 
 # Required optimization tools
-sudo apt-get install jpegoptim pngquant
+sudo apt-get install jpegoptim pngquant gifsicle
 
-# Note: pngquant 3.0+ recommended for best results
+# Note: pngquant 3.0+ and gifsicle 1.9+ recommended for best results
 ```
 
 #### Build Instructions
@@ -106,7 +106,7 @@ snap install pixelbatch
 |--------|-----------|----------------|------------------|
 | JPEG   | `.jpg`, `.jpeg` | jpegoptim | Lossless or Lossy |
 | PNG    | `.png` | pngquant | Lossy with quality control |
-| GIF    | `.gif` | (planned) | — |
+| GIF    | `.gif` | gifsicle | Lossless or Lossy |
 | SVG    | `.svg` | (planned) | — |
 
 ## ⚙️ Configuration
@@ -215,6 +215,48 @@ Access PNG settings through **Edit → Optimizer Settings → PNG**:
 - Typical savings: 40-70% file size reduction
 - Uses lossy compression with quality control
 - Much more effective than lossless PNG optimization
+
+#### GIF Optimization
+
+Access GIF settings through **Edit → Optimizer Settings → GIF**:
+
+**Optimization Level:**
+- **Level 1**: Basic optimization (fast, safe)
+- **Level 2**: Normal optimization (balanced, recommended)
+- **Level 3**: Maximum optimization (slower, best compression)
+
+**Compression Type:**
+- **Lossless**: No quality loss (10-30% reduction)
+  - Safe for all GIFs, including animations
+- **Lossy**: Quality trade-off for smaller files (30-60% reduction)
+  - **Lossy Level** (1-200, default: 80):
+    - Lower = better quality, larger files
+    - Higher = more compression, possible artifacts
+    - Recommendation: 60-100 for web
+
+**Color Optimization:**
+- **Reduce Color Palette**: Checkbox to enable color reduction
+  - **Maximum Colors** (2-256, default: 256)
+  - **Color Method**: Diversity (default), Blend Diversity, Median Cut
+- Reduces palette size for much smaller files
+
+**Dithering:**
+- **Apply Dithering**: Enabled by default
+  - Creates smoother gradients when reducing colors
+  - Disable only for pixel art or simple graphics
+
+**Additional Options:**
+- **Crop Transparent Borders**: Remove transparent edges (recommended)
+- **Enable Interlacing**: Progressive loading (good for web)
+
+**Performance:**
+- **Threads** (1-16, default: 4): Multi-threaded processing
+
+**Compression Performance:**
+- Lossless: 10-30% reduction
+- Lossy: 30-60% reduction
+- Lossy + Color reduction: 50-80% reduction
+- Works with both static and animated GIFs
 
 ## 🎨 User Interface
 
@@ -351,6 +393,7 @@ See [DEVELOPER_README.md](DEVELOPER_README.md) for comprehensive development doc
 - **Optimization Tools**:
   - jpegoptim (v1.5.0+) - for JPEG optimization
   - pngquant (v2.0+, v3.0+ recommended) - for PNG optimization
+  - gifsicle (v1.9+, v1.95+ recommended) - for GIF optimization
 
 ### Build Requirements
 

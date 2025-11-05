@@ -1,4 +1,5 @@
 #include "imageformatprefwidgetfactory.h"
+#include "gifsicleprefwidget.h"
 #include "jpegoptimprefwidget.h"
 #include "pngquantprefwidget.h"
 #include "worker/imageworkerfactory.h"
@@ -49,18 +50,18 @@ void ImageFormatPrefWidgetFactory::registerOptimizers() {
           [](QWidget *parent) -> ImageOptimizerPrefWidget * {
         return new PngQuantPrefWidget(parent);
       };
+    } else if (optimizerName == "Gifsicle") {
+      optimizerWidgetMap[optimizerName] =
+          [](QWidget *parent) -> ImageOptimizerPrefWidget * {
+        return new GifsiclePrefWidget(parent);
+      };
     }
-    //} else if (optimizerName == "GIFProcessor") {
-    //   optimizerWidgetMap[optimizerName] =
-    //       [](QWidget *parent) -> ImageOptimizerPrefWidget * {
-    //     return new GIFProcessorPrefWidget(parent);
-    //   };
-    // } else if (optimizerName == "SVGProcessor") {
-    //   optimizerWidgetMap[optimizerName] =
-    //       [](QWidget *parent) -> ImageOptimizerPrefWidget * {
-    //     return new SVGProcessorPrefWidget(parent);
-    //   };
-    // }
+    // else if (optimizerName == "SVGProcessor") {
+    //    optimizerWidgetMap[optimizerName] =
+    //        [](QWidget *parent) -> ImageOptimizerPrefWidget * {
+    //      return new SVGProcessorPrefWidget(parent);
+    //    };
+    //  }
   }
 }
 

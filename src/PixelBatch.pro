@@ -43,6 +43,7 @@ SOURCES += \
     OptimizerPrefWidgets/imageoptimizerprefwidget.cpp \
     OptimizerPrefWidgets/jpegoptimprefwidget.cpp \
     OptimizerPrefWidgets/pngquantprefwidget.cpp \
+    OptimizerPrefWidgets/gifsicleprefwidget.cpp \
     constants.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
@@ -58,13 +59,15 @@ SOURCES += \
     worker/imageoptimizer.cpp \
     worker/imageworkerfactory.cpp \
     worker/jpegoptimworker.cpp \
-    worker/pngquantworker.cpp
+    worker/pngquantworker.cpp \
+    worker/gifsicleworker.cpp
 
 HEADERS += \
     OptimizerPrefWidgets/imageformatprefwidgetfactory.h \
     OptimizerPrefWidgets/imageoptimizerprefwidget.h \
     OptimizerPrefWidgets/jpegoptimprefwidget.h \
     OptimizerPrefWidgets/pngquantprefwidget.h \
+    OptimizerPrefWidgets/gifsicleprefwidget.h \
     constants.h \
     elideditemdelegate.h \
     filehandler.h \
@@ -82,11 +85,13 @@ HEADERS += \
     worker/imageoptimizer.h \
     worker/imageworkerfactory.h \
     worker/jpegoptimworker.h \
-    worker/pngquantworker.h
+    worker/pngquantworker.h \
+    worker/gifsicleworker.h
 
 FORMS += \
     OptimizerPrefWidgets/jpegoptimprefwidget.ui \
     OptimizerPrefWidgets/pngquantprefwidget.ui \
+    OptimizerPrefWidgets/gifsicleprefwidget.ui \
     imageformatprefwidget.ui \
     pixelbatch.ui \
     preferenceswidget.ui \

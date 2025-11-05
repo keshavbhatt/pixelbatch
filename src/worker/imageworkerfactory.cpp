@@ -1,6 +1,7 @@
 #include "imageworkerfactory.h"
 #include "jpegoptimworker.h"
 #include "pngquantworker.h"
+#include "gifsicleworker.h"
 #include <QDebug>
 #include <stdexcept>
 
@@ -19,9 +20,9 @@ QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
       ImageOptimizer("Jpegoptim", QStringList{"jpg", "jpeg"}, ImageType::JPG));
   optimizers.append(
       ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
-  // Future: Add GIF and SVG support
-   optimizers.append(
-       ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
+  optimizers.append(
+      ImageOptimizer("Gifsicle", QStringList{"gif"}, ImageType::GIF));
+  // Future: Add SVG support
    optimizers.append(
        ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
 
@@ -74,8 +75,9 @@ ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
   case ImageType::PNG: {
     return new PngquantWorker();
   }
-  // case ImageType::GIF:
-  //   return new GIFProcessor();
+  case ImageType::GIF: {
+    return new GifsicleWorker();
+  }
   // case ImageType::SVG:
   //   return new SVGProcessor();
   case ImageType::Unsupported:
