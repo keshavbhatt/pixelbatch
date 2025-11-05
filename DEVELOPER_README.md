@@ -359,8 +359,7 @@ Version information is embedded at compile time:
 
 **External Tools (runtime):**
 - jpegoptim (v1.5.6+)
-- pngquant
-- pngout
+- pngquant (v3.0.3+ recommended)
 
 ### JPEG Optimization Settings
 
@@ -425,6 +424,72 @@ jpegoptim --quiet --max=90 --strip-all --keep-exif --auto-mode --preserve -- out
 ```
 
 See `worker/jpegoptimworker.cpp` for full implementation details.
+
+### PNG Optimization Settings
+
+The application uses **pngquant v3.0.3** for PNG compression. pngquant provides lossy compression with quality control, achieving 40-70% file size reduction.
+
+#### Quality Settings
+- **Quality Range (Min-Max)**: Controls compression level
+  - Min: 0-100 (default: 65) - Don't save if quality falls below
+  - Max: 0-100 (default: 80) - Use fewer colors below this quality
+  - Setting Keys: `pngquant/qualityMin`, `pngquant/qualityMax`
+  - CLI: `--quality=MIN-MAX`
+  
+#### Speed vs Quality Trade-off
+- **Speed**: Balances processing time and output quality
+  - Range: 1-11 (default: 4)
+  - 1 = Slowest, best quality
+  - 4 = Default, balanced
+  - 11 = Fastest, rougher quality
+  - Setting Key: `pngquant/speed`
+  - CLI: `--speed=N`
+
+#### Dithering
+- **Enable Floyd-Steinberg Dithering**: Improves gradient quality
+  - true = Enable dithering (default, better gradients)
+  - false = Disable (pixel art, simple graphics)
+  - Setting Key: `pngquant/enableDithering`
+  - CLI: `--nofs` (when disabled)
+
+#### Color Precision (Advanced)
+- **Posterize**: Reduces color precision
+  - Range: 0-8 (default: 0 = disabled)
+  - Use for ARGB4444 or reduced color output
+  - Setting Key: `pngquant/posterize`
+  - CLI: `--posterize=N` (when > 0)
+
+#### Additional Options
+- **Strip Metadata**: Remove optional chunks
+  - Setting Key: `pngquant/stripMetadata`
+  - Default: true
+  - CLI: `--strip`
+  
+- **Skip if Larger**: Keep original if optimization increases size
+  - Setting Key: `pngquant/skipIfLarger`
+  - Default: true
+  - CLI: `--skip-if-larger`
+  
+- **Force Overwrite**: Overwrite existing files
+  - Setting Key: `pngquant/force`
+  - Default: true
+  - CLI: `--force`
+
+### pngquant Command Construction
+
+The worker builds commands like:
+```bash
+pngquant --quality=65-80 --speed=4 --output=out.png --force --strip --skip-if-larger -- input.png
+```
+
+**Why pngquant over pngout?**
+- Superior compression (40-70% vs 5-15%)
+- Quality control (min-max range)
+- Modern & actively maintained (v3.0.3, Rust)
+- Better dithering (Floyd-Steinberg)
+- Smart skip-if-larger protection
+
+See `worker/pngquantworker.cpp` for full implementation details.
 
 ## Development Workflow
 

@@ -1,5 +1,6 @@
 #include "imageformatprefwidgetfactory.h"
 #include "jpegoptimprefwidget.h"
+#include "pngquantprefwidget.h"
 #include "worker/imageworkerfactory.h"
 #include <QDebug>
 
@@ -43,18 +44,13 @@ void ImageFormatPrefWidgetFactory::registerOptimizers() {
           [](QWidget *parent) -> ImageOptimizerPrefWidget * {
         return new JpegOptimPrefWidget(parent);
       };
+    } else if (optimizerName == "Pngquant") {
+      optimizerWidgetMap[optimizerName] =
+          [](QWidget *parent) -> ImageOptimizerPrefWidget * {
+        return new PngQuantPrefWidget(parent);
+      };
     }
-    // else if (optimizerName == "Pngquant") {
-    //   optimizerWidgetMap[optimizerName] =
-    //       [](QWidget *parent) -> ImageOptimizerPrefWidget * {
-    //     return new PngQuantPrefWidget(parent);
-    //   };
-    // } else if (optimizerName == "Pngout") {
-    //   optimizerWidgetMap[optimizerName] =
-    //       [](QWidget *parent) -> ImageOptimizerPrefWidget * {
-    //     return new PngOutPrefWidget(parent);
-    //   };
-    // } else if (optimizerName == "GIFProcessor") {
+    //} else if (optimizerName == "GIFProcessor") {
     //   optimizerWidgetMap[optimizerName] =
     //       [](QWidget *parent) -> ImageOptimizerPrefWidget * {
     //     return new GIFProcessorPrefWidget(parent);

@@ -19,12 +19,11 @@ QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
       ImageOptimizer("Jpegoptim", QStringList{"jpg", "jpeg"}, ImageType::JPG));
   optimizers.append(
       ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
-  optimizers.append(
-      ImageOptimizer("Pngout", QStringList{"png"}, ImageType::PNG));
-  optimizers.append(
-      ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
-  optimizers.append(
-      ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
+  // Future: Add GIF and SVG support
+   optimizers.append(
+       ImageOptimizer("GIFProcessor", QStringList{"gif"}, ImageType::GIF));
+   optimizers.append(
+       ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
 
   return optimizers;
 }
@@ -73,11 +72,7 @@ ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
     return new JpegoptimWorker();
   }
   case ImageType::PNG: {
-    bool allowLossy = true;
-    int maxColors = 256;
-    QPair<int, int> qualityRange = qMakePair(0, 100);
-    int speed = 3;
-    return new PngquantWorker(allowLossy, maxColors, qualityRange, speed);
+    return new PngquantWorker();
   }
   // case ImageType::GIF:
   //   return new GIFProcessor();

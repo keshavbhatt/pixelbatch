@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PngQuantPrefWidget</class>
+ <widget class="QWidget" name="PngQuantPrefWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>523</width>
+    <height>695</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PNG Optimization Settings</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="qualityGroupBox">
+     <property name="title">
+      <string>Quality Settings</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="qualityMinLabel">
+        <property name="toolTip">
+         <string>Don't save if quality falls below this level (0-100)</string>
+        </property>
+        <property name="text">
+         <string>Minimum Quality:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="qualityMinSpinBox">
+        <property name="toolTip">
+         <string>Minimum acceptable quality (lower = more compression but worse quality)</string>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>65</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="qualityMaxLabel">
+        <property name="toolTip">
+         <string>Use fewer colors to stay below this quality (0-100)</string>
+        </property>
+        <property name="text">
+         <string>Maximum Quality:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="qualityMaxSpinBox">
+        <property name="toolTip">
+         <string>Maximum quality level (higher = better quality but larger file)</string>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>80</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="qualityRangeLabel">
+        <property name="styleSheet">
+         <string>color: #0066CC; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>Quality Range: 65-80%</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="qualityHintLabel">
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Tip: Higher quality = better image but larger file. Range 65-80% is good for web.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="speedGroupBox">
+     <property name="title">
+      <string>Speed vs Quality Trade-off</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="speedLabel">
+          <property name="text">
+           <string>Speed:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="speedSlider">
+          <property name="toolTip">
+           <string>1=slow but best quality, 4=default, 11=fast but rougher</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>11</number>
+          </property>
+          <property name="value">
+           <number>4</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TickPosition::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="speedValueLabel">
+          <property name="text">
+           <string>4 (Default)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="speedLabelsLayout">
+        <item>
+         <widget class="QLabel" name="slowLabel">
+          <property name="styleSheet">
+           <string>font-size: 8pt; color: #666;</string>
+          </property>
+          <property name="text">
+           <string>Slow/Best</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="fastLabel">
+          <property name="styleSheet">
+           <string>font-size: 8pt; color: #666;</string>
+          </property>
+          <property name="text">
+           <string>Fast/Rough</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="speedHintLabel">
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Lower values produce better quality but take longer. Speed 4 is recommended for most use cases.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ditheringGroupBox">
+     <property name="title">
+      <string>Dithering</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="ditheringCheckBox">
+        <property name="toolTip">
+         <string>Dithering creates smoother gradients but slightly larger files</string>
+        </property>
+        <property name="text">
+         <string>Enable Floyd-Steinberg dithering (recommended)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="ditheringHintLabel">
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Dithering improves image quality by reducing color banding. Disable only for pixel art or simple graphics.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="posterizeGroupBox">
+     <property name="title">
+      <string>Color Precision (Advanced)</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="posterizeLabel">
+        <property name="toolTip">
+         <string>Output lower-precision color (0=disabled, 1-8=reduced precision)</string>
+        </property>
+        <property name="text">
+         <string>Posterize Level:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="posterizeSpinBox">
+        <property name="toolTip">
+         <string>0 = disabled (default). Use for ARGB4444 or reduced color output.</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>8</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="posterizeHintLabel">
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+        <property name="text">
+         <string>Note: Only use posterization if you need reduced color precision for specific output formats.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="optionsGroupBox">
+     <property name="title">
+      <string>Additional Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="stripMetadataCheckBox">
+        <property name="toolTip">
+         <string>Remove optional chunks to reduce file size</string>
+        </property>
+        <property name="text">
+         <string>Strip optional metadata (recommended for web)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="skipIfLargerCheckBox">
+        <property name="toolTip">
+         <string>Keep original if compression doesn't reduce size</string>
+        </property>
+        <property name="text">
+         <string>Skip if optimized file is larger than original</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="forceCheckBox">
+        <property name="toolTip">
+         <string>Overwrite output files without prompting</string>
+        </property>
+        <property name="text">
+         <string>Force overwrite existing files</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

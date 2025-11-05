@@ -44,8 +44,7 @@ sudo apt-get install qt5-default build-essential
 # Required optimization tools
 sudo apt-get install jpegoptim pngquant
 
-# Optional (for additional PNG optimization)
-sudo apt-get install pngcrush
+# Note: pngquant 3.0+ recommended for best results
 ```
 
 #### Build Instructions
@@ -103,12 +102,12 @@ snap install pixelbatch
 
 ### Supported Image Formats
 
-| Format | Extension | Optimizer Used |
-|--------|-----------|----------------|
-| JPEG   | `.jpg`, `.jpeg` | jpegoptim |
-| PNG    | `.png` | pngquant, pngout |
-| GIF    | `.gif` | (supported) |
-| SVG    | `.svg` | (supported) |
+| Format | Extension | Optimizer Used | Compression Type |
+|--------|-----------|----------------|------------------|
+| JPEG   | `.jpg`, `.jpeg` | jpegoptim | Lossless or Lossy |
+| PNG    | `.png` | pngquant | Lossy with quality control |
+| GIF    | `.gif` | (planned) | — |
+| SVG    | `.svg` | (planned) | — |
 
 ## ⚙️ Configuration
 
@@ -173,9 +172,49 @@ Access JPEG settings through **Edit → Optimizer Settings → JPEG**:
   - Recommended: 1-2 for most users
 
 #### PNG Optimization
-- Color palette reduction
-- Compression level
-- Transparency handling
+
+Access PNG settings through **Edit → Optimizer Settings → PNG**:
+
+**Quality Settings:**
+- **Minimum Quality** (0-100%, default: 65%):
+  - Don't save if quality falls below this level
+  - Prevents over-compression
+  - Lower = more compression risk
+  
+- **Maximum Quality** (0-100%, default: 80%):
+  - Use fewer colors to stay below this quality
+  - Higher = better quality but larger files
+  - Recommendation: 65-80% for web, 80-95% for archival
+
+**Speed vs Quality:**
+- **Speed Slider** (1-11, default: 4):
+  - 1 = Slowest processing, best quality
+  - 4 = Balanced (recommended)
+  - 11 = Fastest processing, rougher quality
+- Note: Lower speeds produce better results but take longer
+
+**Dithering:**
+- **Enable Floyd-Steinberg Dithering** (default: enabled):
+  - Creates smoother gradients
+  - Reduces color banding
+  - Recommended for photos and graphics
+  - Disable only for pixel art or simple images
+
+**Color Precision (Advanced):**
+- **Posterize Level** (0-8, default: 0):
+  - Reduces color precision
+  - Use only for specific output formats (e.g., ARGB4444)
+  - 0 = disabled (recommended for most users)
+
+**Additional Options:**
+- **Strip Metadata**: Remove optional chunks (reduces file size)
+- **Skip if Larger**: Keep original if optimization makes file bigger
+- **Force Overwrite**: Always overwrite existing output files
+
+**Compression Performance:**
+- Typical savings: 40-70% file size reduction
+- Uses lossy compression with quality control
+- Much more effective than lossless PNG optimization
 
 ## 🎨 User Interface
 
@@ -310,9 +349,8 @@ See [DEVELOPER_README.md](DEVELOPER_README.md) for comprehensive development doc
 - **Operating System**: Linux (Ubuntu 18.04+, Debian 10+, or equivalent)
 - **Qt**: Version 5.9 or higher
 - **Optimization Tools**:
-  - jpegoptim (for JPEG optimization)
-  - pngquant (for PNG optimization)
-  - pngout (optional, for additional PNG optimization)
+  - jpegoptim (v1.5.0+) - for JPEG optimization
+  - pngquant (v2.0+, v3.0+ recommended) - for PNG optimization
 
 ### Build Requirements
 
