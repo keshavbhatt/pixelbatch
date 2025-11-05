@@ -227,6 +227,8 @@ void PixelBatch::addImages() {
     m_fileHandler->addFiles(m_settings.getLastOpenedImageDirPath());
   } else {
     qWarning() << "Unable to Add files, fileHandler not initialized.";
+    QMessageBox::critical(this, tr("Error"),
+                          tr("Unable to add images. Please try again."));
   }
 }
 
