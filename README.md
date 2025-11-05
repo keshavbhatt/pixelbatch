@@ -208,6 +208,8 @@ Access JPEG settings through **Edit → Optimizer Settings → JPEG**:
 - **Ctrl+O**: Add images
 - **Ctrl+Q**: Quit application
 - **Delete**: Remove selected task
+- **Enter/Return**: Open completed image in viewer
+- **Ctrl+A**: Select all tasks
 - **F5**: Start processing
 
 ## 🔧 Advanced Usage

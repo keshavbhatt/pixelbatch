@@ -150,12 +150,25 @@ PixelBatch follows a **Model-View-Controller (MVC)** pattern with Qt's signal/sl
   - Real-time status updates during processing
   - Task filtering (pending, completed, error)
   - Context menu operations (remove, open, view)
+  - **Color-coded status indicators** for visual feedback
+  - **Keyboard shortcuts** (Delete, Enter, Ctrl+A)
+  - **Rich tooltips** with detailed information
+  - **Smart duplicate detection**
+  - **Compression quality indicators** with color coding
 - **Columns:**
-  1. File name (with elision)
-  2. Status (Pending/Queued/Processing/Completed/Error)
-  3. Size Before
-  4. Size After
-  5. Savings (bytes and percentage)
+  1. File name (with elision and full path tooltip)
+  2. Status (color-coded: gray/blue/orange/green/red)
+  3. Size Before (with exact byte count tooltip)
+  4. Size After (with exact byte count tooltip)
+  5. Savings (with compression quality rating and color coding)
+
+**UX Improvements:**
+- Status colors: Pending (gray), Queued (blue), Processing (orange), Completed (green), Error (red)
+- Savings colors: Excellent (≥30%, dark green), Good (15-29%, green), Moderate (5-14%, orange), Minimal (<5%, gray)
+- Keyboard shortcuts: Delete to remove, Enter to view, Ctrl+A to select all
+- Enhanced drag & drop with validation and user feedback
+- Detailed progress messages showing active/remaining tasks
+- See [TASKWIDGET_UX_IMPROVEMENTS.md](DOCS/TASKWIDGET_UX_IMPROVEMENTS.md) for complete details
 
 #### `imagetask.h`
 - **Type:** Struct (Data model)

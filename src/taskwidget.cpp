@@ -16,6 +16,8 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QKeyEvent>
 
 TaskWidget::TaskWidget(QWidget *parent)
     : QTableWidget(parent), m_overlayWidget(new TaskWidgetOverlay(this)),
@@ -52,13 +54,20 @@ void TaskWidget::updateStatusBarMessage(const QString &message) {
 
 void TaskWidget::dragEnterEvent(QDragEnterEvent *event) {
   if (event->mimeData()->hasUrls()) {
+    bool hasValidImage = false;
     foreach (const QUrl &url, event->mimeData()->urls()) {
       QFileInfo fileInfo(url.toLocalFile());
       if (QImageReader::supportedImageFormats().contains(
               fileInfo.suffix().toLower().toUtf8())) {
-        event->acceptProposedAction();
-        return;
+        hasValidImage = true;
+        break;
       }
+    }
+
+    if (hasValidImage) {
+      event->acceptProposedAction();
+      // Visual feedback: could add border highlight here if needed
+      return;
     }
   }
   event->ignore();
@@ -70,10 +79,45 @@ void TaskWidget::dragMoveEvent(QDragMoveEvent *event) {
 
 void TaskWidget::dropEvent(QDropEvent *event) {
   if (event->mimeData()->hasUrls()) {
+    QStringList addedFiles;
+    QStringList skippedFiles;
+
     foreach (const QUrl &url, event->mimeData()->urls()) {
       QFileInfo fileInfo(url.toLocalFile());
+
+      // Check if file is a supported image format
+      if (!QImageReader::supportedImageFormats().contains(
+              fileInfo.suffix().toLower().toUtf8())) {
+        skippedFiles << fileInfo.fileName();
+        continue;
+      }
+
+      // Check if file exists
+      if (!fileInfo.exists()) {
+        skippedFiles << fileInfo.fileName();
+        continue;
+      }
+
       this->addFileToTable(fileInfo.filePath());
+      addedFiles << fileInfo.fileName();
     }
+
+    // Provide feedback
+    if (!addedFiles.isEmpty()) {
+      updateStatusBarMessage(tr("Added %1 image(s)").arg(addedFiles.count()));
+    }
+
+    if (!skippedFiles.isEmpty() && skippedFiles.count() <= 5) {
+      QMessageBox::information(this, tr("Files Skipped"),
+                               tr("Skipped %1 unsupported or invalid file(s):\n%2")
+                                   .arg(skippedFiles.count())
+                                   .arg(skippedFiles.join("\n")));
+    } else if (!skippedFiles.isEmpty()) {
+      QMessageBox::information(this, tr("Files Skipped"),
+                               tr("Skipped %1 unsupported or invalid file(s)")
+                                   .arg(skippedFiles.count()));
+    }
+
     event->acceptProposedAction();
   }
 }
@@ -90,9 +134,47 @@ void TaskWidget::selectionChanged(const QItemSelection &selected,
   emit toggleShowTaskActionWidget(selectedItems().count() > 0);
 }
 
+void TaskWidget::keyPressEvent(QKeyEvent *event) {
+  // Delete key to remove selected task
+  if (event->key() == Qt::Key_Delete && hasSelection()) {
+    removeSelectedRow();
+    event->accept();
+    return;
+  }
+
+  // Enter/Return to open optimized image
+  if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && hasSelection()) {
+    ImageTask *task = getImageTaskFromRow(currentRow());
+    if (task && task->taskStatus == ImageTask::Completed) {
+      openOptimizedImageInImageViewerForSelectedTask();
+      event->accept();
+      return;
+    }
+  }
+
+  // Ctrl+A to select all (default behavior, but we ensure it works)
+  if (event->matches(QKeySequence::SelectAll)) {
+    selectAll();
+    event->accept();
+    return;
+  }
+
+  QTableWidget::keyPressEvent(event);
+}
+
 void TaskWidget::addFileToTable(const QString &filePath) {
 
   QFileInfo fileInfo(filePath);
+
+  // Check for duplicates
+  for (const ImageTask *existingTask : qAsConst(m_imageTasks)) {
+    if (existingTask->imagePath == filePath) {
+      QMessageBox::information(this, tr("Duplicate File"),
+                               tr("The file '%1' is already in the list.")
+                                   .arg(fileInfo.fileName()));
+      return;
+    }
+  }
 
   QString destination = m_settings.getOptimizedPath() +
                         m_settings.getOutputFilePrefix() + fileInfo.fileName();
@@ -110,12 +192,14 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   QTableWidgetItem *fileItem = new QTableWidgetItem(filePath);
   // we use this data to map ImageTask to table row
   fileItem->setData(Qt::UserRole, QVariant::fromValue<ImageTask *>(imageTask));
+  fileItem->setToolTip(filePath); // Show full path on hover
   setItem(newRow, 0, fileItem);
 
   // Insert initial status
   QTableWidgetItem *statusItem =
       new QTableWidgetItem(imageTask->statusToString());
   statusItem->setTextAlignment(Qt::AlignCenter);
+  statusItem->setToolTip(tr("Waiting to be processed"));
   setItem(newRow, 1, statusItem);
 
   // Insert file size before
@@ -123,16 +207,19 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   QString formattedSize = m_locale.formattedDataSize(fileSize);
   QTableWidgetItem *sizeBeforeItem = new QTableWidgetItem(formattedSize);
   sizeBeforeItem->setTextAlignment(Qt::AlignCenter);
+  sizeBeforeItem->setToolTip(tr("Original file size: %1 bytes").arg(fileSize));
   setItem(newRow, 2, sizeBeforeItem);
 
   // Insert file size after
-  QTableWidgetItem *sizeAfterItem = new QTableWidgetItem("N/A");
+  QTableWidgetItem *sizeAfterItem = new QTableWidgetItem("—");
   sizeAfterItem->setTextAlignment(Qt::AlignCenter);
+  sizeAfterItem->setToolTip(tr("Not yet optimized"));
   setItem(newRow, 3, sizeAfterItem);
 
   // savings
-  QTableWidgetItem *savingsItem = new QTableWidgetItem("N/A");
+  QTableWidgetItem *savingsItem = new QTableWidgetItem("—");
   savingsItem->setTextAlignment(Qt::AlignCenter);
+  savingsItem->setToolTip(tr("Not yet optimized"));
   setItem(newRow, 4, savingsItem);
 
   updateStatusBarMessage(getSummaryAndUpdateView());
@@ -252,13 +339,20 @@ void TaskWidget::processNextBatch() {
       m_activeTasks--;
       processNextBatch();
     }
-    int processedTasks = m_imageTasks.count() - m_imageTaskQueue.count();
-    updateStatusBarMessage(tr("Processed %1 of %2")
-                               .arg(QString::number(processedTasks),
-                                    QString::number(m_imageTasks.count())));
+
+    // Update progress message
+    int processedTasks = m_imageTasks.count() - m_imageTaskQueue.count() - m_activeTasks;
+    int totalTasks = m_imageTasks.count();
+    int remainingTasks = m_imageTaskQueue.count();
+
+    updateStatusBarMessage(tr("Processing: %1 of %2 complete (%3 in progress, %4 remaining)")
+                               .arg(processedTasks)
+                               .arg(totalTasks)
+                               .arg(m_activeTasks)
+                               .arg(remainingTasks));
   }
 
-  if (m_imageTaskQueue.isEmpty()) {
+  if (m_imageTaskQueue.isEmpty() && m_activeTasks == 0) {
     updateStatusBarMessage(getSummaryAndUpdateView());
     setIsProcessing(false);
   }
@@ -418,8 +512,41 @@ void TaskWidget::updateTaskStatus(ImageTask *task,
   if (row >= 0) {
     QTableWidgetItem *statusItem = item(row, 1);
 
-    statusItem->setToolTip(optionalDetail);
+    // Set status text
     statusItem->setText(task->statusToString());
+
+    // Set tooltip with details
+    QString tooltip;
+    switch (task->taskStatus) {
+      case ImageTask::Pending:
+        tooltip = tr("Waiting to be processed");
+        statusItem->setForeground(QBrush(QColor("#999999"))); // Gray
+        break;
+      case ImageTask::Queued:
+        tooltip = tr("Queued for processing");
+        statusItem->setForeground(QBrush(QColor("#0066CC"))); // Blue
+        break;
+      case ImageTask::Processing:
+        tooltip = tr("Currently being optimized...");
+        statusItem->setForeground(QBrush(QColor("#FF8800"))); // Orange
+        break;
+      case ImageTask::Completed:
+        tooltip = tr("Successfully optimized");
+        statusItem->setForeground(QBrush(QColor("#00AA00"))); // Green
+        break;
+      case ImageTask::Error:
+        tooltip = optionalDetail.isEmpty()
+            ? tr("Optimization failed")
+            : tr("Error: %1").arg(optionalDetail);
+        statusItem->setForeground(QBrush(QColor("#CC0000"))); // Red
+        break;
+    }
+
+    if (!optionalDetail.isEmpty() && task->taskStatus != ImageTask::Error) {
+      tooltip += "\n" + optionalDetail;
+    }
+
+    statusItem->setToolTip(tooltip);
   }
 }
 
@@ -427,8 +554,14 @@ void TaskWidget::updateTaskSizeAfter(ImageTask *task, const QString text) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
     QTableWidgetItem *sizeAfterItem = item(row, 3);
-
     sizeAfterItem->setText(text);
+
+    // Add tooltip with formatted size
+    QFileInfo fileInfo(task->optimizedPath);
+    if (fileInfo.exists()) {
+      qint64 bytes = fileInfo.size();
+      sizeAfterItem->setToolTip(tr("Optimized file size: %1 bytes").arg(bytes));
+    }
   }
 }
 
@@ -436,8 +569,33 @@ void TaskWidget::updateTaskSaving(ImageTask *task, const QString text) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
     QTableWidgetItem *savingItem = item(row, 4);
-
     savingItem->setText(text);
+
+    // Extract percentage from text (format: "XXX KB (YY.YY%)")
+    QRegularExpression re("\\(([\\d.]+)%\\)");
+    QRegularExpressionMatch match = re.match(text);
+
+    if (match.hasMatch()) {
+      double percentage = match.captured(1).toDouble();
+
+      // Color code based on savings
+      if (percentage >= 30.0) {
+        savingItem->setForeground(QBrush(QColor("#00AA00"))); // Excellent - Dark Green
+        savingItem->setToolTip(tr("Excellent compression! Saved %1%").arg(QString::number(percentage, 'f', 2)));
+      } else if (percentage >= 15.0) {
+        savingItem->setForeground(QBrush(QColor("#44AA44"))); // Good - Green
+        savingItem->setToolTip(tr("Good compression. Saved %1%").arg(QString::number(percentage, 'f', 2)));
+      } else if (percentage >= 5.0) {
+        savingItem->setForeground(QBrush(QColor("#FF8800"))); // Moderate - Orange
+        savingItem->setToolTip(tr("Moderate compression. Saved %1%").arg(QString::number(percentage, 'f', 2)));
+      } else if (percentage > 0.0) {
+        savingItem->setForeground(QBrush(QColor("#999999"))); // Minimal - Gray
+        savingItem->setToolTip(tr("Minimal compression. Saved %1%").arg(QString::number(percentage, 'f', 2)));
+      } else {
+        savingItem->setForeground(QBrush(QColor("#666666"))); // No savings - Dark Gray
+        savingItem->setToolTip(tr("No compression achieved"));
+      }
+    }
   }
 }
 
