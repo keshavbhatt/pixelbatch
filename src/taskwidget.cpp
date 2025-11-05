@@ -12,6 +12,10 @@
 #include <QMainWindow>
 #include <QQueue>
 #include <QThreadPool>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
+#include <QMessageBox>
 
 TaskWidget::TaskWidget(QWidget *parent)
     : QTableWidget(parent), m_overlayWidget(new TaskWidgetOverlay(this)),
@@ -314,15 +318,74 @@ void TaskWidget::removeSelectedRow() {
 }
 
 void TaskWidget::openOptimizedImageInFileManagerForSelectedTask() {
-  Q_UNIMPLEMENTED();
+  ImageTask *task = getImageTaskFromRow(this->currentRow());
+
+  if (!task) {
+    qWarning() << "No task selected";
+    return;
+  }
+
+  // Check if the optimized file exists
+  QFileInfo fileInfo(task->optimizedPath);
+  if (!fileInfo.exists()) {
+    QMessageBox::warning(this, tr("File Not Found"),
+                         tr("The optimized image does not exist yet.\n"
+                            "Please ensure the image has been processed."));
+    return;
+  }
+
+  // Open the directory containing the file in the default file manager
+  QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absolutePath()));
 }
 
 void TaskWidget::openOptimizedImageInImageViewerForSelectedTask() {
-  Q_UNIMPLEMENTED();
+  ImageTask *task = getImageTaskFromRow(this->currentRow());
+
+  if (!task) {
+    qWarning() << "No task selected";
+    return;
+  }
+
+  // Check if the optimized file exists
+  QFileInfo fileInfo(task->optimizedPath);
+  if (!fileInfo.exists()) {
+    QMessageBox::warning(this, tr("File Not Found"),
+                         tr("The optimized image does not exist yet.\n"
+                            "Please ensure the image has been processed."));
+    return;
+  }
+
+  // Open the file with the system's default image viewer
+  if (!QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()))) {
+    QMessageBox::warning(this, tr("Error Opening File"),
+                         tr("Failed to open the optimized image.\n"
+                            "Please check that you have a default image viewer configured."));
+  }
 }
 
 void TaskWidget::openOriginalImageInImageViewerForSelectedTask() {
-  Q_UNIMPLEMENTED();
+  ImageTask *task = getImageTaskFromRow(this->currentRow());
+
+  if (!task) {
+    qWarning() << "No task selected";
+    return;
+  }
+
+  // Check if the original file exists
+  QFileInfo fileInfo(task->imagePath);
+  if (!fileInfo.exists()) {
+    QMessageBox::warning(this, tr("File Not Found"),
+                         tr("The original image file does not exist.\n"
+                            "It may have been moved or deleted."));
+    return;
+  }
+
+  // Open the file with the system's default image viewer
+  if (!QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()))) {
+    QMessageBox::warning(this, tr("Error Opening File"),
+                         tr("Failed to open the original image.\n"
+                            "Please check that you have a default image viewer configured."));
+  }
 }
 
 int TaskWidget::findRowByImageTask(ImageTask *task) {
