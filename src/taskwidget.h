@@ -23,10 +23,14 @@ class TaskWidget : public QTableWidget {
 
 public:
   explicit TaskWidget(QWidget *parent = nullptr);
+  ~TaskWidget();
+
   ImageTask::TaskStatusCounts getTaskStatusCounts() const;
 
   bool isProcessing() const;
   bool hasSelection();
+
+  void cancelAllProcessing();
 
 public slots:
 
@@ -81,6 +85,8 @@ private:
 
   QQueue<ImageTask *> m_imageTaskQueue;
   int m_activeTasks = 0;
+  QList<QObject*> m_activeWorkers;  // Track active workers for cleanup
+
   void removeTask(ImageTask *task);
   int findRowByImageTask(ImageTask *task);
   void removeTasksByStatus(const ImageTask::Status &status);

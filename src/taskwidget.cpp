@@ -49,6 +49,33 @@ TaskWidget::TaskWidget(QWidget *parent)
   });
 }
 
+TaskWidget::~TaskWidget() {
+  qDebug() << "TaskWidget destructor: Cleaning up active workers and processes";
+  cancelAllProcessing();
+
+  // Clean up image tasks
+  qDeleteAll(m_imageTasks);
+  m_imageTasks.clear();
+}
+
+void TaskWidget::cancelAllProcessing() {
+  qDebug() << "Cancelling all processing - " << m_activeWorkers.count() << " active workers";
+
+  // Delete workers immediately (not deleteLater) to ensure cleanup happens NOW
+  for (QObject *worker : m_activeWorkers) {
+    if (worker) {
+      delete worker;  // Immediate deletion triggers destructor NOW
+    }
+  }
+  m_activeWorkers.clear();
+
+  // Clear the queue
+  m_imageTaskQueue.clear();
+  m_activeTasks = 0;
+
+  qDebug() << "All processing cancelled and workers cleaned up";
+}
+
 void TaskWidget::updateStatusBarMessage(const QString &message) {
   emit statusMessageUpdated(message);
 }
@@ -355,11 +382,16 @@ void TaskWidget::processNextBatch() {
       // Process
       ImageWorker *worker =
           ImageWorkerFactory::instance().getWorker(imageTask->imagePath);
+
+      // Track worker for cleanup
+      m_activeWorkers.append(worker);
+
       connect(worker, &ImageWorker::optimizationFinished, this,
               [this, worker](ImageTask *task, bool success) {
                 task->taskStatus =
                     success ? ImageTask::Completed : ImageTask::Error;
                 onOptimizationFinished(task, success);
+                m_activeWorkers.removeOne(worker);
                 worker->deleteLater();
                 m_activeTasks--;
                 processNextBatch();
@@ -368,6 +400,7 @@ void TaskWidget::processNextBatch() {
               [this, worker](ImageTask *task, const QString &errorString) {
                 task->taskStatus = ImageTask::Error;
                 onOptimizationError(task, errorString);
+                m_activeWorkers.removeOne(worker);
                 worker->deleteLater();
                 m_activeTasks--;
                 processNextBatch();

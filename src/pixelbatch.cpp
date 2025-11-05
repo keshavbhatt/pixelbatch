@@ -4,6 +4,7 @@
 
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QThread>
 
 PixelBatch::PixelBatch(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::PixelBatch),
@@ -42,7 +43,23 @@ PixelBatch::PixelBatch(QWidget *parent)
   updateStatusBarButtons(); // keep it last
 }
 
-PixelBatch::~PixelBatch() { delete ui; }
+PixelBatch::~PixelBatch() {
+  qDebug() << "PixelBatch destructor - cleaning up";
+
+  // Cancel any active processing before destroying
+  if (m_taskWidget) {
+    qDebug() << "Calling cancelAllProcessing...";
+    m_taskWidget->cancelAllProcessing();
+    qDebug() << "cancelAllProcessing complete";
+
+    // Give a moment for processes to die
+    QThread::msleep(100);
+  }
+
+  qDebug() << "Deleting UI";
+  delete ui;
+  qDebug() << "PixelBatch destructor complete";
+}
 
 void PixelBatch::initTaskWidget() {
 

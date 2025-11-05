@@ -1,12 +1,12 @@
 #include "svgoworker.h"
 #include "settings.h"
-#include <QProcess>
-#include <QFileInfo>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
+#include <QProcess>
 
 /**
  * https://github.com/svg/svgo
@@ -63,98 +63,99 @@
  * @param parent
  */
 
-SvgoWorker::SvgoWorker(QObject *parent)
-    : ImageWorker(parent) {}
+SvgoWorker::SvgoWorker(QObject *parent) : ImageWorker(parent) {}
 
 void SvgoWorker::optimize(ImageTask *task) {
-    QString src = task->imagePath;
-    QString dst = task->optimizedPath;
+  QString src = task->imagePath;
+  QString dst = task->optimizedPath;
 
-    // Ensure destination directory exists
-    QFileInfo dstInfo(dst);
-    QDir dstDir = dstInfo.absoluteDir();
-    if (!dstDir.exists()) {
-        dstDir.mkpath(".");
-    }
+  // Ensure destination directory exists
+  QFileInfo dstInfo(dst);
+  QDir dstDir = dstInfo.absoluteDir();
+  if (!dstDir.exists()) {
+    dstDir.mkpath(".");
+  }
 
-    // Remove existing destination file
-    if (QFile::exists(dst)) {
-        QFile::remove(dst);
-    }
+  // Remove existing destination file
+  if (QFile::exists(dst)) {
+    QFile::remove(dst);
+  }
 
-    // Load settings
-    const QSettings &settings = Settings::instance().getSettings();
+  // Load settings
+  const QSettings &settings = Settings::instance().getSettings();
 
-    int precision = settings.value("svgo/precision", 3).toInt();
-    bool multipass = settings.value("svgo/multipass", true).toBool();
-    bool prettyPrint = settings.value("svgo/prettyPrint", false).toBool();
-    int indent = settings.value("svgo/indent", 2).toInt();
+  int precision = settings.value("svgo/precision", 3).toInt();
+  bool multipass = settings.value("svgo/multipass", true).toBool();
+  bool prettyPrint = settings.value("svgo/prettyPrint", false).toBool();
+  int indent = settings.value("svgo/indent", 2).toInt();
 
-    // Cleanup options
-    bool removeComments = settings.value("svgo/removeComments", true).toBool();
-    bool removeMetadata = settings.value("svgo/removeMetadata", true).toBool();
-    bool removeTitle = settings.value("svgo/removeTitle", false).toBool();
-    bool removeDesc = settings.value("svgo/removeDesc", false).toBool();
-    bool removeEditorsData = settings.value("svgo/removeEditorsData", true).toBool();
+  // // Cleanup options
+  // bool removeComments = settings.value("svgo/removeComments", true).toBool();
+  // bool removeMetadata = settings.value("svgo/removeMetadata", true).toBool();
+  // bool removeTitle = settings.value("svgo/removeTitle", false).toBool();
+  // bool removeDesc = settings.value("svgo/removeDesc", false).toBool();
+  // bool removeEditorsData = settings.value("svgo/removeEditorsData",
+  // true).toBool();
 
-    // Size optimization
-    bool removeHidden = settings.value("svgo/removeHidden", true).toBool();
-    bool removeEmpty = settings.value("svgo/removeEmpty", true).toBool();
-    bool mergePaths = settings.value("svgo/mergePaths", true).toBool();
-    bool convertShapes = settings.value("svgo/convertShapes", true).toBool();
+  // // Size optimization
+  // bool removeHidden = settings.value("svgo/removeHidden", true).toBool();
+  // bool removeEmpty = settings.value("svgo/removeEmpty", true).toBool();
+  // bool mergePaths = settings.value("svgo/mergePaths", true).toBool();
+  // bool convertShapes = settings.value("svgo/convertShapes", true).toBool();
 
-    // Advanced options
-    bool removeDimensions = settings.value("svgo/removeDimensions", false).toBool();
-    bool cleanupIds = settings.value("svgo/cleanupIds", true).toBool();
-    bool inlineStyles = settings.value("svgo/inlineStyles", false).toBool();
+  // // Advanced options
+  // bool removeDimensions = settings.value("svgo/removeDimensions",
+  // false).toBool(); bool cleanupIds = settings.value("svgo/cleanupIds",
+  // true).toBool(); bool inlineStyles = settings.value("svgo/inlineStyles",
+  // false).toBool();
 
-    // Build arguments
-    QStringList args;
+  // Build arguments
+  QStringList args;
 
-    // Input/Output
-    args << "-i" << src;
-    args << "-o" << dst;
+  // Input/Output
+  args << "-i" << src;
+  args << "-o" << dst;
 
-    // Precision
-    args << "--precision=" + QString::number(precision);
+  // Precision
+  args << "--precision=" + QString::number(precision);
 
-    // Multipass
-    if (multipass) {
-        args << "--multipass";
-    }
+  // Multipass
+  if (multipass) {
+    args << "--multipass";
+  }
 
-    // Pretty print
-    if (prettyPrint) {
-        args << "--pretty";
-        args << "--indent=" + QString::number(indent);
-    }
+  // Pretty print
+  if (prettyPrint) {
+    args << "--pretty";
+    args << "--indent=" + QString::number(indent);
+  }
 
-    // Quiet mode
-    args << "-q";
+  // Quiet mode
+  args << "-q";
 
-    // SVGO 4.0+ uses a config-based approach for plugins
-    // We'll use default plugins and override specific ones via command line isn't directly possible
-    // Instead, we rely on SVGO's built-in defaults which align with most of our settings
-    // For fine-grained control, we'd need to create a config file, but for simplicity,
-    // we'll use the defaults which are already quite good
+  // SVGO 4.0+ uses a config-based approach for plugins
+  // We'll use default plugins and override specific ones via command line isn't
+  // directly possible Instead, we rely on SVGO's built-in defaults which align
+  // with most of our settings For fine-grained control, we'd need to create a
+  // config file, but for simplicity, we'll use the defaults which are already
+  // quite good
 
-    // Note: SVGO 4.0's defaults already include:
-    // - removeComments: enabled
-    // - removeMetadata: enabled
-    // - removeEditorsNSData: enabled
-    // - removeHiddenElems: enabled
-    // - removeEmptyContainers: enabled
-    // - mergePaths: enabled
-    // - convertShapeToPath: enabled
-    // - cleanupIds: enabled
+  // Note: SVGO 4.0's defaults already include:
+  // - removeComments: enabled
+  // - removeMetadata: enabled
+  // - removeEditorsNSData: enabled
+  // - removeHiddenElems: enabled
+  // - removeEmptyContainers: enabled
+  // - mergePaths: enabled
+  // - convertShapeToPath: enabled
+  // - cleanupIds: enabled
 
-    // The settings we've exposed give users awareness of what's happening,
-    // and in a future version we could generate a custom config file
+  // The settings we've exposed give users awareness of what's happening,
+  // and in a future version we could generate a custom config file
 
-    // Debug output
-    qDebug() << "svgo command:" << "svgo" << args.join(" ");
+  // Debug output
+  qDebug() << "svgo command:" << "svgo" << args.join(" ");
 
-    // Execute the optimization
-    executeProcess("svgo", args, task);
+  // Execute the optimization
+  executeProcess("svgo", args, task);
 }
-
