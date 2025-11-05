@@ -2,6 +2,7 @@
 #include "jpegoptimworker.h"
 #include "pngquantworker.h"
 #include "gifsicleworker.h"
+#include "svgoworker.h"
 #include <QDebug>
 #include <stdexcept>
 
@@ -22,9 +23,8 @@ QList<ImageOptimizer> ImageWorkerFactory::createImageOptimizers() {
       ImageOptimizer("Pngquant", QStringList{"png"}, ImageType::PNG));
   optimizers.append(
       ImageOptimizer("Gifsicle", QStringList{"gif"}, ImageType::GIF));
-  // Future: Add SVG support
-   optimizers.append(
-       ImageOptimizer("SVGProcessor", QStringList{"svg"}, ImageType::SVG));
+  optimizers.append(
+      ImageOptimizer("SVGO", QStringList{"svg"}, ImageType::SVG));
 
   return optimizers;
 }
@@ -78,8 +78,9 @@ ImageWorker *ImageWorkerFactory::getWorker(const QString &filePath) {
   case ImageType::GIF: {
     return new GifsicleWorker();
   }
-  // case ImageType::SVG:
-  //   return new SVGProcessor();
+  case ImageType::SVG: {
+    return new SvgoWorker();
+  }
   case ImageType::Unsupported:
   default:
     qWarning() << "Unsupported file type: " + ext;

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SvgoPrefWidget</class>
+ <widget class="QWidget" name="SvgoPrefWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>550</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SVG Optimization Settings</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="precisionGroupBox">
+     <property name="title">
+      <string>Precision</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="precisionLabel">
+        <property name="text">
+         <string>Decimal Precision:</string>
+        </property>
+        <property name="toolTip">
+         <string>Number of digits in the fractional part of coordinates (1-10)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="precisionLayout">
+        <item>
+         <widget class="QSlider" name="precisionSlider">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+          <property name="value">
+           <number>3</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
+          </property>
+          <property name="toolTip">
+           <string>Lower = smaller files but less precise, Higher = larger files but more precise</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="precisionValueLabel">
+          <property name="text">
+           <string>3 digits</string>
+          </property>
+          <property name="minimumWidth">
+           <number>70</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="precisionHintLabel">
+        <property name="text">
+         <string>3-5 digits is usually sufficient. Higher precision preserves more detail but increases file size.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string>color: #666; font-size: 9pt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="optimizationGroupBox">
+     <property name="title">
+      <string>Optimization Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="multipassCheckBox">
+        <property name="text">
+         <string>Enable multipass optimization (recommended)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Pass over SVGs multiple times to ensure all optimizations are applied</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="prettyPrintCheckBox">
+        <property name="text">
+         <string>Pretty print output (human-readable)</string>
+        </property>
+        <property name="toolTip">
+         <string>Format SVG with indentation for readability (increases file size)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="prettyPrintWidget" native="true">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="indentLabel">
+           <property name="text">
+            <string>Indent Spaces:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="indentSpinBox">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>8</number>
+           </property>
+           <property name="value">
+            <number>2</number>
+           </property>
+           <property name="toolTip">
+            <string>Number of spaces for indentation when pretty printing</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="cleanupGroupBox">
+     <property name="title">
+      <string>Cleanup Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="removeCommentsCheckBox">
+        <property name="text">
+         <string>Remove comments</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove XML/SVG comments from the file</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="removeMetadataCheckBox">
+        <property name="text">
+         <string>Remove metadata</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove &lt;metadata&gt; elements</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="removeTitleCheckBox">
+        <property name="text">
+         <string>Remove title</string>
+        </property>
+        <property name="toolTip">
+         <string>Remove &lt;title&gt; elements (may affect accessibility)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="removeDescCheckBox">
+        <property name="text">
+         <string>Remove descriptions</string>
+        </property>
+        <property name="toolTip">
+         <string>Remove &lt;desc&gt; elements (may affect accessibility)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="removeEditorsDataCheckBox">
+        <property name="text">
+         <string>Remove editor data (Inkscape, Adobe, etc.)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove editor-specific namespaces and data</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sizeGroupBox">
+     <property name="title">
+      <string>Size Optimization</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="removeHiddenCheckBox">
+        <property name="text">
+         <string>Remove hidden elements</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove elements that are not visible (zero-sized, hidden)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="removeEmptyCheckBox">
+        <property name="text">
+         <string>Remove empty containers and attributes</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove empty groups, attributes, and text elements</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="mergePathsCheckBox">
+        <property name="text">
+         <string>Merge paths when possible</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Combine multiple paths into one if possible</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="convertShapesCheckBox">
+        <property name="text">
+         <string>Convert shapes to paths</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Convert basic shapes to more compact path form</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="advancedGroupBox">
+     <property name="title">
+      <string>Advanced Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QCheckBox" name="removeDimensionsCheckBox">
+        <property name="text">
+         <string>Remove width/height (keep viewBox only)</string>
+        </property>
+        <property name="toolTip">
+         <string>Remove width and height attributes in presence of viewBox (responsive SVG)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cleanupIdsCheckBox">
+        <property name="text">
+         <string>Cleanup and minify IDs</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Remove unused IDs and shorten used ones</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="inlineStylesCheckBox">
+        <property name="text">
+         <string>Inline styles from &lt;style&gt; elements</string>
+        </property>
+        <property name="toolTip">
+         <string>Move styles from style elements to inline attributes</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+

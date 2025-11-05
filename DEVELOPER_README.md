@@ -361,6 +361,7 @@ Version information is embedded at compile time:
 - jpegoptim (v1.5.6+)
 - pngquant (v3.0.3+ recommended)
 - gifsicle (v1.95+)
+- SVGO (v4.0.0+)
 
 ### JPEG Optimization Settings
 
@@ -582,6 +583,84 @@ gifsicle -O3 --lossy=80 --colors=256 --color-method=diversity -f --crop-transpar
 - Color palette reduction capabilities
 
 See `worker/gifsicleworker.cpp` for full implementation details.
+
+### SVG Optimization Settings
+
+The application uses **SVGO v4.0.0** for SVG optimization. SVGO is a Node.js-based tool with 50+ plugins for optimizing SVG vector graphics, achieving 30-70% file size reduction through code optimization (lossless).
+
+#### Precision
+- **Precision**: Decimal places for coordinates
+  - Range: 1-10 (default: 3)
+  - Lower = smaller files but rounded coordinates
+  - Higher = larger files but more precise
+  - Setting Key: `svgo/precision`
+  - CLI: `--precision=N`
+
+#### Optimization Options
+- **Multipass**: Multiple optimization passes
+  - Setting Key: `svgo/multipass` (default: true)
+  - CLI: `--multipass`
+  
+- **Pretty Print**: Human-readable formatting
+  - Setting Key: `svgo/prettyPrint` (default: false)
+  - CLI: `--pretty`
+  
+- **Indent**: Spaces for indentation
+  - Range: 0-8 (default: 2)
+  - Setting Key: `svgo/indent`
+  - CLI: `--indent=N` (when pretty print enabled)
+
+#### Cleanup Plugins
+All default to true except removeTitle and removeDesc (accessibility):
+- **Remove Comments**: `svgo/removeComments` (default: true)
+- **Remove Metadata**: `svgo/removeMetadata` (default: true)
+- **Remove Title**: `svgo/removeTitle` (default: false)
+- **Remove Desc**: `svgo/removeDesc` (default: false)
+- **Remove Editors Data**: `svgo/removeEditorsData` (default: true)
+
+#### Size Optimization Plugins
+All default to true:
+- **Remove Hidden**: `svgo/removeHidden`
+- **Remove Empty**: `svgo/removeEmpty`
+- **Merge Paths**: `svgo/mergePaths`
+- **Convert Shapes**: `svgo/convertShapes`
+
+#### Advanced Plugins
+- **Remove Dimensions**: `svgo/removeDimensions` (default: false)
+  - Creates responsive SVG (viewBox only)
+- **Cleanup IDs**: `svgo/cleanupIds` (default: true)
+- **Inline Styles**: `svgo/inlineStyles` (default: false)
+
+### SVGO Command Construction
+
+The worker builds commands like:
+
+**Standard Optimization:**
+```bash
+svgo -i input.svg -o output.svg --precision=3 --multipass -q
+```
+
+**With Pretty Print:**
+```bash
+svgo -i input.svg -o output.svg --precision=3 --multipass --pretty --indent=2 -q
+```
+
+**High Precision:**
+```bash
+svgo -i input.svg -o output.svg --precision=5 --multipass -q
+```
+
+**Note**: SVGO 4.0 uses plugin-based optimization with sensible defaults. The settings we expose give users control over the most impactful options. SVGO's built-in defaults already enable most optimization plugins (removeComments, removeMetadata, removeEditorsNSData, removeHiddenElems, removeEmptyContainers, mergePaths, convertShapeToPath, cleanupIds).
+
+**Why SVGO?**
+- Industry standard for SVG optimization
+- 50+ optimization plugins
+- Actively maintained (v4.0.0, Node.js/Rust)
+- Lossless optimization
+- Safe for all SVG types (logos, icons, illustrations)
+- Used by major companies and frameworks
+
+See `worker/svgoworker.cpp` for full implementation details.
 
 ## Development Workflow
 

@@ -2,6 +2,7 @@
 #include "gifsicleprefwidget.h"
 #include "jpegoptimprefwidget.h"
 #include "pngquantprefwidget.h"
+#include "svgoprefwidget.h"
 #include "worker/imageworkerfactory.h"
 #include <QDebug>
 
@@ -55,13 +56,12 @@ void ImageFormatPrefWidgetFactory::registerOptimizers() {
           [](QWidget *parent) -> ImageOptimizerPrefWidget * {
         return new GifsiclePrefWidget(parent);
       };
+    } else if (optimizerName == "SVGO") {
+      optimizerWidgetMap[optimizerName] =
+          [](QWidget *parent) -> ImageOptimizerPrefWidget * {
+        return new SvgoPrefWidget(parent);
+      };
     }
-    // else if (optimizerName == "SVGProcessor") {
-    //    optimizerWidgetMap[optimizerName] =
-    //        [](QWidget *parent) -> ImageOptimizerPrefWidget * {
-    //      return new SVGProcessorPrefWidget(parent);
-    //    };
-    //  }
   }
 }
 

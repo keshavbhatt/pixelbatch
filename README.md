@@ -44,7 +44,11 @@ sudo apt-get install qt5-default build-essential
 # Required optimization tools
 sudo apt-get install jpegoptim pngquant gifsicle
 
-# Note: pngquant 3.0+ and gifsicle 1.9+ recommended for best results
+# SVGO (requires Node.js)
+sudo apt-get install npm
+sudo npm install -g svgo
+
+# Note: pngquant 3.0+, gifsicle 1.9+, and SVGO 3.0+ recommended for best results
 ```
 
 #### Build Instructions
@@ -107,7 +111,7 @@ snap install pixelbatch
 | JPEG   | `.jpg`, `.jpeg` | jpegoptim | Lossless or Lossy |
 | PNG    | `.png` | pngquant | Lossy with quality control |
 | GIF    | `.gif` | gifsicle | Lossless or Lossy |
-| SVG    | `.svg` | (planned) | — |
+| SVG    | `.svg` | SVGO | Lossless (code optimization) |
 
 ## ⚙️ Configuration
 
@@ -258,6 +262,56 @@ Access GIF settings through **Edit → Optimizer Settings → GIF**:
 - Lossy + Color reduction: 50-80% reduction
 - Works with both static and animated GIFs
 
+#### SVG Optimization
+
+Access SVG settings through **Edit → Optimizer Settings → SVG**:
+
+**Precision:**
+- **Decimal Precision** (1-10 digits, default: 3):
+  - Controls rounding of coordinates
+  - Lower = smaller files but less precise
+  - Higher = larger files but more precise
+  - Recommendation: 3-5 digits for most use cases
+
+**Optimization Options:**
+- **Multipass Optimization**: Enabled by default
+  - Passes over SVG multiple times for best results
+- **Pretty Print**: Disabled by default
+  - Makes SVG human-readable with indentation
+  - Increases file size but improves editability
+  - **Indent Spaces**: 0-8 (default: 2) when pretty print enabled
+
+**Cleanup Options:**
+- **Remove Comments**: Enabled by default
+- **Remove Metadata**: Enabled by default
+- **Remove Title**: Disabled (accessibility)
+- **Remove Descriptions**: Disabled (accessibility)
+- **Remove Editor Data**: Enabled (Inkscape, Adobe, etc.)
+
+**Size Optimization:**
+- **Remove Hidden Elements**: Enabled
+  - Removes zero-sized and invisible elements
+- **Remove Empty Containers**: Enabled
+  - Removes empty groups and attributes
+- **Merge Paths**: Enabled
+  - Combines multiple paths when possible
+- **Convert Shapes to Paths**: Enabled
+  - Converts basic shapes to compact path form
+
+**Advanced Options:**
+- **Remove Width/Height**: Disabled by default
+  - Creates responsive SVG (viewBox only)
+- **Cleanup IDs**: Enabled
+  - Removes unused IDs and shortens used ones
+- **Inline Styles**: Disabled by default
+  - Moves styles from `<style>` to inline attributes
+
+**Compression Performance:**
+- Typical savings: 30-70% file size reduction
+- Lossless optimization (no visual quality loss)
+- Safe for logos, icons, and illustrations
+- Works with complex SVG files
+
 ## 🎨 User Interface
 
 ### Main Window Components
@@ -394,6 +448,7 @@ See [DEVELOPER_README.md](DEVELOPER_README.md) for comprehensive development doc
   - jpegoptim (v1.5.0+) - for JPEG optimization
   - pngquant (v2.0+, v3.0+ recommended) - for PNG optimization
   - gifsicle (v1.9+, v1.95+ recommended) - for GIF optimization
+  - SVGO (v3.0+, v4.0+ recommended) - for SVG optimization (requires Node.js)
 
 ### Build Requirements
 
