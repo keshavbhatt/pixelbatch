@@ -349,6 +349,7 @@ Access SVG settings through **Edit → Optimizer Settings → SVG**:
 - **Ctrl+Q**: Quit application
 - **Delete**: Remove selected task
 - **Enter/Return**: Open completed image in viewer
+- **Escape**: Deselect current selection
 - **Ctrl+A**: Select all tasks
 - **F5**: Start processing
 

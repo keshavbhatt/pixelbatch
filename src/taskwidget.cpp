@@ -18,6 +18,7 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 TaskWidget::TaskWidget(QWidget *parent)
     : QTableWidget(parent), m_overlayWidget(new TaskWidgetOverlay(this)),
@@ -134,6 +135,21 @@ void TaskWidget::selectionChanged(const QItemSelection &selected,
   emit toggleShowTaskActionWidget(selectedItems().count() > 0);
 }
 
+void TaskWidget::mousePressEvent(QMouseEvent *event) {
+  // Get the item at the click position
+  QTableWidgetItem *item = itemAt(event->pos());
+
+  // If clicked on empty space (no item), clear selection
+  if (!item) {
+    clearSelection();
+    event->accept();
+    return;
+  }
+
+  // Otherwise, handle normally
+  QTableWidget::mousePressEvent(event);
+}
+
 void TaskWidget::keyPressEvent(QKeyEvent *event) {
   // Delete key to remove selected task
   if (event->key() == Qt::Key_Delete && hasSelection()) {
@@ -150,6 +166,13 @@ void TaskWidget::keyPressEvent(QKeyEvent *event) {
       event->accept();
       return;
     }
+  }
+
+  // Escape to deselect current selection
+  if (event->key() == Qt::Key_Escape && hasSelection()) {
+    clearSelection();
+    event->accept();
+    return;
   }
 
   // Ctrl+A to select all (default behavior, but we ensure it works)

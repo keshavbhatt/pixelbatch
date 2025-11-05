@@ -56,6 +56,7 @@ protected:
   void selectionChanged(const QItemSelection &selected,
                         const QItemSelection &deselected) override;
   void keyPressEvent(QKeyEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
 private slots:
   void onOptimizationFinished(ImageTask *task, bool success);
