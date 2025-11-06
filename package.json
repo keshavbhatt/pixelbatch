@@ -1,0 +1,10 @@
+{
+  "name": "pixelbatch-svgo",
+  "version": "1.0.0",
+  "description": "SVGO dependency for PixelBatch",
+  "private": true,
+  "dependencies": {
+    "svgo": "^3.0.0"
+  }
+}
+

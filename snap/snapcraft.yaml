@@ -132,21 +132,20 @@ parts:
      source: .
      npm-include-node: true
      npm-node-version: "18.19.0"
-     override-build: |
-            craftctl default
-            
-            # Install SVGO globally
-            npm install -g svgo
-            
-            # Copy svgo to usr/bin (not usr/local/bin)
-            mkdir -p ${CRAFT_PART_INSTALL}/usr/bin
-            cp ${CRAFT_PART_INSTALL}/bin/svgo ${CRAFT_PART_INSTALL}/usr/bin/ || true
-
      override-prime: |
             craftctl default
             
-            # Ensure svgo is executable
-            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/svgo || true
+            # Copy svgo executable to usr/bin
+            mkdir -p ${CRAFT_PRIME}/usr/bin
+            
+            # Find and copy svgo from node_modules
+            if [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
+                cp ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+            elif [ -f ${CRAFT_PRIME}/bin/svgo ]; then
+                cp ${CRAFT_PRIME}/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+            fi
 
    desktop-launch:
      plugin: nil
