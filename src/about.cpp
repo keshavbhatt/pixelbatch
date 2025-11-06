@@ -37,7 +37,7 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
 
   setWindowTitle(appName + " | About");
   setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
-s
+
   // Start with minimum size
   adjustSize();
 
