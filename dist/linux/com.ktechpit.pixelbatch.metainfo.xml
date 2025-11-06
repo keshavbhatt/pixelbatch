@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- appstreamcli validate com.ktechpit.pixelbatch.metainfo.xml -->
+<component type="desktop-application">
+  <id>com.ktechpit.pixelbatch</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer_name>PixelBatch Development Team</developer_name>
+  <name>PixelBatch</name>
+  <summary>Batch Image Optimization Tool</summary>
+  <description>
+    <p>PixelBatch is a powerful batch image optimization application that helps you reduce file sizes while maintaining quality. Perfect for web developers, photographers, and content creators.</p>
+    <p>Key features of PixelBatch:</p>
+    <ul>
+      <li>Multi-format support: JPEG, PNG, GIF, and SVG optimization</li>
+      <li>Professional optimizers: jpegoptim for JPEG, pngquant for PNG, gifsicle for GIF, and SVGO for SVG</li>
+      <li>Batch processing: Optimize hundreds of images at once</li>
+      <li>Concurrent processing: Multi-threaded optimization for speed</li>
+      <li>Lossless and lossy compression: Choose your quality vs size trade-off</li>
+      <li>Real-time statistics: See file size reduction as you work</li>
+      <li>Format-specific settings: Fine-tune optimization for each image type</li>
+      <li>Dark and light themes: Qt Creator-inspired professional interface</li>
+      <li>Drag and drop: Simple, intuitive workflow</li>
+      <li>Re-processing support: Test different settings easily</li>
+    </ul>
+  </description>
+  <keywords>
+      <keyword translate="no">PixelBatch</keyword>
+      <keyword>Image</keyword>
+      <keyword>Optimization</keyword>
+      <keyword>Compress</keyword>
+      <keyword>JPEG</keyword>
+      <keyword>PNG</keyword>
+      <keyword>GIF</keyword>
+      <keyword>SVG</keyword>
+      <keyword>Batch</keyword>
+      <keyword>Optimizer</keyword>
+      <keyword>jpegoptim</keyword>
+      <keyword>pngquant</keyword>
+      <keyword>gifsicle</keyword>
+      <keyword>svgo</keyword>
+      <keyword>Lossless</keyword>
+      <keyword>Lossy</keyword>
+      <keyword>Graphics</keyword>
+      <keyword>Photo</keyword>
+      <keyword>Web</keyword>
+  </keywords>
+  <categories>
+    <category>Graphics</category>
+    <category>Utility</category>
+    <category>Qt</category>
+  </categories>
+  <launchable type="desktop-id">com.ktechpit.pixelbatch.desktop</launchable>
+  <provides>
+    <binary>pixelbatch</binary>
+  </provides>
+  <url type="homepage">https://github.com/pixelbatch</url>
+  <url type="bugtracker">https://github.com/pixelbatch/issues</url>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.0.0" date="2025-11-06">
+      <description>
+        <p>Initial release of PixelBatch</p>
+        <ul>
+          <li>JPEG optimization with jpegoptim</li>
+          <li>PNG optimization with pngquant</li>
+          <li>GIF optimization with gifsicle</li>
+          <li>SVG optimization with SVGO</li>
+          <li>Batch processing with concurrent tasks</li>
+          <li>Dark and light themes</li>
+          <li>Comprehensive settings for each format</li>
+          <li>Real-time statistics and preview</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>
+

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=PixelBatch
+GenericName=Image Batch Optimizer
+Comment=Batch image optimization tool for JPEG, PNG, GIF, and SVG files
+Icon=com.ktechpit.pixelbatch
+Exec=pixelbatch %F
+Terminal=false
+Type=Application
+Categories=Graphics;Utility;Qt;
+Keywords=Image;Optimization;Batch;JPEG;PNG;GIF;SVG;Compress;Optimizer;
+StartupWMClass=pixelbatch
+StartupNotify=true
+MimeType=image/jpeg;image/png;image/gif;image/svg+xml;
+
