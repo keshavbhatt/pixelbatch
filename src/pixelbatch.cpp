@@ -325,3 +325,9 @@ void PixelBatch::applySavedThemeAndStyle() {
   }
 }
 
+void PixelBatch::addFileFromCommandLine(const QString &filePath) {
+  if (m_taskWidget) {
+    m_taskWidget->addFileToTable(filePath);
+  }
+}
+

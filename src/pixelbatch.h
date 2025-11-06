@@ -23,6 +23,8 @@ public:
   PixelBatch(QWidget *parent = nullptr);
   ~PixelBatch();
 
+  void addFileFromCommandLine(const QString &filePath);
+
 private slots:
   void setStatus(const QString &message);
   void updateStatusBarButtons(bool processing = false);
