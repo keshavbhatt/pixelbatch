@@ -7,44 +7,42 @@ namespace Ui {
 class About;
 }
 
-class About : public QWidget
-{
-    Q_OBJECT
+class About : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit About(QWidget *parent = nullptr);
-    ~About();
+  explicit About(QWidget *parent = nullptr);
+  ~About();
 
 private slots:
-    void on_debugInfoButton_clicked();
-    void onDonateClicked();
-    void onReportIssueClicked();
-    void onSourceCodeClicked();
-    void onWebsiteClicked();
+  void on_debugInfoButton_clicked();
+  void onDonateClicked();
+  void onReportIssueClicked();
+  void onSourceCodeClicked();
+  void onWebsiteClicked();
 
 private:
-    Ui::About *ui;
+  Ui::About *ui;
 
-    void setupConnections();
-    void setupUI();
-    QString generateDebugInfo();
+  void setupConnections();
+  void setupUI();
+  QString generateDebugInfo();
 
-    // Application info
-    QString appName;
-    QString appDescription;
-    QString appVersion;
-    QString appSourceCodeLink;
-    QString appIssuesLink;
-    QString appWebsiteLink;
-    QString appLicense;
+  // Application info
+  QString appName;
+  QString appDescription;
+  QString appVersion;
+  QString appSourceCodeLink;
+  QString appIssuesLink;
+  QString appWebsiteLink;
+  QString appLicense;
 
-    // Author info
-    QString appAuthorName;
-    QString appOrganization;
+  // Author info
+  QString appAuthorName;
 
-    // Links
-    QString donateLink;
-    QString githubLink;
+  // Links
+  QString donateLink;
+  QString githubLink;
 };
 
 #endif // ABOUT_H

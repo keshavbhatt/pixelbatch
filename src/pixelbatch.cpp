@@ -292,7 +292,7 @@ void PixelBatch::reportIssue() {
 }
 
 void PixelBatch::donate() {
-  QDesktopServices::openUrl(QUrl("https://github.com/sponsors/pixelbatch"));
+  QDesktopServices::openUrl(QUrl("https://www.paypal.com/paypalme/keshavnrj/15USD?note=Donation%20for%20PixelBatch%20Application"));
 }
 
 void PixelBatch::showAbout() {
