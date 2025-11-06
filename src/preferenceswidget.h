@@ -16,6 +16,11 @@ public:
   explicit PreferencesWidget(QWidget *parent = nullptr);
   ~PreferencesWidget();
 
+private slots:
+  void onChangeOutputDirPath();
+  void onCleanOptimizedFilePrefix();
+  void onResetFilepickerLastOpenedPath();
+
 private:
   Ui::PreferencesWidget *ui;
 

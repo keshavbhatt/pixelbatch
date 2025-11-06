@@ -3,6 +3,7 @@
 #include "ui_preferenceswidget.h"
 
 #include <QAction>
+#include <QFileDialog>
 #include <QIcon>
 
 #include <worker/imageworkerfactory.h>
@@ -19,7 +20,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
   changeOutputDirPathAction->setToolTip(tr("Change Output Directory Path"));
   ui->outputDirPathLineEdit->addAction(changeOutputDirPathAction,
                                        QLineEdit::TrailingPosition);
-  // TODO add trigger binding
+  connect(changeOutputDirPathAction, &QAction::triggered, this,
+          &PreferencesWidget::onChangeOutputDirPath);
 
   QAction *cleanOptimizedFilePrefixAction =
       new QAction(QIcon(":/resources/icons/brush-2-line.png"), "",
@@ -28,7 +30,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
       tr("Clear Optimized File Prefix Keyword"));
   ui->optimizedFilePrefixLineEdit->addAction(cleanOptimizedFilePrefixAction,
                                              QLineEdit::TrailingPosition);
-  // TODO add trigger binding
+  connect(cleanOptimizedFilePrefixAction, &QAction::triggered, this,
+          &PreferencesWidget::onCleanOptimizedFilePrefix);
 
   QAction *resetFilepickerLastOpenedPathAction =
       new QAction(QIcon(":/resources/icons/reset-left-line.png"), "",
@@ -37,7 +40,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
       tr("Restore Default File Picker Path"));
   ui->filepickerLastOpenedPathLineEdit->addAction(
       resetFilepickerLastOpenedPathAction, QLineEdit::TrailingPosition);
-  // TODO add trigger binding
+  connect(resetFilepickerLastOpenedPathAction, &QAction::triggered, this,
+          &PreferencesWidget::onResetFilepickerLastOpenedPath);
 
   ui->concurrentTasksSpinBox->setRange(1, 20);
   ui->concurrentTasksSpinBox->setToolTip(
@@ -51,7 +55,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
 
   // LOAD SETTINGS AND BIND
   ui->outputDirPathLineEdit->setText(m_settings.getOptimizedPath());
-  // todo BIND
+  connect(ui->outputDirPathLineEdit, &QLineEdit::textChanged, this,
+          [=](const QString &arg1) { m_settings.setOptimizedPath(arg1); });
 
   ui->optimizedFilePrefixLineEdit->setText(m_settings.getOutputFilePrefix());
   connect(ui->optimizedFilePrefixLineEdit, &QLineEdit::textChanged, this,
@@ -64,7 +69,9 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
 
   ui->filepickerLastOpenedPathLineEdit->setText(
       m_settings.getLastOpenedImageDirPath());
-  // todo BIND
+  connect(
+      ui->filepickerLastOpenedPathLineEdit, &QLineEdit::textChanged, this,
+      [=](const QString &arg1) { m_settings.setLastOpenedImageDirPath(arg1); });
 
   ui->filepickerRememberLastPathCheckBox->setChecked(
       m_settings.getRememberOpenLastOpenedPath());
@@ -84,3 +91,25 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
 }
 
 PreferencesWidget::~PreferencesWidget() { delete ui; }
+
+void PreferencesWidget::onChangeOutputDirPath() {
+  QString dir = QFileDialog::getExistingDirectory(
+      this, tr("Select Output Directory"), m_settings.getOptimizedPath(),
+      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+  if (!dir.isEmpty()) {
+    if (!dir.endsWith(QDir::separator())) {
+      dir += QDir::separator();
+    }
+    ui->outputDirPathLineEdit->setText(dir);
+  }
+}
+
+void PreferencesWidget::onCleanOptimizedFilePrefix() {
+  ui->optimizedFilePrefixLineEdit->clear();
+}
+
+void PreferencesWidget::onResetFilepickerLastOpenedPath() {
+  ui->filepickerLastOpenedPathLineEdit->setText(
+      Constants::DEFAULT_INPUT_LAST_IMAGE_DIR_PATH);
+}
