@@ -2893,4 +2893,7 @@
         <file>resources/icons/zzz-fill.png</file>
         <file>resources/icons/zzz-line.png</file>
     </qresource>
+    <qresource prefix="/icons/app">
+        <file>resources/icons/app/icon-64.png</file>
+    </qresource>
 </RCC>
