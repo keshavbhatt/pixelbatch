@@ -1,8 +1,8 @@
 #include "about.h"
 #include "constants.h"
+#include "desktoputils.h"
 #include "ui_about.h"
 
-#include <QDesktopServices>
 #include <QGraphicsOpacityEffect>
 #include <QProcess>
 #include <QPropertyAnimation>
@@ -10,7 +10,6 @@
 #include <QStyleFactory>
 #include <QSysInfo>
 #include <QTimer>
-#include <QUrl>
 
 About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
   ui->setupUi(this);
@@ -175,17 +174,10 @@ void About::on_debugInfoButton_clicked() {
     this->adjustSize();
   }
 }
+void About::onDonateClicked() { DesktopUtils::openUrl(donateLink); }
 
-void About::onDonateClicked() { QDesktopServices::openUrl(QUrl(donateLink)); }
+void About::onReportIssueClicked() { DesktopUtils::openUrl(appIssuesLink); }
 
-void About::onReportIssueClicked() {
-  QDesktopServices::openUrl(QUrl(appIssuesLink));
-}
+void About::onSourceCodeClicked() { DesktopUtils::openUrl(appSourceCodeLink); }
 
-void About::onSourceCodeClicked() {
-  QDesktopServices::openUrl(QUrl(appSourceCodeLink));
-}
-
-void About::onWebsiteClicked() {
-  QDesktopServices::openUrl(QUrl(appWebsiteLink));
-}
+void About::onWebsiteClicked() { DesktopUtils::openUrl(appWebsiteLink); }

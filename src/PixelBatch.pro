@@ -47,6 +47,7 @@ SOURCES += \
     OptimizerPrefWidgets/svgoprefwidget.cpp \
     about.cpp \
     constants.cpp \
+    desktoputils.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imageformatprefwidget.cpp \
@@ -74,6 +75,7 @@ HEADERS += \
     OptimizerPrefWidgets/svgoprefwidget.h \
     about.h \
     constants.h \
+    desktoputils.h \
     elideditemdelegate.h \
     filehandler.h \
     imageformatprefwidget.h \

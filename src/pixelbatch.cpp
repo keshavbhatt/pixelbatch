@@ -1,14 +1,13 @@
 #include "pixelbatch.h"
 #include "about.h"
+#include "desktoputils.h"
 #include "elideditemdelegate.h"
 #include "thememanager.h"
 #include "ui_pixelbatch.h"
 
 #include <QDesktopWidget>
-#include <QDesktopServices>
 #include <QScreen>
 #include <QThread>
-#include <QUrl>
 
 PixelBatch::PixelBatch(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::PixelBatch),
@@ -231,7 +230,8 @@ void PixelBatch::updateStatusBarButtons(bool processing) {
   if (m_taskWidget) {
     auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
 
-    // Enable process button if there are pending tasks OR completed/error tasks (for re-processing)
+    // Enable process button if there are pending tasks OR completed/error tasks
+    // (for re-processing)
     bool hasTasksToProcess = taskStatusCounts.pendingCount > 0 ||
                              taskStatusCounts.completedCount > 0 ||
                              taskStatusCounts.errorCount > 0;
@@ -241,7 +241,8 @@ void PixelBatch::updateStatusBarButtons(bool processing) {
     // Update button text based on state
     if (taskStatusCounts.pendingCount > 0) {
       m_statusBarProcessButton->setText(tr("Process Images"));
-    } else if (taskStatusCounts.completedCount > 0 || taskStatusCounts.errorCount > 0) {
+    } else if (taskStatusCounts.completedCount > 0 ||
+               taskStatusCounts.errorCount > 0) {
       m_statusBarProcessButton->setText(tr("Re-process Images"));
     }
 
@@ -253,7 +254,8 @@ void PixelBatch::updateMenuActions(bool processing) {
   if (m_taskWidget) {
     auto taskStatusCounts = m_taskWidget->getTaskStatusCounts();
 
-    // Enable process button if there are pending tasks OR completed/error tasks (for re-processing)
+    // Enable process button if there are pending tasks OR completed/error tasks
+    // (for re-processing)
     bool hasTasksToProcess = taskStatusCounts.pendingCount > 0 ||
                              taskStatusCounts.completedCount > 0 ||
                              taskStatusCounts.errorCount > 0;
@@ -288,11 +290,11 @@ void PixelBatch::openSettings() {
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
 void PixelBatch::reportIssue() {
-  QDesktopServices::openUrl(QUrl("https://github.com/keshavbhatt/pixelbatch/issues"));
+  DesktopUtils::openUrl("https://github.com/pixelbatch/pixelbatch/issues");
 }
 
 void PixelBatch::donate() {
-  QDesktopServices::openUrl(QUrl("https://www.paypal.com/paypalme/keshavnrj/15USD?note=Donation%20for%20PixelBatch%20Application"));
+  DesktopUtils::openUrl("https://github.com/sponsors/pixelbatch");
 }
 
 void PixelBatch::showAbout() {
@@ -330,4 +332,3 @@ void PixelBatch::addFileFromCommandLine(const QString &filePath) {
     m_taskWidget->addFileToTable(filePath);
   }
 }
-
