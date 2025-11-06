@@ -135,19 +135,19 @@ parts:
      override-prime: |
             craftctl default
             
-            # Copy svgo executable to usr/bin
+            # Create symlink to svgo executable in usr/bin
             mkdir -p ${CRAFT_PRIME}/usr/bin
             
-            # Find and copy svgo from node_modules (it's installed as a dependency)
+            # Find svgo and create symlink (it's installed as a dependency)
             if [ -f ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ]; then
-                cp ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+                ln -sf ../../lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo
             elif [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
-                cp ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+                ln -sf ../../lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo
             elif [ -f ${CRAFT_PRIME}/bin/svgo ]; then
-                cp ${CRAFT_PRIME}/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+                ln -sf ../bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/bin/svgo
             fi
 
    desktop-launch:
