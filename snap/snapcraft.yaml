@@ -45,9 +45,9 @@ apps:
   pixelbatch:
     command: bin/desktop-launch $SNAP/usr/bin/pixelbatch
     environment:
-       IS_SNAP: 1
+       IS_SNAP: "1"
        LANG: en_US.UTF-8
-       NO_AT_BRIDGE: 1
+       NO_AT_BRIDGE: "1"
        # Extend PATH to include optimizer tools (don't override desktop-launch PATH)
        PATH: $SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
     desktop: usr/share/applications/com.ktechpit.pixelbatch.desktop
@@ -55,6 +55,9 @@ apps:
         - desktop
         - desktop-legacy
         - gsettings
+        - gtk-3-themes
+        - icon-themes
+        - sound-themes
         - home
         - network
         - opengl
@@ -64,7 +67,6 @@ apps:
         - wayland
 
 plugs:
-  gsettings:
   gtk-3-themes:
     interface: content
     target: $SNAP/data-dir/themes
