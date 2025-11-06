@@ -470,7 +470,7 @@ Currently, there are no keyboard shortcuts for theme switching. Themes are chang
 - [ ] Theme-aware icons (light/dark variants)
 
 ### Community Requests
-Users can request features at: [GitHub Issues](https://github.com/pixelbatch/issues)
+Users can request features at: [GitHub Issues](https://github.com/keshavbhatt/pixelbatch/issues)
 
 ---
 
@@ -542,5 +542,5 @@ PixelBatch's theme system provides:
 **Last Updated:** November 6, 2025  
 **Applies To:** PixelBatch v1.0.0+
 
-For issues or suggestions, please visit: [PixelBatch GitHub](https://github.com/pixelbatch)
+For issues or suggestions, please visit: [PixelBatch GitHub](https://github.com/keshavbhatt/pixelbatch)
 

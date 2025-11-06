@@ -1,11 +1,14 @@
 #include "pixelbatch.h"
+#include "about.h"
 #include "elideditemdelegate.h"
 #include "thememanager.h"
 #include "ui_pixelbatch.h"
 
 #include <QDesktopWidget>
+#include <QDesktopServices>
 #include <QScreen>
 #include <QThread>
+#include <QUrl>
 
 PixelBatch::PixelBatch(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::PixelBatch),
@@ -25,7 +28,6 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   ui->setupUi(this);
 
-  // Apply saved theme and style
   applySavedThemeAndStyle();
 
   setWindowTitle(QApplication::applicationName() + " | v" + VERSIONSTR);
@@ -285,15 +287,24 @@ void PixelBatch::openSettings() {
 
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
-void PixelBatch::reportIssue() { Q_UNIMPLEMENTED(); }
+void PixelBatch::reportIssue() {
+  QDesktopServices::openUrl(QUrl("https://github.com/keshavbhatt/pixelbatch/issues"));
+}
 
-void PixelBatch::donate() { Q_UNIMPLEMENTED(); }
+void PixelBatch::donate() {
+  QDesktopServices::openUrl(QUrl("https://github.com/sponsors/pixelbatch"));
+}
 
 void PixelBatch::showAbout() {
-  QMessageBox::about(
-      this, tr("About") + " " + QApplication::applicationName(),
-      QApplication::applicationName() + " " +
-          tr("is an application for batch processing of images."));
+  About *aboutDialog = new About(this);
+  aboutDialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // Center on screen
+  int screenNumber = qApp->desktop()->screenNumber(this);
+  QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+  aboutDialog->move(screenRect.center() - aboutDialog->rect().center());
+
+  aboutDialog->show();
 }
 
 void PixelBatch::applySavedThemeAndStyle() {

@@ -45,6 +45,7 @@ SOURCES += \
     OptimizerPrefWidgets/pngquantprefwidget.cpp \
     OptimizerPrefWidgets/gifsicleprefwidget.cpp \
     OptimizerPrefWidgets/svgoprefwidget.cpp \
+    about.cpp \
     constants.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
@@ -71,6 +72,7 @@ HEADERS += \
     OptimizerPrefWidgets/pngquantprefwidget.h \
     OptimizerPrefWidgets/gifsicleprefwidget.h \
     OptimizerPrefWidgets/svgoprefwidget.h \
+    about.h \
     constants.h \
     elideditemdelegate.h \
     filehandler.h \
@@ -98,6 +100,7 @@ FORMS += \
     OptimizerPrefWidgets/pngquantprefwidget.ui \
     OptimizerPrefWidgets/gifsicleprefwidget.ui \
     OptimizerPrefWidgets/svgoprefwidget.ui \
+    about.ui \
     imageformatprefwidget.ui \
     pixelbatch.ui \
     preferenceswidget.ui \

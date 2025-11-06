@@ -53,8 +53,8 @@
   <provides>
     <binary>pixelbatch</binary>
   </provides>
-  <url type="homepage">https://github.com/pixelbatch</url>
-  <url type="bugtracker">https://github.com/pixelbatch/issues</url>
+  <url type="homepage">https://github.com/keshavbhatt/pixelbatch</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/pixelbatch/issues</url>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="1.0.0" date="2025-11-06">
