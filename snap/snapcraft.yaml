@@ -1,5 +1,5 @@
 name: pixelbatch
-version: '1.0'
+version: '1.0.0'
 summary: Batch Image Optimization Tool
 description: |
   PixelBatch is a powerful batch image optimization application that helps you 
@@ -13,6 +13,20 @@ description: |
   - Concurrent processing: Multi-threaded optimization for speed
   - Real-time statistics: See file size reduction as you work
   - Format-specific settings: Fine-tune optimization for each image type
+  - Dark and Light themes with Qt Creator-inspired color schemes
+  - Professional UI with comprehensive preferences
+  
+  Supported optimizers:
+  - jpegoptim: JPEG lossless and lossy compression
+  - pngquant: PNG lossy compression with excellent quality
+  - gifsicle: GIF optimization and animation processing
+  - SVGO: SVG optimization and cleanup
+
+license: GPL-3.0-or-later
+website: https://ktechpit.com/USS/public
+source-code: https://github.com/keshavbhatt/pixelbatch
+issues: https://github.com/keshavbhatt/pixelbatch/issues
+contact: https://github.com/keshavbhatt/pixelbatch/issues
 
 grade: stable
 confinement: strict
@@ -32,21 +46,23 @@ apps:
     command: bin/desktop-launch $SNAP/usr/bin/pixelbatch
     environment:
        IS_SNAP: 1
-       LANG: en_US.UTF-8 # UMD issue 7,21
-       NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
+       LANG: en_US.UTF-8
+       NO_AT_BRIDGE: 1
+       # Extend PATH to include optimizer tools (don't override desktop-launch PATH)
+       PATH: $SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
     desktop: usr/share/applications/com.ktechpit.pixelbatch.desktop
     plugs:
         - desktop
         - desktop-legacy
         - gsettings
         - home
-        - mount-observe
         - network
         - opengl
         - removable-media
         - unity7
         - x11
         - wayland
+
 plugs:
   gsettings:
   gtk-3-themes:
@@ -71,19 +87,64 @@ parts:
      plugin: nil
      source: .
      source-subdir: src/
+
      build-packages:
         - build-essential
         - qtbase5-dev
         - libqt5svg5-dev
         - libgl1-mesa-dev
+
+     stage-packages:
+        # Image optimizer tools
+        - jpegoptim
+        - pngquant
+        - gifsicle
+
+        # Libraries specifically needed by optimizer tools
+        - libjpeg-turbo8
+        - libpng16-16
+        - libgif7
+
      override-build: |
             craftctl default
+            
+            # Build the application
             qmake PREFIX=${CRAFT_PART_INSTALL}/usr src
-            make -j4
+            make -j$(nproc)
             make install
+
      override-prime: |
             craftctl default
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
+            
+            # Fix desktop file icon path
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' \
+                ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
+            
+            # Ensure optimizer tools are executable
+            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/jpegoptim || true
+            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/pngquant || true
+            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/gifsicle || true
+
+   svgo:
+     plugin: npm
+     source: .
+     npm-include-node: true
+     npm-node-version: "18.19.0"
+     override-build: |
+            craftctl default
+            
+            # Install SVGO globally
+            npm install -g svgo
+            
+            # Copy svgo to usr/bin (not usr/local/bin)
+            mkdir -p ${CRAFT_PART_INSTALL}/usr/bin
+            cp ${CRAFT_PART_INSTALL}/bin/svgo ${CRAFT_PART_INSTALL}/usr/bin/ || true
+
+     override-prime: |
+            craftctl default
+            
+            # Ensure svgo is executable
+            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/svgo || true
 
    desktop-launch:
      plugin: nil
@@ -93,3 +154,4 @@ parts:
             craftctl default
             mkdir -p ${CRAFT_PART_INSTALL}/bin/
             cp -rf ${CRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${CRAFT_PART_INSTALL}/bin/
+            chmod +x ${CRAFT_PART_INSTALL}/bin/desktop-launch
