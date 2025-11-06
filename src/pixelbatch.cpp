@@ -1,5 +1,6 @@
 #include "pixelbatch.h"
 #include "elideditemdelegate.h"
+#include "thememanager.h"
 #include "ui_pixelbatch.h"
 
 #include <QDesktopWidget>
@@ -23,6 +24,9 @@ PixelBatch::PixelBatch(QWidget *parent)
       m_fileHandler(new FileHandler(this)) {
 
   ui->setupUi(this);
+
+  // Apply saved theme and style
+  applySavedThemeAndStyle();
 
   setWindowTitle(QApplication::applicationName() + " | v" + VERSIONSTR);
 
@@ -291,3 +295,22 @@ void PixelBatch::showAbout() {
       QApplication::applicationName() + " " +
           tr("is an application for batch processing of images."));
 }
+
+void PixelBatch::applySavedThemeAndStyle() {
+  bool useSystemTheme = m_settings.getUseSystemTheme();
+
+  if (useSystemTheme) {
+    // Use system theme and style
+    ThemeManager::applyTheme("", true);
+    ThemeManager::applyStyle("", true);
+  } else {
+    // Apply saved custom theme
+    QString theme = m_settings.getTheme();
+    ThemeManager::applyTheme(theme, false);
+
+    // Apply saved custom style
+    QString style = m_settings.getStyle();
+    ThemeManager::applyStyle(style, false);
+  }
+}
+

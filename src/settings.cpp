@@ -64,3 +64,31 @@ void Settings::setRememberOpenLastOpenedPath(const bool &remember) {
   settings.setValue(Constants::INPUT_REMEMBER_LAST_IMAGE_DIR_PATH_KEY,
                     remember);
 }
+
+QString Settings::getTheme() const {
+  return settings.value(Constants::APPEARANCE_THEME_KEY,
+                        Constants::DEFAULT_APPEARANCE_THEME).toString();
+}
+
+void Settings::setTheme(const QString &theme) {
+  settings.setValue(Constants::APPEARANCE_THEME_KEY, theme);
+}
+
+QString Settings::getStyle() const {
+  return settings.value(Constants::APPEARANCE_STYLE_KEY,
+                        Constants::DEFAULT_APPEARANCE_STYLE).toString();
+}
+
+void Settings::setStyle(const QString &style) {
+  settings.setValue(Constants::APPEARANCE_STYLE_KEY, style);
+}
+
+bool Settings::getUseSystemTheme() const {
+  return settings.value(Constants::APPEARANCE_USE_SYSTEM_THEME_KEY,
+                        Constants::DEFAULT_APPEARANCE_USE_SYSTEM_THEME).toBool();
+}
+
+void Settings::setUseSystemTheme(const bool &useSystemTheme) {
+  settings.setValue(Constants::APPEARANCE_USE_SYSTEM_THEME_KEY, useSystemTheme);
+}
+

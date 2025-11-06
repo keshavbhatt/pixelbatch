@@ -1,10 +1,12 @@
 #include "preferenceswidget.h"
 #include "imageformatprefwidget.h"
+#include "thememanager.h"
 #include "ui_preferenceswidget.h"
 
 #include <QAction>
 #include <QFileDialog>
 #include <QIcon>
+#include <QStyleFactory>
 
 #include <worker/imageworkerfactory.h>
 
@@ -78,6 +80,43 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
   connect(ui->filepickerRememberLastPathCheckBox, &QCheckBox::toggled, this,
           [=](bool arg1) { m_settings.setRememberOpenLastOpenedPath(arg1); });
 
+  // Theme and Style
+  // Load use system theme setting
+  bool useSystemTheme = m_settings.getUseSystemTheme();
+  ui->useSystemThemeCheckBox->setChecked(useSystemTheme);
+
+  // Populate available styles
+  QStringList availableStyles = QStyleFactory::keys();
+  ui->styleComboBox->addItems(availableStyles);
+
+  // Load current theme
+  QString currentTheme = m_settings.getTheme();
+  int themeIndex = ui->themeComboBox->findText(currentTheme);
+  if (themeIndex >= 0) {
+    ui->themeComboBox->setCurrentIndex(themeIndex);
+  }
+
+  // Load current style
+  QString currentStyle = m_settings.getStyle();
+  int styleIndex = ui->styleComboBox->findText(currentStyle, Qt::MatchFixedString);
+  if (styleIndex >= 0) {
+    ui->styleComboBox->setCurrentIndex(styleIndex);
+  }
+
+  // Enable/disable theme controls based on system theme checkbox
+  ui->themeComboBox->setEnabled(!useSystemTheme);
+  ui->styleComboBox->setEnabled(!useSystemTheme);
+  ui->themeLabel->setEnabled(!useSystemTheme);
+  ui->styleLabel->setEnabled(!useSystemTheme);
+
+  // Connect theme and style change signals
+  connect(ui->useSystemThemeCheckBox, &QCheckBox::toggled,
+          this, &PreferencesWidget::onUseSystemThemeToggled);
+  connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &PreferencesWidget::onThemeChanged);
+  connect(ui->styleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &PreferencesWidget::onStyleChanged);
+
   QList<ImageType> supportedImageTypes =
       ImageTypeUtils::getSupportedImageTypes();
   foreach (auto imageType, supportedImageTypes) {
@@ -113,3 +152,49 @@ void PreferencesWidget::onResetFilepickerLastOpenedPath() {
   ui->filepickerLastOpenedPathLineEdit->setText(
       Constants::DEFAULT_INPUT_LAST_IMAGE_DIR_PATH);
 }
+
+void PreferencesWidget::onThemeChanged(int index) {
+  QString theme = ui->themeComboBox->itemText(index);
+  m_settings.setTheme(theme);
+  bool useSystemTheme = m_settings.getUseSystemTheme();
+  applyTheme(theme, useSystemTheme);
+}
+
+void PreferencesWidget::onStyleChanged(int index) {
+  QString style = ui->styleComboBox->itemText(index);
+  m_settings.setStyle(style);
+  bool useSystemTheme = m_settings.getUseSystemTheme();
+  applyStyle(style, useSystemTheme);
+}
+
+void PreferencesWidget::onUseSystemThemeToggled(bool checked) {
+  m_settings.setUseSystemTheme(checked);
+
+  // Enable/disable custom theme controls
+  ui->themeComboBox->setEnabled(!checked);
+  ui->styleComboBox->setEnabled(!checked);
+  ui->themeLabel->setEnabled(!checked);
+  ui->styleLabel->setEnabled(!checked);
+
+  // Apply theme immediately
+  if (checked) {
+    // Use system theme
+    ThemeManager::applyTheme("", true);
+    ThemeManager::applyStyle("", true);
+  } else {
+    // Use custom theme
+    QString theme = m_settings.getTheme();
+    QString style = m_settings.getStyle();
+    ThemeManager::applyTheme(theme, false);
+    ThemeManager::applyStyle(style, false);
+  }
+}
+
+void PreferencesWidget::applyTheme(const QString &theme, bool useSystemTheme) {
+  ThemeManager::applyTheme(theme, useSystemTheme);
+}
+
+void PreferencesWidget::applyStyle(const QString &style, bool useSystemTheme) {
+  ThemeManager::applyStyle(style, useSystemTheme);
+}
+

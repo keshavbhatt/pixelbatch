@@ -20,3 +20,13 @@ const bool Constants::DEFAULT_INPUT_REMEMBER_LAST_IMAGE_DIR_PATH = true;
 const QString Constants::TASK_MAX_CONCURRENT_TASKS_KEY =
     "task/max_concurrent_tasks";
 const int Constants::DEFAULT_TASK_MAX_CONCURRENT_TASKS = 1;
+
+const QString Constants::APPEARANCE_THEME_KEY = "appearance/theme";
+const QString Constants::DEFAULT_APPEARANCE_THEME = "Light";
+
+const QString Constants::APPEARANCE_STYLE_KEY = "appearance/style";
+const QString Constants::DEFAULT_APPEARANCE_STYLE = "Fusion";
+
+const QString Constants::APPEARANCE_USE_SYSTEM_THEME_KEY =
+    "appearance/useSystemTheme";
+const bool Constants::DEFAULT_APPEARANCE_USE_SYSTEM_THEME = true;

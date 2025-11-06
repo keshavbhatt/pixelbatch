@@ -54,5 +54,6 @@ private:
   void setupStatusBar();
   void initMenuBar();
   void initPreferencesWidget();
+  void applySavedThemeAndStyle();
 };
 #endif // PIXELBATCH_H

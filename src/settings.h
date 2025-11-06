@@ -28,6 +28,15 @@ public:
   bool getRememberOpenLastOpenedPath() const;
   void setRememberOpenLastOpenedPath(const bool &remember);
 
+  QString getTheme() const;
+  void setTheme(const QString &theme);
+
+  QString getStyle() const;
+  void setStyle(const QString &style);
+
+  bool getUseSystemTheme() const;
+  void setUseSystemTheme(const bool &useSystemTheme);
+
 private:
   Settings(QObject *parent = nullptr);            // Private constructor
   Settings(const Settings &) = delete;            // Disable copy constructor

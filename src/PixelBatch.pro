@@ -84,6 +84,7 @@ HEADERS += \
     taskactionwidget.h \
     taskwidget.h \
     taskwidgetoverlay.h \
+    thememanager.h \
     worker/ImageWorker.h \
     worker/imageoptimizer.h \
     worker/imageworkerfactory.h \

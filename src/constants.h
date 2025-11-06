@@ -20,6 +20,15 @@ public:
   static const QString TASK_MAX_CONCURRENT_TASKS_KEY;
   static const int DEFAULT_TASK_MAX_CONCURRENT_TASKS;
 
+  static const QString APPEARANCE_THEME_KEY;
+  static const QString DEFAULT_APPEARANCE_THEME;
+
+  static const QString APPEARANCE_STYLE_KEY;
+  static const QString DEFAULT_APPEARANCE_STYLE;
+
+  static const QString APPEARANCE_USE_SYSTEM_THEME_KEY;
+  static const bool DEFAULT_APPEARANCE_USE_SYSTEM_THEME;
+
 private:
   Constants() = default;
 };

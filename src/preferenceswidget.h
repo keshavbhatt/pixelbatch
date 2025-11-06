@@ -20,11 +20,17 @@ private slots:
   void onChangeOutputDirPath();
   void onCleanOptimizedFilePrefix();
   void onResetFilepickerLastOpenedPath();
+  void onThemeChanged(int index);
+  void onStyleChanged(int index);
+  void onUseSystemThemeToggled(bool checked);
 
 private:
   Ui::PreferencesWidget *ui;
 
   Settings &m_settings;
+
+  void applyTheme(const QString &theme, bool useSystemTheme = false);
+  void applyStyle(const QString &style, bool useSystemTheme = false);
 };
 
 #endif // PREFERENCESWIDGET_H
