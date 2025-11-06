@@ -1,8 +1,18 @@
 name: pixelbatch
 version: '1.0'
-summary: Ultra HD wallpaper store
+summary: Batch Image Optimization Tool
 description: |
-  ColorWall is a desktop wallpaper store/manager utility that allows you to browse download and apply wallpaper from huge collection of wallpapers.
+  PixelBatch is a powerful batch image optimization application that helps you 
+  reduce file sizes while maintaining quality. Perfect for web developers, 
+  photographers, and content creators.
+  
+  Features:
+  - Multi-format support: JPEG, PNG, GIF, and SVG optimization
+  - Professional optimizers: jpegoptim, pngquant, gifsicle, and SVGO
+  - Batch processing: Optimize hundreds of images at once
+  - Concurrent processing: Multi-threaded optimization for speed
+  - Real-time statistics: See file size reduction as you work
+  - Format-specific settings: Fine-tune optimization for each image type
 
 grade: stable
 confinement: strict
