@@ -138,8 +138,11 @@ parts:
             # Copy svgo executable to usr/bin
             mkdir -p ${CRAFT_PRIME}/usr/bin
             
-            # Find and copy svgo from node_modules
-            if [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
+            # Find and copy svgo from node_modules (it's installed as a dependency)
+            if [ -f ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ]; then
+                cp ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+                chmod +x ${CRAFT_PRIME}/usr/bin/svgo
+            elif [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
                 cp ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
                 chmod +x ${CRAFT_PRIME}/usr/bin/svgo
             elif [ -f ${CRAFT_PRIME}/bin/svgo ]; then
