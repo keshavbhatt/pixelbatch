@@ -73,10 +73,9 @@ parts:
      source-subdir: src/
      build-packages:
         - build-essential
-        - qtbase5-dev # also contains dev headers for libqt5sql5 there is no libqt5sql5-dev
+        - qtbase5-dev
         - libqt5svg5-dev
         - libgl1-mesa-dev
-        - libgumbo-dev
      override-build: |
             craftctl default
             qmake PREFIX=${CRAFT_PART_INSTALL}/usr src
@@ -85,17 +84,6 @@ parts:
      override-prime: |
             craftctl default
             sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
-
-   gumbo:
-     plugin: nil
-     stage-packages:
-         - libgumbo1
-
-   desktop-data-packages:
-     plugin: nil
-     stage-packages:
-         - mate-desktop-common
-         - cinnamon-desktop-data
 
    desktop-launch:
      plugin: nil
