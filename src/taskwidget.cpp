@@ -2,6 +2,7 @@
 
 #include "desktoputils.h"
 #include "elideditemdelegate.h"
+#include "imagecomparisonwidget.h"
 #include "imagestats.h"
 #include "imagetask.h"
 #include "settings.h"
@@ -560,6 +561,48 @@ void TaskWidget::openOriginalImageInImageViewerForSelectedTask() {
         tr("Failed to open the original image.\n"
            "Please check that you have a default image viewer configured."));
   }
+}
+
+void TaskWidget::compareImagesForSelectedTask() {
+  ImageTask *task = getImageTaskFromRow(this->currentRow());
+
+  if (!task) {
+    qWarning() << "No task selected";
+    return;
+  }
+
+  // Check if the task has been completed
+  if (task->taskStatus != ImageTask::Completed) {
+    QMessageBox::information(
+        this, tr("Image Not Processed"),
+        tr("Please process the image first before comparing.\n"
+           "The optimized image does not exist yet."));
+    return;
+  }
+
+  // Check if both files exist
+  QFileInfo originalInfo(task->imagePath);
+  QFileInfo optimizedInfo(task->optimizedPath);
+
+  if (!originalInfo.exists()) {
+    QMessageBox::warning(this, tr("File Not Found"),
+                         tr("The original image file does not exist.\n"
+                            "It may have been moved or deleted."));
+    return;
+  }
+
+  if (!optimizedInfo.exists()) {
+    QMessageBox::warning(this, tr("File Not Found"),
+                         tr("The optimized image file does not exist.\n"
+                            "Please ensure the image has been processed."));
+    return;
+  }
+
+  // Create and show the comparison dialog
+  ImageComparisonWidget *comparisonDialog =
+      new ImageComparisonWidget(task->imagePath, task->optimizedPath, this);
+  comparisonDialog->setAttribute(Qt::WA_DeleteOnClose);
+  comparisonDialog->exec();
 }
 
 int TaskWidget::findRowByImageTask(ImageTask *task) {

@@ -16,6 +16,9 @@ TaskActionWidget::TaskActionWidget(QWidget *parent, TaskWidget *taskWidget)
 
   connect(ui->openOriginalPb, &QPushButton::clicked, m_taskWidget,
           &TaskWidget::openOriginalImageInImageViewerForSelectedTask);
+
+  connect(ui->compareImagesPb, &QPushButton::clicked, m_taskWidget,
+          &TaskWidget::compareImagesForSelectedTask);
 }
 
 TaskActionWidget::~TaskActionWidget() { delete ui; }
@@ -32,4 +35,5 @@ void TaskActionWidget::updateActions() {
   ui->openOptimizedInFilesPb->setEnabled(hasSelection);
   ui->openOptimizedPb->setEnabled(hasSelection);
   ui->openOriginalPb->setEnabled(hasSelection);
+  ui->compareImagesPb->setEnabled(hasSelection);
 }

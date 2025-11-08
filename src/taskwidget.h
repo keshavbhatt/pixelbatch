@@ -39,6 +39,7 @@ public slots:
   void openOptimizedImageInFileManagerForSelectedTask();
   void openOptimizedImageInImageViewerForSelectedTask();
   void openOriginalImageInImageViewerForSelectedTask();
+  void compareImagesForSelectedTask();
 
   void addFileToTable(const QString &filePath);
   void processImages();

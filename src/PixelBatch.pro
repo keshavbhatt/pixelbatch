@@ -50,6 +50,7 @@ SOURCES += \
     desktoputils.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
+    imagecomparisonwidget.cpp \
     imageformatprefwidget.cpp \
     imagestats.cpp \
     main.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     desktoputils.h \
     elideditemdelegate.h \
     filehandler.h \
+    imagecomparisonwidget.h \
     imageformatprefwidget.h \
     imagestats.h \
     imagetask.h \
