@@ -48,6 +48,7 @@ SOURCES += \
     about.cpp \
     constants.cpp \
     desktoputils.cpp \
+    draggablelabel.cpp \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imagecomparisonwidget.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     about.h \
     constants.h \
     desktoputils.h \
+    draggablelabel.h \
     elideditemdelegate.h \
     filehandler.h \
     imagecomparisonwidget.h \

@@ -99,11 +99,15 @@ void ImageComparisonWidget::setupUI() {
   leftLayout->addWidget(leftTitle);
 
   m_leftScroll = new QScrollArea();
-  m_leftLabel = new QLabel();
+  m_leftLabel = new DraggableLabel();
   m_leftLabel->setScaledContents(false);
   m_leftLabel->setAlignment(Qt::AlignCenter);
+  m_leftLabel->setScrollArea(m_leftScroll);
   m_leftScroll->setWidget(m_leftLabel);
   m_leftScroll->setWidgetResizable(true);
+  // Optimize scroll area for smooth dragging
+  m_leftScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  m_leftScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   leftLayout->addWidget(m_leftScroll);
 
   QVBoxLayout *rightLayout = new QVBoxLayout();
@@ -113,11 +117,15 @@ void ImageComparisonWidget::setupUI() {
   rightLayout->addWidget(rightTitle);
 
   m_rightScroll = new QScrollArea();
-  m_rightLabel = new QLabel();
+  m_rightLabel = new DraggableLabel();
   m_rightLabel->setScaledContents(false);
   m_rightLabel->setAlignment(Qt::AlignCenter);
+  m_rightLabel->setScrollArea(m_rightScroll);
   m_rightScroll->setWidget(m_rightLabel);
   m_rightScroll->setWidgetResizable(true);
+  // Optimize scroll area for smooth dragging
+  m_rightScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  m_rightScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   rightLayout->addWidget(m_rightScroll);
 
   QSplitter *splitter = new QSplitter(Qt::Horizontal);

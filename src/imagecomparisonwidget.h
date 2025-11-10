@@ -1,6 +1,8 @@
 #ifndef IMAGECOMPARISONWIDGET_H
 #define IMAGECOMPARISONWIDGET_H
 
+#include "draggablelabel.h"
+
 #include <QCheckBox>
 #include <QDialog>
 #include <QLabel>
@@ -46,8 +48,8 @@ private:
   QPixmap m_optimizedPixmap;
 
   QLabel *m_imageLabel;
-  QLabel *m_leftLabel;
-  QLabel *m_rightLabel;
+  DraggableLabel *m_leftLabel;
+  DraggableLabel *m_rightLabel;
   QSlider *m_slider;
   QPushButton *m_toggleButton;
   QWidget *m_sideBySideWidget;

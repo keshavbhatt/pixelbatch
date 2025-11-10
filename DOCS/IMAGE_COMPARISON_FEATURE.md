@@ -6,7 +6,81 @@
 - `zoomReset()`: Set zoom to 1.0 (100%)
 - `zoomFit()`: Calculate optimal zoom to fit viewport (max 100%)
 
-# Image Comparison Feature
+### Mouse Drag Implementation
+
+The drag functionality is implemented in a custom `DraggableLabel` class:
+
+```cpp
+class DraggableLabel : public QLabel {
+  Q_OBJECT
+  
+public:
+  void setScrollArea(QScrollArea *scrollArea);
+  
+protected:
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  
+private:
+  bool m_isDragging;
+  QPoint m_lastMousePos;
+  QScrollArea *m_scrollArea;
+};
+
+void DraggableLabel::mousePressEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    m_isDragging = true;
+    m_lastMousePos = event->globalPos(); // Use globalPos for accuracy
+    setCursor(Qt::ClosedHandCursor);
+  }
+}
+
+void DraggableLabel::mouseMoveEvent(QMouseEvent *event) {
+  if (m_isDragging) {
+    QPoint delta = m_lastMousePos - event->globalPos();
+    m_lastMousePos = event->globalPos();
+    
+    // Update scroll bars with bounds checking for smooth performance
+    int newValue = scrollBar->value() + delta.y();
+    scrollBar->setValue(qBound(min, newValue, max));
+  }
+}
+
+void DraggableLabel::mouseReleaseEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    m_isDragging = false;
+    setCursor(Qt::OpenHandCursor);
+  }
+}
+```
+
+**Key Features:**
+- **Custom QLabel Subclass**: Inherits from QLabel and overrides mouse events
+- **Cursor Feedback**: 
+  - `Qt::OpenHandCursor`: Indicates draggable area (when not dragging)
+  - `Qt::ClosedHandCursor`: Indicates active dragging
+- **Delta Calculation**: Computes mouse movement between frames
+- **Scroll Bar Manipulation**: Directly updates scroll bar values based on delta
+- **Event Handling**: Accepts events to prevent propagation to parent widgets
+- **Integration**: Replaces standard QLabel in side-by-side view
+- **Synchronized Support**: Works seamlessly with scroll synchronization (drag triggers scroll bar changes, which trigger sync)
+
+**Performance Optimizations:**
+- **Global Position Tracking**: Uses `event->globalPos()` instead of `event->pos()` for more accurate cross-widget tracking
+- **Bounds Checking**: Uses `qBound()` to clamp scroll values, preventing unnecessary updates
+- **Mouse Tracking**: Enabled for better cursor feedback without lag
+- **Direct Updates**: Zero-delay scroll bar value updates for immediate response
+- **Conditional Updates**: Only updates scroll bars when delta is non-zero
+
+**User Experience:**
+1. User hovers over image → cursor changes to open hand
+2. User clicks and holds → cursor changes to closed hand
+3. User drags → image pans smoothly in the direction of drag
+4. If sync enabled → both images pan together
+5. User releases → cursor returns to open hand
+
+## User Workflow
 
 ## Overview
 
@@ -54,6 +128,7 @@ The side-by-side view displays the original and optimized images next to each ot
 - **Splitter**: Adjustable divider between the two images
 - **Independent Scrolling**: Each image can be scrolled independently (when sync is disabled)
 - **Synchronized Scrolling**: Optional feature to scroll both images together (enabled by default)
+- **Mouse Drag Navigation**: Click and drag to pan images (especially useful when zoomed in)
 - **Zoom Controls**: Interactive zoom functionality to inspect details
 - **Labels**: Clear headers indicating "Original" and "Optimized"
 
@@ -63,6 +138,14 @@ The side-by-side view displays the original and optimized images next to each ot
 - **Unchecked**: Images can be scrolled independently
 - Works for both horizontal and vertical scrolling
 - Handles images of different dimensions by using proportional scaling
+
+**Mouse Drag Navigation:**
+- **Click and Drag**: Left-click and drag anywhere on the image to pan
+- **Visual Feedback**: Cursor changes to open hand (ready) and closed hand (dragging)
+- **Smooth Panning**: Direct manipulation of scroll position for intuitive navigation
+- **Synchronized Drag**: When scroll sync is enabled, dragging one image moves both
+- **Works with Zoom**: Especially useful when zoomed in to inspect specific areas
+- **No Selection Interference**: Mouse drag is detected separately from text/widget selection
 
 **Zoom Functionality:**
 - **Zoom In (+)**: Increase magnification by 25% (up to 500%)
@@ -154,17 +237,24 @@ Original: 2.5 MB (2621440 bytes)  |  Optimized: 892.3 KB (914124 bytes)  |  Save
 
 ```cpp
 class ImageComparisonWidget : public QDialog
+class DraggableLabel : public QLabel
 ```
 
-**Key Member Variables:**
+**Key Member Variables (ImageComparisonWidget):**
 - `m_originalPixmap`, `m_optimizedPixmap`: Loaded images (original size)
 - `m_originalPixmapScaled`, `m_optimizedPixmapScaled`: Zoomed versions
 - `m_leftScroll`, `m_rightScroll`: Scroll areas for side-by-side view
 - `m_imageLabel`: Label for slider view composite image
+- `m_leftLabel`, `m_rightLabel`: DraggableLabel instances for mouse drag support
 - `m_syncScrollBars`: Boolean flag for scroll synchronization
 - `m_updatingScrollBars`: Prevents infinite scroll loops
 - `m_isSideBySideView`: Tracks current view mode
 - `m_zoomFactor`: Current zoom level (0.1 to 5.0)
+
+**Key Member Variables (DraggableLabel):**
+- `m_isDragging`: Boolean flag tracking drag state
+- `m_lastMousePos`: Last recorded mouse position for delta calculation
+- `m_scrollArea`: Reference to parent scroll area for scroll bar manipulation
 
 ### Image Loading
 
@@ -302,9 +392,10 @@ void ImageComparisonWidget::updateZoom() {
 **Side-by-Side Method:**
 1. Enable scroll synchronization
 2. Zoom in on specific areas (if needed)
-3. Scroll to various parts of the image
-4. Look for overall quality differences
-5. Check edges, gradients, and details
+3. Use mouse drag to pan around the zoomed image
+4. Scroll to various parts of the image
+5. Look for overall quality differences
+6. Check edges, gradients, and details
 
 **Slider Method:**
 1. Move slider slowly across the image
@@ -422,8 +513,10 @@ The dialog responds to standard Qt shortcuts and zoom controls:
 
 ### Main Implementation Files
 
-- **Header**: `src/imagecomparisonwidget.h`
-- **Implementation**: `src/imagecomparisonwidget.cpp`
+- **Comparison Widget Header**: `src/imagecomparisonwidget.h`
+- **Comparison Widget Implementation**: `src/imagecomparisonwidget.cpp`
+- **Draggable Label Header**: `src/draggablelabel.h`
+- **Draggable Label Implementation**: `src/draggablelabel.cpp`
 
 ### Integration Files
 
