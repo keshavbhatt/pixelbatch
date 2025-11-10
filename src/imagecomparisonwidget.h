@@ -26,6 +26,10 @@ private slots:
   void onLeftScrollChanged();
   void onRightScrollChanged();
   void onSyncCheckboxToggled(bool checked);
+  void zoomIn();
+  void zoomOut();
+  void zoomReset();
+  void zoomFit();
 
 private:
   void setupUI();
@@ -55,6 +59,13 @@ private:
   bool m_isSideBySideView;
   bool m_syncScrollBars;
   bool m_updatingScrollBars;
+
+  double m_zoomFactor;
+  QPixmap m_originalPixmapScaled;
+  QPixmap m_optimizedPixmapScaled;
+
+  void updateZoom();
+  void applyZoom(double factor);
 };
 
 #endif // IMAGECOMPARISONWIDGET_H

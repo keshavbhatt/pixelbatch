@@ -1,3 +1,11 @@
+- **Synchronized Display**: Both images zoom together
+
+**Zoom Methods:**
+- `zoomIn()`: Multiply current zoom by 1.25
+- `zoomOut()`: Divide current zoom by 1.25
+- `zoomReset()`: Set zoom to 1.0 (100%)
+- `zoomFit()`: Calculate optimal zoom to fit viewport (max 100%)
+
 # Image Comparison Feature
 
 ## Overview
@@ -16,17 +24,21 @@ The comparison dialog will open showing both the original and optimized images.
 
 The Image Comparison dialog consists of several components arranged vertically:
 
-```
-┌─────────────────────────────────────────────────────┐
-│  [Toggle View Button]                               │
-├─────────────────────────────────────────────────────┤
+2. Use "Fit" to see the whole image first
+3. Zoom in to 200-300% to inspect compression artifacts
+4. Scroll to various parts of the image
+5. Check edges, gradients, and text details
+6. Look for JPEG blocking or PNG color banding
+7. Reset to 100% to verify at actual size
 │                                                     │
 │  [Comparison View - Side-by-Side OR Slider]        │
-│                                                     │
-│              (Main Content Area)                    │
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│  [Image Information] (compact, minimal height)     │
+1. Start at 100% zoom (if needed)
+2. Move slider slowly across the image
+3. Watch for compression artifacts at the split line
+4. Check fine details and textures
+5. Verify color accuracy
+6. Examine critical areas thoroughly
+7. Pay attention to areas with gradients or subtle details
 ├─────────────────────────────────────────────────────┤
 │  [Close Button]                                     │
 └─────────────────────────────────────────────────────┘
@@ -42,6 +54,7 @@ The side-by-side view displays the original and optimized images next to each ot
 - **Splitter**: Adjustable divider between the two images
 - **Independent Scrolling**: Each image can be scrolled independently (when sync is disabled)
 - **Synchronized Scrolling**: Optional feature to scroll both images together (enabled by default)
+- **Zoom Controls**: Interactive zoom functionality to inspect details
 - **Labels**: Clear headers indicating "Original" and "Optimized"
 
 **Synchronized Scrolling:**
@@ -51,10 +64,22 @@ The side-by-side view displays the original and optimized images next to each ot
 - Works for both horizontal and vertical scrolling
 - Handles images of different dimensions by using proportional scaling
 
+**Zoom Functionality:**
+- **Zoom In (+)**: Increase magnification by 25% (up to 500%)
+- **Zoom Out (−)**: Decrease magnification by 25% (down to 10%)
+- **100%**: Reset to original size (1:1 pixel ratio)
+- **Fit**: Scale image to fit within the viewport (max 100%)
+- **Range**: 10% to 500% zoom levels
+- **Scroll Position Preservation**: Maintains relative scroll position when zooming
+- **Synchronized Zoom**: Both images zoom together
+- **Smooth Scaling**: Uses Qt's SmoothTransformation for quality
+
 **Benefits:**
 - Easy to see overall composition differences
 - Good for comparing different areas of the image
 - Natural way to view two images simultaneously
+- Zoom in to inspect compression artifacts and fine details
+- Zoom out to see the whole picture at once
 
 ### 2. Slider View
 
@@ -121,12 +146,14 @@ class ImageComparisonWidget : public QDialog
 ```
 
 **Key Member Variables:**
-- `m_originalPixmap`, `m_optimizedPixmap`: Loaded images
+- `m_originalPixmap`, `m_optimizedPixmap`: Loaded images (original size)
+- `m_originalPixmapScaled`, `m_optimizedPixmapScaled`: Zoomed versions
 - `m_leftScroll`, `m_rightScroll`: Scroll areas for side-by-side view
 - `m_imageLabel`: Label for slider view composite image
 - `m_syncScrollBars`: Boolean flag for scroll synchronization
 - `m_updatingScrollBars`: Prevents infinite scroll loops
 - `m_isSideBySideView`: Tracks current view mode
+- `m_zoomFactor`: Current zoom level (0.1 to 5.0)
 
 ### Image Loading
 
@@ -194,6 +221,47 @@ painter.drawLine(splitX, 0, splitX, height);
 - Efficient QPainter operations
 - Line drawn last to ensure visibility
 
+### Zoom Implementation
+
+The zoom feature uses scaled pixmaps with intelligent scroll position management:
+
+```cpp
+void ImageComparisonWidget::applyZoom(double factor) {
+  // Clamp zoom factor between 10% and 500%
+  factor = qBound(0.1, factor, 5.0);
+  
+  m_zoomFactor = factor;
+  updateZoom();
+}
+
+void ImageComparisonWidget::updateZoom() {
+  // Calculate scaled size
+  QSize scaledSize(originalSize.width() * m_zoomFactor,
+                   originalSize.height() * m_zoomFactor);
+  
+  // Scale pixmaps with smooth transformation
+  m_originalPixmapScaled = m_originalPixmap.scaled(
+      scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  
+  // Store scroll position as ratio before update
+  double scrollRatio = currentScrollPos / maxScrollPos;
+  
+  // Update display
+  m_leftLabel->setPixmap(m_originalPixmapScaled);
+  
+  // Restore scroll position proportionally
+  QTimer::singleShot(10, [this, scrollRatio]() {
+    scrollBar->setValue(scrollRatio * newMaxScrollPos);
+  });
+}
+```
+
+**Key Features:**
+- **Zoom Levels**: 10%, 25%, 50%, 75%, 100%, 125%, 150%, 200%, 300%, 400%, 500%
+- **Incremental Zoom**: Each step multiplies/divides by 1.25 (25% change)
+- **Scroll Position**: Maintains relative position when zooming
+- **Delayed Restoration**: Uses QTimer to ensure layout update before scroll adjustment
+- **Smooth Scaling**: Qt::SmoothTransformation ensures quality at all zoom levels
 ## User Workflow
 
 ### Basic Comparison
@@ -294,10 +362,18 @@ qWarning() << "Failed to load one or both images";
 
 ## Keyboard Shortcuts
 
-Currently, the dialog responds to standard Qt dialog shortcuts:
+The dialog responds to standard Qt shortcuts and zoom controls:
 
+**Dialog Controls:**
 - **Escape**: Close dialog (same as clicking Close button)
 - **Enter/Return**: Close dialog (default button behavior)
+
+**Zoom Controls (Side-by-Side View):**
+- **Ctrl++** or **Ctrl+=**: Zoom in (via tooltip hint)
+- **Ctrl+-**: Zoom out (via tooltip hint)
+- **Ctrl+0**: Reset to 100% (via tooltip hint)
+
+*Note: Keyboard shortcuts are currently implemented via button tooltips. Full keyboard event handling could be added in future updates.*
 
 ## Future Enhancement Possibilities
 

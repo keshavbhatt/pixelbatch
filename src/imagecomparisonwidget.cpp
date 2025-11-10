@@ -10,8 +10,8 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSettings>
-
 #include <QSplitter>
+#include <QTimer>
 #include <QVBoxLayout>
 
 ImageComparisonWidget::ImageComparisonWidget(const QString &originalPath,
@@ -23,7 +23,7 @@ ImageComparisonWidget::ImageComparisonWidget(const QString &originalPath,
       m_toggleButton(nullptr), m_sideBySideWidget(nullptr),
       m_overlayWidget(nullptr), m_syncScrollCheckbox(nullptr),
       m_leftScroll(nullptr), m_rightScroll(nullptr), m_isSideBySideView(true),
-      m_syncScrollBars(true), m_updatingScrollBars(false) {
+      m_syncScrollBars(true), m_updatingScrollBars(false), m_zoomFactor(1.0) {
 
   setWindowTitle(tr("Compare Images - Before and After"));
   resize(1200, 700);
@@ -50,15 +50,44 @@ void ImageComparisonWidget::setupUI() {
   QVBoxLayout *sideBySideMainLayout = new QVBoxLayout(m_sideBySideWidget);
   sideBySideMainLayout->setContentsMargins(0, 0, 0, 0);
 
-  // Sync checkbox for side-by-side view
-  QHBoxLayout *syncLayout = new QHBoxLayout();
+  // Sync checkbox and zoom controls for side-by-side view
+  QHBoxLayout *controlsLayout = new QHBoxLayout();
   m_syncScrollCheckbox = new QCheckBox(tr("Synchronize scroll bars"));
   m_syncScrollCheckbox->setChecked(true);
   connect(m_syncScrollCheckbox, &QCheckBox::toggled, this,
           &ImageComparisonWidget::onSyncCheckboxToggled);
-  syncLayout->addWidget(m_syncScrollCheckbox);
-  syncLayout->addStretch();
-  sideBySideMainLayout->addLayout(syncLayout);
+  controlsLayout->addWidget(m_syncScrollCheckbox);
+  controlsLayout->addStretch();
+
+  // Zoom controls
+  QLabel *zoomLabel = new QLabel(tr("Zoom:"));
+  controlsLayout->addWidget(zoomLabel);
+
+  QPushButton *zoomOutBtn = new QPushButton(tr("−"));
+  zoomOutBtn->setMaximumWidth(30);
+  zoomOutBtn->setToolTip(tr("Zoom Out (Ctrl+-)"));
+  connect(zoomOutBtn, &QPushButton::clicked, this, &ImageComparisonWidget::zoomOut);
+  controlsLayout->addWidget(zoomOutBtn);
+
+  QPushButton *zoomResetBtn = new QPushButton(tr("100%"));
+  zoomResetBtn->setMaximumWidth(50);
+  zoomResetBtn->setToolTip(tr("Reset Zoom (Ctrl+0)"));
+  connect(zoomResetBtn, &QPushButton::clicked, this, &ImageComparisonWidget::zoomReset);
+  controlsLayout->addWidget(zoomResetBtn);
+
+  QPushButton *zoomInBtn = new QPushButton(tr("+"));
+  zoomInBtn->setMaximumWidth(30);
+  zoomInBtn->setToolTip(tr("Zoom In (Ctrl++)"));
+  connect(zoomInBtn, &QPushButton::clicked, this, &ImageComparisonWidget::zoomIn);
+  controlsLayout->addWidget(zoomInBtn);
+
+  QPushButton *zoomFitBtn = new QPushButton(tr("Fit"));
+  zoomFitBtn->setMaximumWidth(50);
+  zoomFitBtn->setToolTip(tr("Fit to Window"));
+  connect(zoomFitBtn, &QPushButton::clicked, this, &ImageComparisonWidget::zoomFit);
+  controlsLayout->addWidget(zoomFitBtn);
+
+  sideBySideMainLayout->addLayout(controlsLayout);
 
   QHBoxLayout *sideBySideLayout = new QHBoxLayout();
   sideBySideLayout->setContentsMargins(0, 0, 0, 0);
@@ -217,8 +246,7 @@ void ImageComparisonWidget::showSideBySide() {
   m_isSideBySideView = true;
   m_toggleButton->setText(tr("Switch to Slider View"));
 
-  m_leftLabel->setPixmap(m_originalPixmap);
-  m_rightLabel->setPixmap(m_optimizedPixmap);
+  updateZoom();
 
   saveViewMode();
 }
@@ -384,3 +412,97 @@ void ImageComparisonWidget::loadViewMode() {
     showSideBySide();
   }
 }
+
+void ImageComparisonWidget::zoomIn() {
+  applyZoom(m_zoomFactor * 1.25);
+}
+
+void ImageComparisonWidget::zoomOut() {
+  applyZoom(m_zoomFactor / 1.25);
+}
+
+void ImageComparisonWidget::zoomReset() {
+  applyZoom(1.0);
+}
+
+void ImageComparisonWidget::zoomFit() {
+  if (m_originalPixmap.isNull() || !m_leftScroll) {
+    return;
+  }
+
+  // Calculate zoom to fit the image in the scroll area
+  QSize scrollSize = m_leftScroll->viewport()->size();
+  QSize imageSize = m_originalPixmap.size();
+
+  double widthRatio = (double)scrollSize.width() / imageSize.width();
+  double heightRatio = (double)scrollSize.height() / imageSize.height();
+  double fitZoom = qMin(widthRatio, heightRatio);
+
+  // Ensure we don't zoom in beyond 100% for fit
+  if (fitZoom > 1.0) {
+    fitZoom = 1.0;
+  }
+
+  applyZoom(fitZoom);
+}
+
+void ImageComparisonWidget::applyZoom(double factor) {
+  // Clamp zoom factor between 10% and 500%
+  if (factor < 0.1) {
+    factor = 0.1;
+  } else if (factor > 5.0) {
+    factor = 5.0;
+  }
+
+  m_zoomFactor = factor;
+  updateZoom();
+}
+
+void ImageComparisonWidget::updateZoom() {
+  if (m_originalPixmap.isNull() || m_optimizedPixmap.isNull()) {
+    return;
+  }
+
+  // Only apply zoom in side-by-side view
+  if (m_isSideBySideView) {
+    // Calculate scaled size
+    QSize originalSize = m_originalPixmap.size();
+    QSize scaledSize(originalSize.width() * m_zoomFactor,
+                     originalSize.height() * m_zoomFactor);
+
+    // Scale the pixmaps
+    m_originalPixmapScaled = m_originalPixmap.scaled(
+        scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    m_optimizedPixmapScaled = m_optimizedPixmap.scaled(
+        scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    // Store current scroll positions (as ratios)
+    double hRatioLeft = 0.0;
+    double vRatioLeft = 0.0;
+    if (m_leftScroll->horizontalScrollBar()->maximum() > 0) {
+      hRatioLeft = (double)m_leftScroll->horizontalScrollBar()->value() /
+                   m_leftScroll->horizontalScrollBar()->maximum();
+    }
+    if (m_leftScroll->verticalScrollBar()->maximum() > 0) {
+      vRatioLeft = (double)m_leftScroll->verticalScrollBar()->value() /
+                   m_leftScroll->verticalScrollBar()->maximum();
+    }
+
+    // Update the labels
+    m_leftLabel->setPixmap(m_originalPixmapScaled);
+    m_rightLabel->setPixmap(m_optimizedPixmapScaled);
+
+    // Restore scroll positions after a short delay to allow layout update
+    QTimer::singleShot(10, this, [this, hRatioLeft, vRatioLeft]() {
+      if (m_leftScroll->horizontalScrollBar()->maximum() > 0) {
+        m_leftScroll->horizontalScrollBar()->setValue(
+            hRatioLeft * m_leftScroll->horizontalScrollBar()->maximum());
+      }
+      if (m_leftScroll->verticalScrollBar()->maximum() > 0) {
+        m_leftScroll->verticalScrollBar()->setValue(
+            vRatioLeft * m_leftScroll->verticalScrollBar()->maximum());
+      }
+    });
+  }
+}
+
