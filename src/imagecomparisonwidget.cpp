@@ -141,11 +141,46 @@ void ImageComparisonWidget::setupUI() {
   QVBoxLayout *overlayLayout = new QVBoxLayout(m_overlayWidget);
   overlayLayout->setContentsMargins(0, 0, 0, 0);
 
+  // Title and zoom controls for overlay view
+  QHBoxLayout *overlayTopLayout = new QHBoxLayout();
+
   QLabel *overlayTitle = new QLabel(
       tr("<b>Slider View</b> - Move slider to compare (Left: Original, Right: "
          "Optimized)"));
-  overlayTitle->setAlignment(Qt::AlignCenter);
-  overlayLayout->addWidget(overlayTitle);
+  overlayTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+  overlayTopLayout->addWidget(overlayTitle, 1);
+
+  overlayTopLayout->addStretch();
+
+  // Zoom controls for slider view
+  QLabel *zoomLabel2 = new QLabel(tr("Zoom:"));
+  overlayTopLayout->addWidget(zoomLabel2);
+
+  QPushButton *zoomOutBtn2 = new QPushButton(tr("−"));
+  zoomOutBtn2->setMaximumWidth(30);
+  zoomOutBtn2->setToolTip(tr("Zoom Out (Ctrl+-)"));
+  connect(zoomOutBtn2, &QPushButton::clicked, this, &ImageComparisonWidget::zoomOut);
+  overlayTopLayout->addWidget(zoomOutBtn2);
+
+  QPushButton *zoomResetBtn2 = new QPushButton(tr("100%"));
+  zoomResetBtn2->setMaximumWidth(50);
+  zoomResetBtn2->setToolTip(tr("Reset Zoom (Ctrl+0)"));
+  connect(zoomResetBtn2, &QPushButton::clicked, this, &ImageComparisonWidget::zoomReset);
+  overlayTopLayout->addWidget(zoomResetBtn2);
+
+  QPushButton *zoomInBtn2 = new QPushButton(tr("+"));
+  zoomInBtn2->setMaximumWidth(30);
+  zoomInBtn2->setToolTip(tr("Zoom In (Ctrl++)"));
+  connect(zoomInBtn2, &QPushButton::clicked, this, &ImageComparisonWidget::zoomIn);
+  overlayTopLayout->addWidget(zoomInBtn2);
+
+  QPushButton *zoomFitBtn2 = new QPushButton(tr("Fit"));
+  zoomFitBtn2->setMaximumWidth(50);
+  zoomFitBtn2->setToolTip(tr("Fit to Window"));
+  connect(zoomFitBtn2, &QPushButton::clicked, this, &ImageComparisonWidget::zoomFit);
+  overlayTopLayout->addWidget(zoomFitBtn2);
+
+  overlayLayout->addLayout(overlayTopLayout);
 
   QScrollArea *overlayScroll = new QScrollArea();
   m_imageLabel = new QLabel();
@@ -257,6 +292,7 @@ void ImageComparisonWidget::showOverlay() {
   m_isSideBySideView = false;
   m_toggleButton->setText(tr("Switch to Side-by-Side View"));
 
+  updateZoom();
   updateComparison(m_slider->value());
 
   saveViewMode();
@@ -267,28 +303,36 @@ void ImageComparisonWidget::updateComparison(int value) {
     return;
   }
 
+  // Use scaled pixmaps if zoom is active, otherwise use original
+  QPixmap &originalToUse = (m_zoomFactor != 1.0 && !m_originalPixmapScaled.isNull())
+                            ? m_originalPixmapScaled
+                            : m_originalPixmap;
+  QPixmap &optimizedToUse = (m_zoomFactor != 1.0 && !m_optimizedPixmapScaled.isNull())
+                             ? m_optimizedPixmapScaled
+                             : m_optimizedPixmap;
+
   // Create a composite image
-  QPixmap composite(m_originalPixmap.size());
+  QPixmap composite(originalToUse.size());
   QPainter painter(&composite);
 
   // Calculate split position
-  int splitX = (m_originalPixmap.width() * value) / 100;
+  int splitX = (originalToUse.width() * value) / 100;
 
   // Draw original image (left part)
-  painter.drawPixmap(0, 0, m_originalPixmap);
+  painter.drawPixmap(0, 0, originalToUse);
 
   // Draw optimized image (right part)
-  if (splitX < m_originalPixmap.width()) {
-    QRect sourceRect(splitX, 0, m_optimizedPixmap.width() - splitX,
-                     m_optimizedPixmap.height());
-    QRect targetRect(splitX, 0, m_originalPixmap.width() - splitX,
-                     m_originalPixmap.height());
-    painter.drawPixmap(targetRect, m_optimizedPixmap, sourceRect);
+  if (splitX < originalToUse.width()) {
+    QRect sourceRect(splitX, 0, optimizedToUse.width() - splitX,
+                     optimizedToUse.height());
+    QRect targetRect(splitX, 0, originalToUse.width() - splitX,
+                     originalToUse.height());
+    painter.drawPixmap(targetRect, optimizedToUse, sourceRect);
   }
 
   // Draw a vertical line at the split position
   painter.setPen(QPen(Qt::yellow, 3));
-  painter.drawLine(splitX, 0, splitX, m_originalPixmap.height());
+  painter.drawLine(splitX, 0, splitX, originalToUse.height());
 
   painter.end();
 
@@ -426,12 +470,28 @@ void ImageComparisonWidget::zoomReset() {
 }
 
 void ImageComparisonWidget::zoomFit() {
-  if (m_originalPixmap.isNull() || !m_leftScroll) {
+  if (m_originalPixmap.isNull()) {
+    return;
+  }
+
+  QSize scrollSize;
+
+  // Get viewport size based on current view
+  if (m_isSideBySideView && m_leftScroll) {
+    scrollSize = m_leftScroll->viewport()->size();
+  } else if (!m_isSideBySideView && m_imageLabel && m_imageLabel->parentWidget()) {
+    // For slider view, get the scroll area size
+    QScrollArea *scrollArea = qobject_cast<QScrollArea*>(m_imageLabel->parentWidget()->parentWidget());
+    if (scrollArea) {
+      scrollSize = scrollArea->viewport()->size();
+    } else {
+      return;
+    }
+  } else {
     return;
   }
 
   // Calculate zoom to fit the image in the scroll area
-  QSize scrollSize = m_leftScroll->viewport()->size();
   QSize imageSize = m_originalPixmap.size();
 
   double widthRatio = (double)scrollSize.width() / imageSize.width();
@@ -463,19 +523,18 @@ void ImageComparisonWidget::updateZoom() {
     return;
   }
 
-  // Only apply zoom in side-by-side view
+  // Calculate scaled size
+  QSize originalSize = m_originalPixmap.size();
+  QSize scaledSize(originalSize.width() * m_zoomFactor,
+                   originalSize.height() * m_zoomFactor);
+
+  // Scale the pixmaps
+  m_originalPixmapScaled = m_originalPixmap.scaled(
+      scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  m_optimizedPixmapScaled = m_optimizedPixmap.scaled(
+      scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
   if (m_isSideBySideView) {
-    // Calculate scaled size
-    QSize originalSize = m_originalPixmap.size();
-    QSize scaledSize(originalSize.width() * m_zoomFactor,
-                     originalSize.height() * m_zoomFactor);
-
-    // Scale the pixmaps
-    m_originalPixmapScaled = m_originalPixmap.scaled(
-        scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    m_optimizedPixmapScaled = m_optimizedPixmap.scaled(
-        scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
     // Store current scroll positions (as ratios)
     double hRatioLeft = 0.0;
     double vRatioLeft = 0.0;
@@ -503,6 +562,9 @@ void ImageComparisonWidget::updateZoom() {
             vRatioLeft * m_leftScroll->verticalScrollBar()->maximum());
       }
     });
+  } else {
+    // In slider view, update the composite image
+    updateComparison(m_slider->value());
   }
 }
 

@@ -91,11 +91,22 @@ The slider view overlays both images and provides an interactive slider to revea
 - **Left Side**: Shows original image
 - **Right Side**: Shows optimized image
 - **Smooth Transition**: Drag slider to see real-time comparison
+- **Zoom Controls**: Same zoom functionality as side-by-side view
+
+**Zoom Functionality:**
+- **Zoom In (+)**: Increase magnification by 25% (up to 500%)
+- **Zoom Out (−)**: Decrease magnification by 25% (down to 10%)
+- **100%**: Reset to original size (1:1 pixel ratio)
+- **Fit**: Scale image to fit within the viewport (max 100%)
+- **Real-time Composite**: Slider composite updates automatically with zoom
+- **Range**: 10% to 500% zoom levels
 
 **Benefits:**
 - Pixel-perfect comparison at the exact same position
 - Easy to spot subtle compression artifacts
 - Excellent for detailed quality inspection
+- Zoom in to examine fine details at the split boundary
+- Zoom out to see overall composition
 
 ## View Mode Persistence
 
@@ -259,9 +270,19 @@ void ImageComparisonWidget::updateZoom() {
 **Key Features:**
 - **Zoom Levels**: 10%, 25%, 50%, 75%, 100%, 125%, 150%, 200%, 300%, 400%, 500%
 - **Incremental Zoom**: Each step multiplies/divides by 1.25 (25% change)
-- **Scroll Position**: Maintains relative position when zooming
+- **Scroll Position**: Maintains relative position when zooming (side-by-side view)
 - **Delayed Restoration**: Uses QTimer to ensure layout update before scroll adjustment
 - **Smooth Scaling**: Qt::SmoothTransformation ensures quality at all zoom levels
+- **Dual Mode Support**: Works in both side-by-side and slider views
+- **Real-time Composite**: Slider view regenerates composite image with zoomed pixmaps
+- **Synchronized Display**: Both images zoom together in all modes
+
+**Implementation Notes:**
+- In **side-by-side view**: Scaled pixmaps are displayed directly in labels
+- In **slider view**: Composite image is regenerated using scaled pixmaps when slider moves or zoom changes
+- The `updateComparison()` method checks zoom factor and uses scaled pixmaps when `m_zoomFactor != 1.0`
+- Both views share the same zoom controls and zoom factor value
+
 ## User Workflow
 
 ### Basic Comparison
@@ -368,27 +389,27 @@ The dialog responds to standard Qt shortcuts and zoom controls:
 - **Escape**: Close dialog (same as clicking Close button)
 - **Enter/Return**: Close dialog (default button behavior)
 
-**Zoom Controls (Side-by-Side View):**
+**Zoom Controls (Both Views):**
 - **Ctrl++** or **Ctrl+=**: Zoom in (via tooltip hint)
 - **Ctrl+-**: Zoom out (via tooltip hint)
 - **Ctrl+0**: Reset to 100% (via tooltip hint)
 
-*Note: Keyboard shortcuts are currently implemented via button tooltips. Full keyboard event handling could be added in future updates.*
+*Note: Keyboard shortcuts are currently implemented via button tooltips. Full keyboard event handling could be added in future updates. Zoom functionality works in both side-by-side and slider views.*
 
 ## Future Enhancement Possibilities
 
 ### Potential Features
 
-1. **Zoom Controls**: Synchronized zoom in/out for detailed inspection
-2. **Difference Highlighting**: Overlay showing pixel differences
-3. **Metadata Comparison**: EXIF data, color space, etc.
-4. **Histogram Display**: Visual representation of color distribution
-5. **Export Comparison**: Save side-by-side or slider view as image
-6. **Keyboard Shortcuts**: Arrow keys for slider, space for toggle
-7. **Full Screen Mode**: Maximize comparison area
-8. **Multiple Image Support**: Compare more than two images
-9. **Difference Metrics**: PSNR, SSIM, perceptual quality scores
-10. **Region Selection**: Compare specific areas only
+1. **Difference Highlighting**: Overlay showing pixel differences
+2. **Metadata Comparison**: EXIF data, color space, etc.
+3. **Histogram Display**: Visual representation of color distribution
+4. **Export Comparison**: Save side-by-side or slider view as image
+5. **Full Keyboard Shortcuts**: Arrow keys for slider, space for toggle, keyboard-based zoom
+6. **Full Screen Mode**: Maximize comparison area
+7. **Multiple Image Support**: Compare more than two images
+8. **Difference Metrics**: PSNR, SSIM, perceptual quality scores
+9. **Region Selection**: Compare specific areas only
+10. **Mouse Wheel Zoom**: Zoom with mouse wheel for convenience
 
 ### Performance Optimizations
 
