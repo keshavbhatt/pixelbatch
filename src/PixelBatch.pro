@@ -52,6 +52,7 @@ SOURCES += \
     elideditemdelegate.cpp \
     filehandler.cpp \
     imagecomparisonwidget.cpp \
+    imagedetailpanel.cpp \
     imageformatprefwidget.cpp \
     imagestats.cpp \
     main.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     elideditemdelegate.h \
     filehandler.h \
     imagecomparisonwidget.h \
+    imagedetailpanel.h \
     imageformatprefwidget.h \
     imagestats.h \
     imagetask.h \

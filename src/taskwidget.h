@@ -29,6 +29,7 @@ public:
 
   bool isProcessing() const;
   bool hasSelection();
+  ImageTask *getSelectedImageTask() const;
 
   void cancelAllProcessing();
 
@@ -52,6 +53,7 @@ signals:
   void selectionChangedCustom();
   void toggleShowTaskActionWidget(bool visible);
   void isProcessingChanged(bool processing);
+  void selectedImageTaskChanged(ImageTask *task);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;

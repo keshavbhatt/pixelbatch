@@ -2,6 +2,7 @@
 #define PIXELBATCH_H
 
 #include "filehandler.h"
+#include "imagedetailpanel.h"
 #include "preferenceswidget.h"
 #include "taskwidget.h"
 
@@ -9,6 +10,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -45,6 +47,8 @@ private:
   PreferencesWidget *m_preferencesWidget;
   TaskWidget *m_taskWidget;
   TaskActionWidget *m_taskActionWidget;
+  ImageDetailPanel *m_imageDetailPanel;
+  QSplitter *m_mainSplitter;
   QWidget *m_statusBarPermanentWidget;
   QPushButton *m_statusBarAddButton;
   QPushButton *m_statusBarProcessButton;
@@ -53,6 +57,8 @@ private:
 
   void initTaskWidget();
   void initTaskActionWidget();
+  void initImageDetailPanel();
+  void setupMainLayout();
   void setupStatusBar();
   void initMenuBar();
   void initPreferencesWidget();

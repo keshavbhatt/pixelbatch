@@ -15,6 +15,8 @@ PixelBatch::PixelBatch(QWidget *parent)
       m_preferencesWidget(new PreferencesWidget(this)),
       m_taskWidget(new TaskWidget(this)),
       m_taskActionWidget(new TaskActionWidget(this, m_taskWidget)),
+      m_imageDetailPanel(new ImageDetailPanel(this)),
+      m_mainSplitter(new QSplitter(Qt::Horizontal, this)),
       m_statusBarPermanentWidget(new QWidget(this->statusBar())),
       m_statusBarAddButton(
           new QPushButton(QIcon(":/resources/icons/image-add-line.png"),
@@ -33,11 +35,15 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   setWindowIcon(QIcon(":/icons/app/icon-64.png"));
 
-  setMinimumSize(350, 300);
+  setMinimumSize(900, 500);  // Increased minimum size for split layout
 
   initTaskWidget();
 
   initTaskActionWidget();
+
+  initImageDetailPanel();
+
+  setupMainLayout();
 
   setupStatusBar();
 
@@ -98,8 +104,6 @@ void PixelBatch::initTaskWidget() {
 
   connect(m_taskWidget, &TaskWidget::isProcessingChanged, this,
           &PixelBatch::updateStatusBarButtons);
-
-  ui->taskWidgetLayout->addWidget(m_taskWidget);
 }
 
 void PixelBatch::setupStatusBar() {
@@ -217,9 +221,45 @@ void PixelBatch::initTaskActionWidget() {
   QObject::connect(m_taskWidget, &TaskWidget::toggleShowTaskActionWidget,
                    m_taskActionWidget, &TaskActionWidget::setVisible);
 
-  ui->taskActionWidgetLayout->addWidget(m_taskActionWidget);
-
+  // TaskActionWidget will be hidden as we're using ImageDetailPanel instead
   m_taskActionWidget->setVisible(false);
+}
+
+void PixelBatch::initImageDetailPanel() {
+  // Connect TaskWidget selection to ImageDetailPanel
+  connect(m_taskWidget, &TaskWidget::selectedImageTaskChanged,
+          m_imageDetailPanel, &ImageDetailPanel::setImageTask);
+
+
+  // Set minimum width for the detail panel (allow more flexibility)
+  m_imageDetailPanel->setMinimumWidth(300);
+  // No maximum width - let user resize as needed
+}
+
+void PixelBatch::setupMainLayout() {
+  // Create a container widget for the task widget and action widget
+  QWidget *leftPanel = new QWidget();
+  QVBoxLayout *leftLayout = new QVBoxLayout(leftPanel);
+  leftLayout->setContentsMargins(0, 0, 0, 0);
+  leftLayout->setSpacing(0);
+
+  leftLayout->addWidget(m_taskWidget);
+  leftLayout->addWidget(m_taskActionWidget);
+
+  // Add both panels to the splitter
+  m_mainSplitter->addWidget(leftPanel);
+  m_mainSplitter->addWidget(m_imageDetailPanel);
+
+  // Set splitter proportions (70% for task list, 30% for detail panel)
+  m_mainSplitter->setStretchFactor(0, 7);
+  m_mainSplitter->setStretchFactor(1, 3);
+
+  // Make splitter more flexible - allow collapsing
+  m_mainSplitter->setCollapsible(0, false);  // Don't collapse task list completely
+  m_mainSplitter->setCollapsible(1, true);   // Allow detail panel to be collapsed
+
+  // Add splitter to the main layout
+  ui->taskWidgetLayout->addWidget(m_mainSplitter);
 }
 
 void PixelBatch::setStatus(const QString &message) {

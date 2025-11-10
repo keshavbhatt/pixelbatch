@@ -162,6 +162,10 @@ void TaskWidget::selectionChanged(const QItemSelection &selected,
   QTableWidget::selectionChanged(selected, deselected);
   emit selectionChangedCustom();
   emit toggleShowTaskActionWidget(selectedItems().count() > 0);
+
+  // Emit selected task for the detail panel
+  ImageTask *selectedTask = getSelectedImageTask();
+  emit selectedImageTaskChanged(selectedTask);
 }
 
 void TaskWidget::mousePressEvent(QMouseEvent *event) {
@@ -621,6 +625,20 @@ int TaskWidget::findRowByImageTask(ImageTask *task) {
 }
 
 ImageTask *TaskWidget::getImageTaskFromRow(int row) {
+  QTableWidgetItem *item = this->item(row, 0);
+  if (item) {
+    ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
+    return storedTask;
+  }
+  return nullptr;
+}
+
+ImageTask *TaskWidget::getSelectedImageTask() const {
+  int row = currentRow();
+  if (row < 0) {
+    return nullptr;
+  }
+
   QTableWidgetItem *item = this->item(row, 0);
   if (item) {
     ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();

@@ -30,6 +30,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
                   ui->optimizedFilePrefixLineEdit);
   cleanOptimizedFilePrefixAction->setToolTip(
       tr("Clear Optimized File Prefix Keyword"));
+  ui->optimizedFilePrefixLineEdit->setPlaceholderText(
+      tr("Prefix in file names of optimized images"));
   ui->optimizedFilePrefixLineEdit->addAction(cleanOptimizedFilePrefixAction,
                                              QLineEdit::TrailingPosition);
   connect(cleanOptimizedFilePrefixAction, &QAction::triggered, this,
@@ -98,7 +100,8 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
 
   // Load current style
   QString currentStyle = m_settings.getStyle();
-  int styleIndex = ui->styleComboBox->findText(currentStyle, Qt::MatchFixedString);
+  int styleIndex =
+      ui->styleComboBox->findText(currentStyle, Qt::MatchFixedString);
   if (styleIndex >= 0) {
     ui->styleComboBox->setCurrentIndex(styleIndex);
   }
@@ -110,12 +113,14 @@ PreferencesWidget::PreferencesWidget(QWidget *parent)
   ui->styleLabel->setEnabled(!useSystemTheme);
 
   // Connect theme and style change signals
-  connect(ui->useSystemThemeCheckBox, &QCheckBox::toggled,
-          this, &PreferencesWidget::onUseSystemThemeToggled);
-  connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-          this, &PreferencesWidget::onThemeChanged);
-  connect(ui->styleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-          this, &PreferencesWidget::onStyleChanged);
+  connect(ui->useSystemThemeCheckBox, &QCheckBox::toggled, this,
+          &PreferencesWidget::onUseSystemThemeToggled);
+  connect(ui->themeComboBox,
+          QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &PreferencesWidget::onThemeChanged);
+  connect(ui->styleComboBox,
+          QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &PreferencesWidget::onStyleChanged);
 
   QList<ImageType> supportedImageTypes =
       ImageTypeUtils::getSupportedImageTypes();
@@ -197,4 +202,3 @@ void PreferencesWidget::applyTheme(const QString &theme, bool useSystemTheme) {
 void PreferencesWidget::applyStyle(const QString &style, bool useSystemTheme) {
   ThemeManager::applyStyle(style, useSystemTheme);
 }
-
