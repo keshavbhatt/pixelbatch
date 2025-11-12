@@ -16,6 +16,7 @@ PixelBatch::PixelBatch(QWidget *parent)
       m_taskWidget(new TaskWidget(this)),
       m_taskActionWidget(new TaskActionWidget(this, m_taskWidget)),
       m_imageDetailPanel(new ImageDetailPanel(this)),
+      m_emptyStateWidget(nullptr),
       m_mainSplitter(new QSplitter(Qt::Horizontal, this)),
       m_statusBarPermanentWidget(new QWidget(this->statusBar())),
       m_statusBarAddButton(
@@ -221,22 +222,30 @@ void PixelBatch::initTaskActionWidget() {
   QObject::connect(m_taskWidget, &TaskWidget::toggleShowTaskActionWidget,
                    m_taskActionWidget, &TaskActionWidget::setVisible);
 
-  // TaskActionWidget will be hidden as we're using ImageDetailPanel instead
   m_taskActionWidget->setVisible(false);
+  m_imageDetailPanel->setVisible(false);
 }
 
 void PixelBatch::initImageDetailPanel() {
-  // Connect TaskWidget selection to ImageDetailPanel
+  m_emptyStateWidget = new EmptyStateWidget(this);
+
   connect(m_taskWidget, &TaskWidget::selectedImageTaskChanged,
           m_imageDetailPanel, &ImageDetailPanel::setImageTask);
 
-  // Set minimum width for the detail panel (allow more flexibility)
+  connect(m_taskWidget, &TaskWidget::selectionChangedCustom,
+          this, [this]() {
+            bool hasSelection = m_taskWidget->hasSelection();
+            m_imageDetailPanel->setVisible(hasSelection);
+            m_emptyStateWidget->setVisible(!hasSelection);
+          });
+
   m_imageDetailPanel->setMinimumWidth(300);
-  // No maximum width - let user resize as needed
+
+  m_imageDetailPanel->setVisible(false);
+  m_emptyStateWidget->setVisible(true);
 }
 
 void PixelBatch::setupMainLayout() {
-  // Create a container widget for the task widget and action widget
   QWidget *leftPanel = new QWidget();
   QVBoxLayout *leftLayout = new QVBoxLayout(leftPanel);
   leftLayout->setContentsMargins(0, 0, 0, 0);
@@ -245,9 +254,18 @@ void PixelBatch::setupMainLayout() {
   leftLayout->addWidget(m_taskWidget);
   leftLayout->addWidget(m_taskActionWidget);
 
+  // A container for the right panel that can swap between empty state and detail panel
+  QWidget *rightPanelContainer = new QWidget();
+  QVBoxLayout *rightPanelLayout = new QVBoxLayout(rightPanelContainer);
+  rightPanelLayout->setContentsMargins(0, 0, 0, 0);
+  rightPanelLayout->setSpacing(0);
+
+  rightPanelLayout->addWidget(m_emptyStateWidget);
+  rightPanelLayout->addWidget(m_imageDetailPanel);
+
   // Add both panels to the splitter
   m_mainSplitter->addWidget(leftPanel);
-  m_mainSplitter->addWidget(m_imageDetailPanel);
+  m_mainSplitter->addWidget(rightPanelContainer);
 
   // Set splitter proportions (70% for task list, 30% for detail panel)
   m_mainSplitter->setStretchFactor(0, 7);

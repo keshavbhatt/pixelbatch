@@ -50,6 +50,7 @@ SOURCES += \
     desktoputils.cpp \
     draggablelabel.cpp \
     elideditemdelegate.cpp \
+    emptystatewidget.cpp \
     filehandler.cpp \
     imagecomparisonwidget.cpp \
     imagedetailpanel.cpp \
@@ -80,6 +81,7 @@ HEADERS += \
     constants.h \
     desktoputils.h \
     draggablelabel.h \
+    emptystatewidget.h \
     elideditemdelegate.h \
     filehandler.h \
     imagecomparisonwidget.h \
