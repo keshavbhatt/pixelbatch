@@ -30,3 +30,20 @@ const QString Constants::DEFAULT_APPEARANCE_STYLE = "Fusion";
 const QString Constants::APPEARANCE_USE_SYSTEM_THEME_KEY =
     "appearance/useSystemTheme";
 const bool Constants::DEFAULT_APPEARANCE_USE_SYSTEM_THEME = true;
+
+// Application metadata
+const QString Constants::APP_DESCRIPTION =
+    "Batch Image Optimization Tool for JPEG, PNG, GIF, and SVG";
+const QString Constants::APP_LICENSE = "GPL-3.0-or-later";
+const QString Constants::APP_AUTHOR_NAME = "Keshav Bhatt and Contributors";
+
+// URLs
+const QString Constants::URL_GITHUB_REPO =
+    "https://github.com/keshavbhatt/pixelbatch";
+const QString Constants::URL_GITHUB_ISSUES =
+    "https://github.com/keshavbhatt/pixelbatch/issues";
+const QString Constants::URL_GITHUB_AUTHOR = "https://github.com/keshavbhatt";
+const QString Constants::URL_WEBSITE = "https://ktechpit.com/USS/public";
+const QString Constants::URL_DONATE =
+    "https://www.paypal.com/paypalme/keshavnrj/"
+    "15USD?note=Donation%20for%20PixelBatch%20Application";

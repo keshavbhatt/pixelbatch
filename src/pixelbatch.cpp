@@ -1,5 +1,6 @@
 #include "pixelbatch.h"
 #include "about.h"
+#include "constants.h"
 #include "desktoputils.h"
 #include "elideditemdelegate.h"
 #include "thememanager.h"
@@ -348,13 +349,11 @@ void PixelBatch::openSettings() {
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
 void PixelBatch::reportIssue() {
-  DesktopUtils::openUrl("https://github.com/keshavbhatt/pixelbatch/issues");
+  DesktopUtils::openUrl(Constants::URL_GITHUB_ISSUES);
 }
 
 void PixelBatch::donate() {
-  QString donateLink("https://www.paypal.com/paypalme/keshavnrj/"
-                     "15USD?note=Donation%20for%20PixelBatch%20Application");
-  DesktopUtils::openUrl(donateLink);
+  DesktopUtils::openUrl(Constants::URL_DONATE);
 }
 
 void PixelBatch::showAbout() {
