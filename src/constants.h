@@ -29,6 +29,18 @@ public:
   static const QString APPEARANCE_USE_SYSTEM_THEME_KEY;
   static const bool DEFAULT_APPEARANCE_USE_SYSTEM_THEME;
 
+  // Application metadata
+  static const QString APP_DESCRIPTION;
+  static const QString APP_LICENSE;
+  static const QString APP_AUTHOR_NAME;
+
+  // URLs
+  static const QString URL_GITHUB_REPO;
+  static const QString URL_GITHUB_ISSUES;
+  static const QString URL_GITHUB_AUTHOR;
+  static const QString URL_WEBSITE;
+  static const QString URL_DONATE;
+
 private:
   Constants() = default;
 };

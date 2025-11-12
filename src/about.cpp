@@ -16,20 +16,19 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
 
   // Initialize application info
   appName = QApplication::applicationName();
-  appDescription = "Batch Image Optimization Tool for JPEG, PNG, GIF, and SVG";
+  appDescription = Constants::APP_DESCRIPTION;
   appVersion = VERSIONSTR;
-  appLicense = "GPL-3.0-or-later";
+  appLicense = Constants::APP_LICENSE;
 
   // Organization
-  appAuthorName = "Keshav Bhatt and Contributors";
+  appAuthorName = Constants::APP_AUTHOR_NAME;
 
   // Links
-  appSourceCodeLink = "https://github.com/keshavbhatt/pixelbatch";
-  appIssuesLink = "https://github.com/keshavbhatt/pixelbatch/issues";
-  appWebsiteLink = "https://ktechpit.com/USS/public";
-  donateLink = "https://www.paypal.com/paypalme/keshavnrj/"
-               "15USD?note=Donation%20for%20PixelBatch%20Application";
-  githubLink = "https://github.com/keshavbhatt";
+  appSourceCodeLink = Constants::URL_GITHUB_REPO;
+  appIssuesLink = Constants::URL_GITHUB_ISSUES;
+  appWebsiteLink = Constants::URL_WEBSITE;
+  donateLink = Constants::URL_DONATE;
+  githubLink = Constants::URL_GITHUB_AUTHOR;
 
   setupUI();
   setupConnections();

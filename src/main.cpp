@@ -1,4 +1,5 @@
 #include "pixelbatch.h"
+#include "constants.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
 
   // Parse command line arguments
   QCommandLineParser parser;
-  parser.setApplicationDescription("Batch Image Optimization Tool");
+  parser.setApplicationDescription(Constants::APP_DESCRIPTION);
   parser.addHelpOption();
   parser.addVersionOption();
   parser.addPositionalArgument("files", "Image files or folders to optimize", "[files...]");
