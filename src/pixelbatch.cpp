@@ -232,12 +232,11 @@ void PixelBatch::initImageDetailPanel() {
   connect(m_taskWidget, &TaskWidget::selectedImageTaskChanged,
           m_imageDetailPanel, &ImageDetailPanel::setImageTask);
 
-  connect(m_taskWidget, &TaskWidget::selectionChangedCustom,
-          this, [this]() {
-            bool hasSelection = m_taskWidget->hasSelection();
-            m_imageDetailPanel->setVisible(hasSelection);
-            m_emptyStateWidget->setVisible(!hasSelection);
-          });
+  connect(m_taskWidget, &TaskWidget::selectionChangedCustom, this, [this]() {
+    bool hasSelection = m_taskWidget->hasSelection();
+    m_imageDetailPanel->setVisible(hasSelection);
+    m_emptyStateWidget->setVisible(!hasSelection);
+  });
 
   m_imageDetailPanel->setMinimumWidth(300);
 
@@ -254,7 +253,8 @@ void PixelBatch::setupMainLayout() {
   leftLayout->addWidget(m_taskWidget);
   leftLayout->addWidget(m_taskActionWidget);
 
-  // A container for the right panel that can swap between empty state and detail panel
+  // A container for the right panel that can swap between empty state and
+  // detail panel
   QWidget *rightPanelContainer = new QWidget();
   QVBoxLayout *rightPanelLayout = new QVBoxLayout(rightPanelContainer);
   rightPanelLayout->setContentsMargins(0, 0, 0, 0);
@@ -352,7 +352,9 @@ void PixelBatch::reportIssue() {
 }
 
 void PixelBatch::donate() {
-  DesktopUtils::openUrl("https://github.com/sponsors/pixelbatch");
+  QString donateLink("https://www.paypal.com/paypalme/keshavnrj/"
+                     "15USD?note=Donation%20for%20PixelBatch%20Application");
+  DesktopUtils::openUrl(donateLink);
 }
 
 void PixelBatch::showAbout() {
