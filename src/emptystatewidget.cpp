@@ -31,7 +31,7 @@ void EmptyStateWidget::setupUI() {
          "• See format-specific options"));
   instructionLabel->setAlignment(Qt::AlignCenter);
   instructionLabel->setWordWrap(true);
-  instructionLabel->setStyleSheet("color: palette(mid);");
+  instructionLabel->setEnabled(false);
 
   mainLayout->addStretch();
   mainLayout->addWidget(iconLabel);
