@@ -35,7 +35,7 @@ PixelBatch::PixelBatch(QWidget *parent)
 
   setWindowIcon(QIcon(":/icons/app/icon-64.png"));
 
-  setMinimumSize(900, 500);  // Increased minimum size for split layout
+  setMinimumSize(900, 500); // Increased minimum size for split layout
 
   initTaskWidget();
 
@@ -230,7 +230,6 @@ void PixelBatch::initImageDetailPanel() {
   connect(m_taskWidget, &TaskWidget::selectedImageTaskChanged,
           m_imageDetailPanel, &ImageDetailPanel::setImageTask);
 
-
   // Set minimum width for the detail panel (allow more flexibility)
   m_imageDetailPanel->setMinimumWidth(300);
   // No maximum width - let user resize as needed
@@ -255,8 +254,9 @@ void PixelBatch::setupMainLayout() {
   m_mainSplitter->setStretchFactor(1, 3);
 
   // Make splitter more flexible - allow collapsing
-  m_mainSplitter->setCollapsible(0, false);  // Don't collapse task list completely
-  m_mainSplitter->setCollapsible(1, true);   // Allow detail panel to be collapsed
+  m_mainSplitter->setCollapsible(0,
+                                 false); // Don't collapse task list completely
+  m_mainSplitter->setCollapsible(1, true); // Allow detail panel to be collapsed
 
   // Add splitter to the main layout
   ui->taskWidgetLayout->addWidget(m_mainSplitter);
@@ -330,7 +330,7 @@ void PixelBatch::openSettings() {
 void PixelBatch::quitApplication() { QApplication::quit(); }
 
 void PixelBatch::reportIssue() {
-  DesktopUtils::openUrl("https://github.com/pixelbatch/pixelbatch/issues");
+  DesktopUtils::openUrl("https://github.com/keshavbhatt/pixelbatch/issues");
 }
 
 void PixelBatch::donate() {
