@@ -1,6 +1,7 @@
 #ifndef PIXELBATCH_H
 #define PIXELBATCH_H
 
+#include "emptystatewidget.h"
 #include "filehandler.h"
 #include "imagedetailpanel.h"
 #include "preferenceswidget.h"
@@ -48,6 +49,7 @@ private:
   TaskWidget *m_taskWidget;
   TaskActionWidget *m_taskActionWidget;
   ImageDetailPanel *m_imageDetailPanel;
+  EmptyStateWidget *m_emptyStateWidget;
   QSplitter *m_mainSplitter;
   QWidget *m_statusBarPermanentWidget;
   QPushButton *m_statusBarAddButton;
