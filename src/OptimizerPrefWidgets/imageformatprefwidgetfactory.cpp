@@ -5,6 +5,7 @@
 #include "svgoprefwidget.h"
 #include "worker/imageworkerfactory.h"
 #include <QDebug>
+#include <QScrollArea>
 
 ImageFormatPrefWidgetFactory &ImageFormatPrefWidgetFactory::instance() {
   static ImageFormatPrefWidgetFactory instance;
@@ -23,9 +24,14 @@ void ImageFormatPrefWidgetFactory::openPrefWidgetFor(
     ImageOptimizerPrefWidget *widget =
         optimizerWidgetMap[optimizerName](nullptr);
     if (widget) {
-      widget->setWindowTitle(optimizerName + " " + QObject::tr("Preferences"));
+      // Wrap the widget in a QScrollArea to handle overflow on small screens
+      QScrollArea *scrollArea = new QScrollArea();
+      scrollArea->setWidget(widget);
+      scrollArea->setWidgetResizable(true);
+      scrollArea->setWindowTitle(optimizerName + " " + QObject::tr("Preferences"));
+      
       widget->loadSettings();
-      widget->show();
+      scrollArea->show();
       qDebug() << "Opened preference widget for" << optimizerName;
     }
   } else {
