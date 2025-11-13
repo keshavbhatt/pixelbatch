@@ -6,7 +6,88 @@
 
 **PixelBatch** is a powerful, user-friendly desktop application for batch image optimization on Linux. Optimize hundreds of images at once while preserving quality, reducing file sizes, and saving disk space.
 
-![PixelBatch Screenshot](screenshot.png)
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/PixelBatch-Linux-1.png" alt="PixelBatch Main Interface" width="100%">
+  <br>
+  <em>Main Interface - Batch image optimization with real-time statistics</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/PixelBatch-Linux-2.png" alt="PixelBatch Settings" width="100%">
+  <br>
+  <em>Optimizer Settings - Fine-tune compression for each format</em>
+</p>
+
+<details>
+<summary><strong>📷 View More Screenshots</strong> (click to expand)</summary>
+<br>
+
+<table>
+  <tr>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-3.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-3.png" alt="Screenshot 3" width="100%">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-4.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-4.png" alt="Screenshot 4" width="100%">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-5.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-5.png" alt="Screenshot 5" width="100%">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-6.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-6.png" alt="Screenshot 6" width="100%">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-7.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-7.png" alt="Screenshot 7" width="100%">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-8.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-8.png" alt="Screenshot 8" width="100%">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-9.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-9.png" alt="Screenshot 9" width="100%">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-10.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-10.png" alt="Screenshot 10" width="100%">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-11.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-11.png" alt="Screenshot 11" width="100%">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="screenshots/PixelBatch-Linux-12.png" target="_blank">
+        <img src="screenshots/PixelBatch-Linux-12.png" alt="Screenshot 12" width="100%">
+      </a>
+    </td>
+  </tr>
+</table>
+
+</details>
 
 ## ✨ Features
 
