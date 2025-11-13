@@ -15,6 +15,8 @@ public:
 
   void openPrefWidgetFor(const ImageOptimizer &imageOptimizer);
 
+  QWidget *createPrefWidgetFor(const ImageOptimizer &imageOptimizer, QWidget *parent = nullptr);
+
   bool hasPrefWidgetFor(const ImageOptimizer &imageOptimizer) const;
 
 private:

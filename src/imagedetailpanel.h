@@ -38,7 +38,6 @@ private:
   QLabel *m_sizeLabel;
   QLabel *m_dimensionsLabel;
   QLabel *m_formatLabel;
-  QWidget *m_optimizerSettingsContainer;
   QVBoxLayout *m_optimizerSettingsLayout;
   QWidget *m_currentOptimizerWidget;
 

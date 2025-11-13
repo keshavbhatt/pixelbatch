@@ -40,6 +40,32 @@ void ImageFormatPrefWidgetFactory::openPrefWidgetFor(
   }
 }
 
+QWidget *ImageFormatPrefWidgetFactory::createPrefWidgetFor(
+    const ImageOptimizer &imageOptimizer, QWidget *parent) {
+  QString optimizerName = imageOptimizer.getName();
+
+  if (optimizerWidgetMap.contains(optimizerName)) {
+    ImageOptimizerPrefWidget *widget =
+        optimizerWidgetMap[optimizerName](parent);
+    if (widget) {
+      // Wrap the widget in a QScrollArea to handle overflow on small screens
+      QScrollArea *scrollArea = new QScrollArea(parent);
+      scrollArea->setWidget(widget);
+      scrollArea->setWidgetResizable(true);
+      scrollArea->setFrameShape(QFrame::NoFrame);
+
+      widget->loadSettings();
+      qDebug() << "Created preference widget for" << optimizerName;
+      return scrollArea;
+    }
+  } else {
+    qDebug() << "No preference widget registered for optimizer:"
+             << optimizerName;
+  }
+
+  return nullptr;
+}
+
 void ImageFormatPrefWidgetFactory::registerOptimizers() {
   QList<ImageOptimizer> registeredImageOptimizers =
       ImageWorkerFactory::instance().getRegisteredImageOptimizers();

@@ -18,6 +18,7 @@ public:
 
   ImageWorker *getWorker(const QString &filePath);
   ImageType getImageTypeByExtension(const QString &extension);
+  ImageOptimizer getOptimizerByImageType(ImageType imageType);
   QList<ImageOptimizer> getOptimizersForFormat(const QString &formatName);
   QList<ImageOptimizer> getRegisteredImageOptimizers();
 

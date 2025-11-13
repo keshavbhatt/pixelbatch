@@ -41,6 +41,16 @@ ImageWorkerFactory::getImageTypeByExtension(const QString &extension) {
   return ImageType::Unsupported;
 }
 
+ImageOptimizer ImageWorkerFactory::getOptimizerByImageType(ImageType imageType) {
+  foreach (auto optimizer, registeredImageOptimizers) {
+    if (optimizer.getImageType() == imageType) {
+      return optimizer;
+    }
+  }
+  // Return a default/invalid optimizer if not found
+  return ImageOptimizer("", QStringList{}, ImageType::Unsupported);
+}
+
 QList<ImageOptimizer> ImageWorkerFactory::getRegisteredImageOptimizers() {
   return registeredImageOptimizers;
 }

@@ -1,9 +1,6 @@
 #include "imagedetailpanel.h"
 
-#include "OptimizerPrefWidgets/gifsicleprefwidget.h"
-#include "OptimizerPrefWidgets/jpegoptimprefwidget.h"
-#include "OptimizerPrefWidgets/pngquantprefwidget.h"
-#include "OptimizerPrefWidgets/svgoprefwidget.h"
+#include "OptimizerPrefWidgets/imageformatprefwidgetfactory.h"
 #include "worker/imageworkerfactory.h"
 
 #include <QFileInfo>
@@ -66,17 +63,7 @@ void ImageDetailPanel::setupUI() {
 
   // Optimizer Settings Section
   QGroupBox *settingsGroup = new QGroupBox(tr("Optimization Settings"));
-  QVBoxLayout *settingsGroupLayout = new QVBoxLayout(settingsGroup);
-
-  // Wrap settings in a scroll area
-  QScrollArea *settingsScrollArea = new QScrollArea();
-  settingsScrollArea->setWidgetResizable(true);
-  settingsScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  settingsScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
-  m_optimizerSettingsContainer = new QWidget();
-  m_optimizerSettingsLayout = new QVBoxLayout(m_optimizerSettingsContainer);
-  m_optimizerSettingsLayout->setContentsMargins(0, 0, 0, 0);
+  m_optimizerSettingsLayout = new QVBoxLayout(settingsGroup);
 
   // Add placeholder label initially
   QLabel *noSettingsLabel =
@@ -85,8 +72,6 @@ void ImageDetailPanel::setupUI() {
   noSettingsLabel->setWordWrap(true);
   m_optimizerSettingsLayout->addWidget(noSettingsLabel);
 
-  settingsScrollArea->setWidget(m_optimizerSettingsContainer);
-  settingsGroupLayout->addWidget(settingsScrollArea);
 
   mainLayout->addWidget(
       settingsGroup, 1); // Give stretch factor of 1 to take all available space
@@ -261,30 +246,25 @@ void ImageDetailPanel::loadOptimizerWidget() {
   ImageType imageType =
       ImageWorkerFactory::instance().getImageTypeByExtension(extension);
 
-  ImageOptimizerPrefWidget *prefWidget = nullptr;
-
-  // Create appropriate widget based on image type
-  switch (imageType) {
-  case ImageType::JPG:
-    prefWidget = new JpegOptimPrefWidget(this);
-    break;
-  case ImageType::PNG:
-    prefWidget = new PngQuantPrefWidget(this);
-    break;
-  case ImageType::GIF:
-    prefWidget = new GifsiclePrefWidget(this);
-    break;
-  case ImageType::SVG:
-    prefWidget = new SvgoPrefWidget(this);
-    break;
-  case ImageType::Unsupported:
-  default:
-    break;
+  if (imageType == ImageType::Unsupported) {
+    QLabel *noOptimizerLabel =
+        new QLabel(tr("No optimizer available for this image format"));
+    noOptimizerLabel->setAlignment(Qt::AlignCenter);
+    noOptimizerLabel->setWordWrap(true);
+    m_currentOptimizerWidget = noOptimizerLabel;
+    m_optimizerSettingsLayout->addWidget(m_currentOptimizerWidget);
+    return;
   }
 
+  // Get the optimizer for this image type
+  ImageOptimizer optimizer =
+      ImageWorkerFactory::instance().getOptimizerByImageType(imageType);
+
+  // Create the preference widget using the factory (includes scroll area)
+  QWidget *prefWidget =
+      ImageFormatPrefWidgetFactory::instance().createPrefWidgetFor(optimizer, this);
+
   if (prefWidget) {
-    // Load current settings into the widget
-    prefWidget->loadSettings();
 
     m_currentOptimizerWidget = prefWidget;
     m_optimizerSettingsLayout->addWidget(m_currentOptimizerWidget);
