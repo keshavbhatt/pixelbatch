@@ -5,6 +5,7 @@
 #include "svgoprefwidget.h"
 #include "worker/imageworkerfactory.h"
 #include <QDebug>
+#include <QScrollArea>
 
 ImageFormatPrefWidgetFactory &ImageFormatPrefWidgetFactory::instance() {
   static ImageFormatPrefWidgetFactory instance;
@@ -23,15 +24,46 @@ void ImageFormatPrefWidgetFactory::openPrefWidgetFor(
     ImageOptimizerPrefWidget *widget =
         optimizerWidgetMap[optimizerName](nullptr);
     if (widget) {
-      widget->setWindowTitle(optimizerName + " " + QObject::tr("Preferences"));
+      // Wrap the widget in a QScrollArea to handle overflow on small screens
+      QScrollArea *scrollArea = new QScrollArea();
+      scrollArea->setWidget(widget);
+      scrollArea->setWidgetResizable(true);
+      scrollArea->setWindowTitle(optimizerName + " " + QObject::tr("Preferences"));
+      
       widget->loadSettings();
-      widget->show();
+      scrollArea->show();
       qDebug() << "Opened preference widget for" << optimizerName;
     }
   } else {
     qDebug() << "No preference widget registered for optimizer:"
              << optimizerName;
   }
+}
+
+QWidget *ImageFormatPrefWidgetFactory::createPrefWidgetFor(
+    const ImageOptimizer &imageOptimizer, QWidget *parent) {
+  QString optimizerName = imageOptimizer.getName();
+
+  if (optimizerWidgetMap.contains(optimizerName)) {
+    ImageOptimizerPrefWidget *widget =
+        optimizerWidgetMap[optimizerName](parent);
+    if (widget) {
+      // Wrap the widget in a QScrollArea to handle overflow on small screens
+      QScrollArea *scrollArea = new QScrollArea(parent);
+      scrollArea->setWidget(widget);
+      scrollArea->setWidgetResizable(true);
+      scrollArea->setFrameShape(QFrame::NoFrame);
+
+      widget->loadSettings();
+      qDebug() << "Created preference widget for" << optimizerName;
+      return scrollArea;
+    }
+  } else {
+    qDebug() << "No preference widget registered for optimizer:"
+             << optimizerName;
+  }
+
+  return nullptr;
 }
 
 void ImageFormatPrefWidgetFactory::registerOptimizers() {

@@ -54,3 +54,7 @@ compile_commands.json
 # QtCreator local machine specific files for imported projects
 *creator.user*
 _codeql_detected_source_root
+
+# Build artifacts
+src/pixelbatch
+src/.qmake.stash
