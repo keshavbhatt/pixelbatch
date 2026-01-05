@@ -18,9 +18,11 @@ ImageDetailPanel::ImageDetailPanel(QWidget *parent)
 ImageDetailPanel::~ImageDetailPanel() {}
 
 void ImageDetailPanel::setupUI() {
-  QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setContentsMargins(6, 6, 6, 6);
-  mainLayout->setSpacing(8);
+  // Create a container widget for all content
+  QWidget *contentWidget = new QWidget();
+  QVBoxLayout *contentLayout = new QVBoxLayout(contentWidget);
+  contentLayout->setContentsMargins(6, 6, 6, 6);
+  contentLayout->setSpacing(8);
 
   // Image Preview Section
   QGroupBox *previewGroup = new QGroupBox(tr("Image Preview (original)"));
@@ -34,7 +36,7 @@ void ImageDetailPanel::setupUI() {
 
   previewLayout->addWidget(m_previewLabel, 0, Qt::AlignCenter);
 
-  mainLayout->addWidget(previewGroup);
+  contentLayout->addWidget(previewGroup);
 
   // Image Information Section
   QGroupBox *infoGroup = new QGroupBox(tr("Image Information"));
@@ -61,7 +63,7 @@ void ImageDetailPanel::setupUI() {
   infoLayout->addWidget(new QLabel(tr("<b>Format:</b>")), 3, 0);
   infoLayout->addWidget(m_formatLabel, 3, 1);
 
-  mainLayout->addWidget(infoGroup);
+  contentLayout->addWidget(infoGroup);
 
   // Output Settings Section
   QGroupBox *outputGroup = new QGroupBox(tr("Output Settings"));
@@ -97,7 +99,7 @@ void ImageDetailPanel::setupUI() {
   outputPrefixLayout->addWidget(m_outputPrefixLineEdit, 1);
   outputLayout->addLayout(outputPrefixLayout);
 
-  mainLayout->addWidget(outputGroup);
+  contentLayout->addWidget(outputGroup);
 
   // Connect signals
   connect(m_useCustomOutputCheckBox, &QCheckBox::toggled, this,
@@ -119,8 +121,20 @@ void ImageDetailPanel::setupUI() {
   m_optimizerSettingsLayout->addWidget(noSettingsLabel);
 
 
-  mainLayout->addWidget(
+  contentLayout->addWidget(
       settingsGroup, 1); // Give stretch factor of 1 to take all available space
+
+  // Create a scroll area and set the content widget
+  QScrollArea *scrollArea = new QScrollArea();
+  scrollArea->setWidget(contentWidget);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+  // Set the scroll area as the main layout
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->addWidget(scrollArea);
 
   setLayout(mainLayout);
 }
@@ -314,9 +328,9 @@ void ImageDetailPanel::loadOptimizerWidget() {
   ImageOptimizer optimizer =
       ImageWorkerFactory::instance().getOptimizerByImageType(imageType);
 
-  // Create the preference widget using the factory (includes scroll area)
+  // Create the preference widget without scroll area wrapping (we have outer scroll area)
   QWidget *prefWidget =
-      ImageFormatPrefWidgetFactory::instance().createPrefWidgetFor(optimizer, this);
+      ImageFormatPrefWidgetFactory::instance().createPrefWidgetFor(optimizer, this, false);
 
   if (prefWidget) {
 

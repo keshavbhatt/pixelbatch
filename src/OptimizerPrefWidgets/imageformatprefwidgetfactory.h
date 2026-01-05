@@ -15,7 +15,9 @@ public:
 
   void openPrefWidgetFor(const ImageOptimizer &imageOptimizer);
 
-  QWidget *createPrefWidgetFor(const ImageOptimizer &imageOptimizer, QWidget *parent = nullptr);
+  QWidget *createPrefWidgetFor(const ImageOptimizer &imageOptimizer,
+                                QWidget *parent = nullptr,
+                                bool wrapInScrollArea = true);
 
   bool hasPrefWidgetFor(const ImageOptimizer &imageOptimizer) const;
 

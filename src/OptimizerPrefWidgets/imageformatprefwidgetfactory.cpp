@@ -41,22 +41,27 @@ void ImageFormatPrefWidgetFactory::openPrefWidgetFor(
 }
 
 QWidget *ImageFormatPrefWidgetFactory::createPrefWidgetFor(
-    const ImageOptimizer &imageOptimizer, QWidget *parent) {
+    const ImageOptimizer &imageOptimizer, QWidget *parent, bool wrapInScrollArea) {
   QString optimizerName = imageOptimizer.getName();
 
   if (optimizerWidgetMap.contains(optimizerName)) {
     ImageOptimizerPrefWidget *widget =
         optimizerWidgetMap[optimizerName](parent);
     if (widget) {
-      // Wrap the widget in a QScrollArea to handle overflow on small screens
-      QScrollArea *scrollArea = new QScrollArea(parent);
-      scrollArea->setWidget(widget);
-      scrollArea->setWidgetResizable(true);
-      scrollArea->setFrameShape(QFrame::NoFrame);
-
       widget->loadSettings();
       qDebug() << "Created preference widget for" << optimizerName;
-      return scrollArea;
+
+      if (wrapInScrollArea) {
+        // Wrap the widget in a QScrollArea to handle overflow on small screens
+        QScrollArea *scrollArea = new QScrollArea(parent);
+        scrollArea->setWidget(widget);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setFrameShape(QFrame::NoFrame);
+        return scrollArea;
+      } else {
+        // Return widget directly without scroll area wrapping
+        return widget;
+      }
     }
   } else {
     qDebug() << "No preference widget registered for optimizer:"
