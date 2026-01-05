@@ -14,6 +14,9 @@ public:
   explicit About(QWidget *parent = nullptr);
   ~About();
 
+protected:
+  void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
   void on_debugInfoButton_clicked();
   void onDonateClicked();

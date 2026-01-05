@@ -4,6 +4,7 @@
 #include "ui_about.h"
 
 #include <QGraphicsOpacityEffect>
+#include <QKeyEvent>
 #include <QProcess>
 #include <QPropertyAnimation>
 #include <QStyle>
@@ -180,3 +181,12 @@ void About::onReportIssueClicked() { DesktopUtils::openUrl(appIssuesLink); }
 void About::onSourceCodeClicked() { DesktopUtils::openUrl(appSourceCodeLink); }
 
 void About::onWebsiteClicked() { DesktopUtils::openUrl(appWebsiteLink); }
+
+void About::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Escape) {
+    close();
+    event->accept();
+  } else {
+    QWidget::keyPressEvent(event);
+  }
+}
