@@ -106,6 +106,9 @@ void PixelBatch::initTaskWidget() {
 
   connect(m_taskWidget, &TaskWidget::isProcessingChanged, this,
           &PixelBatch::updateStatusBarButtons);
+
+  connect(m_taskWidget, &TaskWidget::allTasksCompleted, this,
+          &PixelBatch::showProcessingCompletedDialog);
 }
 
 void PixelBatch::setupStatusBar() {
@@ -400,4 +403,37 @@ void PixelBatch::addFileFromCommandLine(const QString &filePath) {
   if (m_taskWidget) {
     m_taskWidget->addFileToTable(filePath);
   }
+}
+
+void PixelBatch::showProcessingCompletedDialog(const ImageTask::TaskStatusCounts &counts) {
+  // Build the message
+  QString title = tr("Processing Complete");
+  QString message;
+
+  if (counts.completedCount == counts.totalTasks) {
+    // All succeeded
+    message = tr("All %1 image(s) have been successfully optimized!").arg(counts.totalTasks);
+  } else {
+    // Some succeeded, some failed
+    message = tr("Processing finished:\n\n");
+    message += tr("✓ Successfully optimized: %1\n").arg(counts.completedCount);
+    if (counts.errorCount > 0) {
+      message += tr("✗ Failed: %1\n").arg(counts.errorCount);
+    }
+    message += tr("\nTotal: %1 image(s)").arg(counts.totalTasks);
+  }
+
+  // Show the dialog
+  QMessageBox msgBox(this);
+  msgBox.setWindowTitle(title);
+  msgBox.setText(message);
+
+  if (counts.errorCount > 0) {
+    msgBox.setIcon(QMessageBox::Warning);
+  } else {
+    msgBox.setIcon(QMessageBox::Information);
+  }
+
+  msgBox.setStandardButtons(QMessageBox::Ok);
+  msgBox.exec();
 }

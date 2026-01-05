@@ -59,6 +59,7 @@ signals:
   void toggleShowTaskActionWidget(bool visible);
   void isProcessingChanged(bool processing);
   void selectedImageTaskChanged(ImageTask *task);
+  void allTasksCompleted(const ImageTask::TaskStatusCounts &counts);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;

@@ -438,8 +438,14 @@ void TaskWidget::processNextBatch() {
   }
 
   if (m_imageTaskQueue.isEmpty() && m_activeTasks == 0) {
+    auto taskStatusCounts = getTaskStatusCounts();
     updateStatusBarMessage(getSummaryAndUpdateView());
     setIsProcessing(false);
+
+    // Emit signal for completion notification (only if there are tasks)
+    if (taskStatusCounts.totalTasks > 0) {
+      emit allTasksCompleted(taskStatusCounts);
+    }
   }
 }
 

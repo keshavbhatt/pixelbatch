@@ -4,6 +4,7 @@
 #include "emptystatewidget.h"
 #include "filehandler.h"
 #include "imagedetailpanel.h"
+#include "imagetask.h"
 #include "preferenceswidget.h"
 #include "taskwidget.h"
 
@@ -32,6 +33,7 @@ private slots:
   void setStatus(const QString &message);
   void updateStatusBarButtons(bool processing = false);
   void updateMenuActions(bool processing = false);
+  void showProcessingCompletedDialog(const ImageTask::TaskStatusCounts &counts);
 
   // actions
   void addImages();
