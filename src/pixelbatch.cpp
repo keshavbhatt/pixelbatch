@@ -76,26 +76,34 @@ PixelBatch::~PixelBatch() {
 
 void PixelBatch::initTaskWidget() {
 
-  m_taskWidget->setColumnCount(5);
+  m_taskWidget->setColumnCount(6);
 
   QStringList horizontalHeaders;
-  horizontalHeaders << tr("File")        // 0
-                    << tr("Status")      // 1
-                    << tr("Size Before") // 2
-                    << tr("Size After")  // 3
-                    << tr("Savings");    // 4
+  horizontalHeaders << ""                // 0 - Checkbox
+                    << tr("File")        // 1
+                    << tr("Status")      // 2
+                    << tr("Size Before") // 3
+                    << tr("Size After")  // 4
+                    << tr("Savings");    // 5
   m_taskWidget->setHorizontalHeaderLabels(horizontalHeaders);
 
   m_taskWidget->setAlternatingRowColors(true);
 
+  // checkbox column will have fixed size (minimum required)
+  int checkboxColumnWidth = 30;
+  m_taskWidget->setColumnWidth(0, checkboxColumnWidth);
+
   // status column will have fixed size
-  int firstColumnWidth = 56;
-  m_taskWidget->setColumnWidth(1, firstColumnWidth);
+  int statusColumnWidth = 56;
+  m_taskWidget->setColumnWidth(2, statusColumnWidth);
 
   // filenames can be long string, elide them
   ElidedItemDelegate *elideItemDelegate = new ElidedItemDelegate(this);
-  m_taskWidget->setItemDelegateForColumn(0, elideItemDelegate);
+  m_taskWidget->setItemDelegateForColumn(1, elideItemDelegate);
   m_taskWidget->setWordWrap(false);
+
+  // Hide checkbox column by default (user can show via Ctrl+E)
+  m_taskWidget->setColumnHidden(0, true);
 
   // connections
   connect(m_taskWidget, &TaskWidget::setStatusRequested, this,
@@ -144,21 +152,19 @@ void PixelBatch::setupStatusBar() {
   m_statusBarPermanentWidget->setLayout(layout);
   statusBar()->addPermanentWidget(m_statusBarPermanentWidget);
 
-  // init m_statusBarAddButton
+  // init "Process Images" button
   connect(m_statusBarProcessButton, &QPushButton::clicked, m_taskWidget,
           &TaskWidget::processImages);
 
   if (m_statusBarPermanentWidget) {
     m_statusBarPermanentWidget->layout()->addWidget(m_statusBarProcessButton);
   }
-
-  statusBar()->showMessage(
-      QString(tr("%1 ver: %2")).arg(qApp->applicationName(), VERSIONSTR));
 }
 
 void PixelBatch::initMenuBar() {
   QMenu *fileMenu = new QMenu(tr("File"), this);
   QMenu *editMenu = new QMenu(tr("Edit"), this);
+  QMenu *selectionMenu = new QMenu(tr("Selection"), this);
   QMenu *aboutMenu = new QMenu(tr("About"), this);
 
   // FILE MENU
@@ -195,6 +201,55 @@ void PixelBatch::initMenuBar() {
   editMenu->addAction(removeAllTasksAction);
   // END EDIT MENU
 
+  // SELECTION MENU
+  QAction *toggleCheckboxesAction =
+      new QAction(tr("Show Checkboxes"), selectionMenu);
+  toggleCheckboxesAction->setCheckable(true);
+  toggleCheckboxesAction->setChecked(false);
+  toggleCheckboxesAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  connect(toggleCheckboxesAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::toggleCheckboxVisibility);
+  selectionMenu->addAction(toggleCheckboxesAction);
+
+  selectionMenu->addSeparator();
+
+  QAction *checkAllAction = new QAction(tr("Check All"), selectionMenu);
+  checkAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A));
+  connect(checkAllAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::checkAll);
+  selectionMenu->addAction(checkAllAction);
+
+  QAction *uncheckAllAction = new QAction(tr("Uncheck All"), selectionMenu);
+  uncheckAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_D));
+  connect(uncheckAllAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::uncheckAll);
+  selectionMenu->addAction(uncheckAllAction);
+
+  selectionMenu->addSeparator();
+
+  QAction *processCheckedAction =
+      new QAction(tr("Process Checked Items"), selectionMenu);
+  processCheckedAction->setShortcut(
+      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
+  connect(processCheckedAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::processCheckedImages);
+  selectionMenu->addAction(processCheckedAction);
+
+  QAction *reprocessCheckedAction =
+      new QAction(tr("Re-process Checked Items"), selectionMenu);
+  connect(reprocessCheckedAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::reprocessCheckedImages);
+  selectionMenu->addAction(reprocessCheckedAction);
+
+  QAction *removeCheckedAction =
+      new QAction(tr("Remove Checked Items"), selectionMenu);
+  removeCheckedAction->setShortcut(
+      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R));
+  connect(removeCheckedAction, &QAction::triggered, m_taskWidget,
+          &TaskWidget::removeCheckedItems);
+  selectionMenu->addAction(removeCheckedAction);
+  // END SELECTION MENU
+
   // ABOUT MENU
   QAction *reportIssueAction = new QAction(tr("Report Issue"), aboutMenu);
   connect(reportIssueAction, &QAction::triggered, this,
@@ -214,6 +269,7 @@ void PixelBatch::initMenuBar() {
 
   menuBar()->addMenu(fileMenu);
   menuBar()->addMenu(editMenu);
+  menuBar()->addMenu(selectionMenu);
   menuBar()->addMenu(aboutMenu);
 }
 
@@ -371,9 +427,7 @@ void PixelBatch::reportIssue() {
   DesktopUtils::openUrl(Constants::URL_GITHUB_ISSUES);
 }
 
-void PixelBatch::donate() {
-  DesktopUtils::openUrl(Constants::URL_DONATE);
-}
+void PixelBatch::donate() { DesktopUtils::openUrl(Constants::URL_DONATE); }
 
 void PixelBatch::showAbout() {
   About *aboutDialog = new About(this);
@@ -419,14 +473,16 @@ void PixelBatch::addFileFromCommandLine(const QString &filePath) {
   }
 }
 
-void PixelBatch::showProcessingCompletedDialog(const ImageTask::TaskStatusCounts &counts) {
+void PixelBatch::showProcessingCompletedDialog(
+    const ImageTask::TaskStatusCounts &counts) {
   // Build the message
   QString title = tr("Processing Complete");
   QString message;
 
   if (counts.completedCount == counts.totalTasks) {
     // All succeeded
-    message = tr("All %1 image(s) have been successfully optimized!").arg(counts.totalTasks);
+    message = tr("All %1 image(s) have been successfully optimized!")
+                  .arg(counts.totalTasks);
   } else {
     // Some succeeded, some failed
     message = tr("Processing finished:\n\n");

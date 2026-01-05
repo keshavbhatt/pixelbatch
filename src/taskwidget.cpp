@@ -10,8 +10,10 @@
 #include <worker/ImageWorker.h>
 #include <worker/imageworkerfactory.h>
 
+#include <QCheckBox>
 #include <QDir>
 #include <QFileInfo>
+#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -34,6 +36,10 @@ TaskWidget::TaskWidget(QWidget *parent)
   setEditTriggers(QAbstractItemView::NoEditTriggers);
 
   updateTableHeader(false);
+
+  // Hide checkbox column by default
+  setColumnHidden(0, true);
+  m_checkboxesVisible = false;
 
   connect(this->model(), &QAbstractItemModel::rowsInserted, this, [=]() {
     // we are updating the status button and message in addFileToTable method
@@ -267,19 +273,32 @@ bool TaskWidget::addFileToTable(const QString &filePath) {
   int newRow = rowCount();
   insertRow(newRow);
 
+  // Insert checkbox in first column
+  QWidget *checkBoxWidget = new QWidget();
+  QCheckBox *checkBox = new QCheckBox();
+  checkBox->setChecked(false);
+  QHBoxLayout *layoutCheckBox = new QHBoxLayout(checkBoxWidget);
+  layoutCheckBox->addWidget(checkBox);
+  layoutCheckBox->setAlignment(Qt::AlignCenter);
+  layoutCheckBox->setContentsMargins(0, 0, 0, 0);
+  setCellWidget(newRow, 0, checkBoxWidget);
+
+  // Connect checkbox state change
+  connect(checkBox, &QCheckBox::stateChanged, this, &TaskWidget::onCheckboxStateChanged);
+
   // Insert file path
   QTableWidgetItem *fileItem = new QTableWidgetItem(filePath);
   // we use this data to map ImageTask to table row
   fileItem->setData(Qt::UserRole, QVariant::fromValue<ImageTask *>(imageTask));
   fileItem->setToolTip(filePath); // Show full path on hover
-  setItem(newRow, 0, fileItem);
+  setItem(newRow, 1, fileItem);
 
   // Insert initial status
   QTableWidgetItem *statusItem =
       new QTableWidgetItem(imageTask->statusToString());
   statusItem->setTextAlignment(Qt::AlignCenter);
   statusItem->setToolTip(tr("Waiting to be processed"));
-  setItem(newRow, 1, statusItem);
+  setItem(newRow, 2, statusItem);
 
   // Insert file size before
   qint64 fileSize = fileInfo.size();
@@ -287,19 +306,19 @@ bool TaskWidget::addFileToTable(const QString &filePath) {
   QTableWidgetItem *sizeBeforeItem = new QTableWidgetItem(formattedSize);
   sizeBeforeItem->setTextAlignment(Qt::AlignCenter);
   sizeBeforeItem->setToolTip(tr("Original file size: %1 bytes").arg(fileSize));
-  setItem(newRow, 2, sizeBeforeItem);
+  setItem(newRow, 3, sizeBeforeItem);
 
   // Insert file size after
   QTableWidgetItem *sizeAfterItem = new QTableWidgetItem("—");
   sizeAfterItem->setTextAlignment(Qt::AlignCenter);
   sizeAfterItem->setToolTip(tr("Not yet optimized"));
-  setItem(newRow, 3, sizeAfterItem);
+  setItem(newRow, 4, sizeAfterItem);
 
   // savings
   QTableWidgetItem *savingsItem = new QTableWidgetItem("—");
   savingsItem->setTextAlignment(Qt::AlignCenter);
   savingsItem->setToolTip(tr("Not yet optimized"));
-  setItem(newRow, 4, savingsItem);
+  setItem(newRow, 5, savingsItem);
 
   emit isProcessingChanged(false); // force update buttons
 
@@ -312,11 +331,12 @@ void TaskWidget::updateTableHeader(const bool &contentLoaded) {
   if (!contentLoaded) {
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   } else {
-    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-    horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
-    horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed); // Checkbox column
+    horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // File column
+    horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch); // Status column
+    horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // Size Before column
+    horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch); // Size After column
+    horizontalHeader()->setSectionResizeMode(5, QHeaderView::Stretch); // Savings column
   }
 }
 
@@ -643,9 +663,8 @@ void TaskWidget::compareImagesForSelectedTask() {
 
 int TaskWidget::findRowByImageTask(ImageTask *task) {
   for (int row = 0; row < rowCount(); ++row) {
-    // ImageTask(task) pointer is mapped with data of QTableWidgetItem in first
-    // column
-    QTableWidgetItem *item = this->item(row, 0);
+    // ImageTask(task) pointer is mapped with data of QTableWidgetItem in File column (column 1)
+    QTableWidgetItem *item = this->item(row, 1);
     if (item) {
       ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
       if (storedTask == task) {
@@ -656,8 +675,8 @@ int TaskWidget::findRowByImageTask(ImageTask *task) {
   return -1;
 }
 
-ImageTask *TaskWidget::getImageTaskFromRow(int row) {
-  QTableWidgetItem *item = this->item(row, 0);
+ImageTask *TaskWidget::getImageTaskFromRow(int row) const {
+  QTableWidgetItem *item = this->item(row, 1); // File column
   if (item) {
     ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
     return storedTask;
@@ -671,7 +690,7 @@ ImageTask *TaskWidget::getSelectedImageTask() const {
     return nullptr;
   }
 
-  QTableWidgetItem *item = this->item(row, 0);
+  QTableWidgetItem *item = this->item(row, 1); // File column
   if (item) {
     ImageTask *storedTask = item->data(Qt::UserRole).value<ImageTask *>();
     return storedTask;
@@ -683,7 +702,7 @@ void TaskWidget::updateTaskStatus(ImageTask *task,
                                   const QString optionalDetail) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
-    QTableWidgetItem *statusItem = item(row, 1);
+    QTableWidgetItem *statusItem = item(row, 2); // Status column
 
     // Set status text
     statusItem->setText(task->statusToString());
@@ -725,7 +744,7 @@ void TaskWidget::updateTaskStatus(ImageTask *task,
 void TaskWidget::updateTaskSizeAfter(ImageTask *task, const QString text) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
-    QTableWidgetItem *sizeAfterItem = item(row, 3);
+    QTableWidgetItem *sizeAfterItem = item(row, 4); // Size After column
     sizeAfterItem->setText(text);
 
     // Add tooltip with formatted size
@@ -740,7 +759,7 @@ void TaskWidget::updateTaskSizeAfter(ImageTask *task, const QString text) {
 void TaskWidget::updateTaskSaving(ImageTask *task, const QString text) {
   int row = findRowByImageTask(task);
   if (row >= 0) {
-    QTableWidgetItem *savingItem = item(row, 4);
+    QTableWidgetItem *savingItem = item(row, 5); // Savings column
     savingItem->setText(text);
 
     // Extract percentage from text (format: "XXX KB (YY.YY%)")
@@ -924,4 +943,177 @@ void TaskWidget::onFilesAddedBatch(int requestedCount) {
     // No files were added (all were duplicates or invalid)
     updateStatusBarMessage(getSummaryAndUpdateView());
   }
+}
+
+void TaskWidget::onCheckboxStateChanged(int state) {
+  Q_UNUSED(state);
+
+  // Emit signal with count of checked items
+  emit checkedItemsChanged(getCheckedTasks().count());
+}
+
+bool TaskWidget::hasCheckedItems() const {
+  for (int row = 0; row < rowCount(); ++row) {
+    QWidget *widget = cellWidget(row, 0);
+    if (widget) {
+      QCheckBox *checkBox = widget->findChild<QCheckBox *>();
+      if (checkBox && checkBox->isChecked()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+QList<ImageTask *> TaskWidget::getCheckedTasks() const {
+  QList<ImageTask *> checkedTasks;
+
+  for (int row = 0; row < rowCount(); ++row) {
+    QWidget *widget = cellWidget(row, 0);
+    if (widget) {
+      QCheckBox *checkBox = widget->findChild<QCheckBox *>();
+      if (checkBox && checkBox->isChecked()) {
+        ImageTask *task = getImageTaskFromRow(row);
+        if (task) {
+          checkedTasks.append(task);
+        }
+      }
+    }
+  }
+
+  return checkedTasks;
+}
+
+void TaskWidget::checkAll() {
+  for (int row = 0; row < rowCount(); ++row) {
+    QWidget *widget = cellWidget(row, 0);
+    if (widget) {
+      QCheckBox *checkBox = widget->findChild<QCheckBox *>();
+      if (checkBox) {
+        checkBox->setChecked(true);
+      }
+    }
+  }
+}
+
+void TaskWidget::uncheckAll() {
+  for (int row = 0; row < rowCount(); ++row) {
+    QWidget *widget = cellWidget(row, 0);
+    if (widget) {
+      QCheckBox *checkBox = widget->findChild<QCheckBox *>();
+      if (checkBox) {
+        checkBox->setChecked(false);
+      }
+    }
+  }
+}
+
+void TaskWidget::processCheckedImages() {
+  QList<ImageTask *> checkedTasks = getCheckedTasks();
+
+  if (checkedTasks.isEmpty()) {
+    updateStatusBarMessage(tr("No items selected"));
+    return;
+  }
+
+  int queuedCount = 0;
+
+  for (ImageTask *imageTask : checkedTasks) {
+    // Only process pending tasks
+    if (imageTask->taskStatus == ImageTask::Pending) {
+      imageTask->taskStatus = ImageTask::Queued;
+      m_imageTaskQueue.enqueue(imageTask);
+      updateTaskStatus(imageTask);
+      queuedCount++;
+    }
+  }
+
+  if (queuedCount > 0) {
+    setIsProcessing(true);
+    updateStatusBarMessage(
+        tr("%1 selected %2 queued for processing")
+            .arg(QString::number(queuedCount),
+                 QString(queuedCount > 1 ? "items" : "item")));
+    processNextBatch();
+  } else {
+    updateStatusBarMessage(tr("Selected items already processed or queued"));
+  }
+}
+
+void TaskWidget::reprocessCheckedImages() {
+  QList<ImageTask *> checkedTasks = getCheckedTasks();
+
+  if (checkedTasks.isEmpty()) {
+    updateStatusBarMessage(tr("No items selected"));
+    return;
+  }
+
+  int queuedCount = 0;
+
+  for (ImageTask *imageTask : checkedTasks) {
+    // Re-process completed or error tasks
+    if (imageTask->taskStatus == ImageTask::Completed ||
+        imageTask->taskStatus == ImageTask::Error) {
+      imageTask->taskStatus = ImageTask::Queued;
+      m_imageTaskQueue.enqueue(imageTask);
+      updateTaskStatus(imageTask);
+
+      // Clear previous results
+      updateTaskSizeAfter(imageTask, "—");
+      updateTaskSaving(imageTask, "—");
+
+      queuedCount++;
+    }
+  }
+
+  if (queuedCount > 0) {
+    setIsProcessing(true);
+    updateStatusBarMessage(
+        tr("%1 selected %2 queued for re-processing")
+            .arg(QString::number(queuedCount),
+                 QString(queuedCount > 1 ? "items" : "item")));
+    processNextBatch();
+  } else {
+    updateStatusBarMessage(tr("No completed or failed items selected for re-processing"));
+  }
+}
+
+void TaskWidget::removeCheckedItems() {
+  QList<ImageTask *> checkedTasks = getCheckedTasks();
+
+  if (checkedTasks.isEmpty()) {
+    updateStatusBarMessage(tr("No items selected"));
+    return;
+  }
+
+  // Ask for confirmation
+  int count = checkedTasks.count();
+  QMessageBox::StandardButton reply = QMessageBox::question(
+      this, tr("Remove Items"),
+      tr("Are you sure you want to remove %1 selected item(s) from the list?").arg(count),
+      QMessageBox::Yes | QMessageBox::No);
+
+  if (reply == QMessageBox::Yes) {
+    for (ImageTask *task : checkedTasks) {
+      removeTask(task);
+    }
+
+    updateStatusBarMessage(tr("Removed %1 item(s)").arg(count));
+  }
+}
+
+void TaskWidget::toggleCheckboxVisibility() {
+  setCheckboxesVisible(!m_checkboxesVisible);
+}
+
+void TaskWidget::setCheckboxesVisible(bool visible) {
+  m_checkboxesVisible = visible;
+  setColumnHidden(0, !visible);
+
+  // Uncheck all when hiding checkboxes
+  if (!visible) {
+    uncheckAll();
+  }
+
+  emit checkedItemsChanged(visible ? getCheckedTasks().count() : 0);
 }

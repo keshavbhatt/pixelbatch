@@ -29,7 +29,9 @@ public:
 
   bool isProcessing() const;
   bool hasSelection();
+  bool hasCheckedItems() const;
   ImageTask *getSelectedImageTask() const;
+  QList<ImageTask *> getCheckedTasks() const;
 
   void setTaskCustomOutputDir(ImageTask *task, const QString &dir);
   void setTaskCustomOutputPrefix(ImageTask *task, const QString &prefix);
@@ -54,6 +56,15 @@ public slots:
   void removeFinishedOperations();
   void clearAllOperations();
 
+  // Batch operations on checked items
+  void processCheckedImages();
+  void reprocessCheckedImages();
+  void removeCheckedItems();
+  void checkAll();
+  void uncheckAll();
+  void toggleCheckboxVisibility();
+  void setCheckboxesVisible(bool visible);
+
 signals:
   void setStatusRequested(const QString &message);
   void statusMessageUpdated(const QString &message);
@@ -62,6 +73,7 @@ signals:
   void isProcessingChanged(bool processing);
   void selectedImageTaskChanged(ImageTask *task);
   void allTasksCompleted(const ImageTask::TaskStatusCounts &counts);
+  void checkedItemsChanged(int count);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -76,6 +88,7 @@ protected:
 private slots:
   void onOptimizationFinished(ImageTask *task, bool success);
   void onOptimizationError(ImageTask *task, const QString &errorString);
+  void onCheckboxStateChanged(int state);
 
 private:
   QList<ImageTask *> m_imageTasks;
@@ -98,13 +111,14 @@ private:
   int m_activeTasks = 0;
   QList<QObject*> m_activeWorkers;  // Track active workers for cleanup
   int m_pendingCountBeforeBatch = 0; // Track count before batch addition
+  bool m_checkboxesVisible = false; // Track if checkboxes are visible
 
   void removeTask(ImageTask *task);
   int findRowByImageTask(ImageTask *task);
   void removeTasksByStatus(const ImageTask::Status &status);
   void updateStatusBarMessage(const QString &message);
   QString getSummaryAndUpdateView();
-  ImageTask *getImageTaskFromRow(int row);
+  ImageTask *getImageTaskFromRow(int row) const;
 
   void updateTaskOverlayWidget();
   QString generateSummary(const ImageTask::TaskStatusCounts &counts) const;
