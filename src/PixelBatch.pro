@@ -26,7 +26,7 @@ CONFIG(debug, debug|release) {
 }
 
 # Set program version
-VERSION = 1.0
+VERSION = 2.0
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 APPLICATION_FULLNAME = PixelBatch
