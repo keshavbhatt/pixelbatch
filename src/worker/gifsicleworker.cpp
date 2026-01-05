@@ -91,19 +91,17 @@ void GifsicleWorker::optimize(ImageTask *task) {
         QFile::remove(dst);
     }
 
-    // Load settings
-    const QSettings &settings = Settings::instance().getSettings();
-
-    int optimizationLevel = settings.value("gifsicle/optimizationLevel", 2).toInt();
-    int compressionType = settings.value("gifsicle/compressionType", 0).toInt();
-    int lossyLevel = settings.value("gifsicle/lossyLevel", 80).toInt();
-    bool reduceColors = settings.value("gifsicle/reduceColors", false).toBool();
-    int colorCount = settings.value("gifsicle/colorCount", 256).toInt();
-    int colorMethod = settings.value("gifsicle/colorMethod", 0).toInt();
-    bool enableDithering = settings.value("gifsicle/enableDithering", true).toBool();
-    bool cropTransparency = settings.value("gifsicle/cropTransparency", true).toBool();
-    bool interlace = settings.value("gifsicle/interlace", false).toBool();
-    int threads = settings.value("gifsicle/threads", 4).toInt();
+    // Load settings (using getSetting which checks custom settings first, then falls back to global)
+    int optimizationLevel = getSetting("gifsicle/optimizationLevel", 2).toInt();
+    int compressionType = getSetting("gifsicle/compressionType", 0).toInt();
+    int lossyLevel = getSetting("gifsicle/lossyLevel", 80).toInt();
+    bool reduceColors = getSetting("gifsicle/reduceColors", false).toBool();
+    int colorCount = getSetting("gifsicle/colorCount", 256).toInt();
+    int colorMethod = getSetting("gifsicle/colorMethod", 0).toInt();
+    bool enableDithering = getSetting("gifsicle/enableDithering", true).toBool();
+    bool cropTransparency = getSetting("gifsicle/cropTransparency", true).toBool();
+    bool interlace = getSetting("gifsicle/interlace", false).toBool();
+    int threads = getSetting("gifsicle/threads", 4).toInt();
 
     // Build arguments
     QStringList args;

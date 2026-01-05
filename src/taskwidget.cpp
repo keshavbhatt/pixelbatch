@@ -436,6 +436,12 @@ void TaskWidget::processNextBatch() {
       ImageWorker *worker =
           ImageWorkerFactory::instance().getWorker(imageTask->imagePath);
 
+      // Apply task-specific settings if available
+      if (imageTask->hasCustomOptimizerSettings()) {
+        worker->setCustomSettings(imageTask->customOptimizerSettings);
+        qDebug() << "Applied custom settings to worker for" << imageTask->imagePath;
+      }
+
       // Track worker for cleanup
       m_activeWorkers.append(worker);
 
@@ -918,6 +924,23 @@ void TaskWidget::clearTaskCustomOutputPrefix(ImageTask *task) {
       task->taskStatus == ImageTask::Error) {
     task->optimizedPath = generateOutputPath(task);
   }
+}
+
+void TaskWidget::setTaskCustomOptimizerSettings(ImageTask *task, const QVariantMap &settings) {
+  if (!task) return;
+
+  task->customOptimizerSettings = settings;
+
+  qDebug() << "Set custom optimizer settings for task:" << task->imagePath;
+  qDebug() << "Custom settings:" << settings;
+}
+
+void TaskWidget::clearTaskCustomOptimizerSettings(ImageTask *task) {
+  if (!task) return;
+
+  task->customOptimizerSettings.clear();
+
+  qDebug() << "Cleared custom optimizer settings for task:" << task->imagePath;
 }
 
 void TaskWidget::onBatchAdditionStarting() {

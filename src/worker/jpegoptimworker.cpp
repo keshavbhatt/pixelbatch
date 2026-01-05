@@ -86,27 +86,25 @@ void JpegoptimWorker::optimize(ImageTask *task) {
     return;
   }
 
-  // Load settings
-  const QSettings &settings = Settings::instance().getSettings();
-
+  // Load settings (using getSetting which checks custom settings first, then falls back to global)
   // Quality settings
-  int maxQuality = settings.value("jpegoptim/maxQuality", 100).toInt();
-  int targetSize = settings.value("jpegoptim/targetSize", 0).toInt();
-  int compressionThreshold = settings.value("jpegoptim/compressionThreshold", 0).toInt();
+  int maxQuality = getSetting("jpegoptim/maxQuality", 100).toInt();
+  int targetSize = getSetting("jpegoptim/targetSize", 0).toInt();
+  int compressionThreshold = getSetting("jpegoptim/compressionThreshold", 0).toInt();
 
   // Metadata handling
-  int metadataMode = settings.value("jpegoptim/metadataMode", 0).toInt();
+  int metadataMode = getSetting("jpegoptim/metadataMode", 0).toInt();
 
   // Output format
-  int outputMode = settings.value("jpegoptim/outputMode", 0).toInt();
+  int outputMode = getSetting("jpegoptim/outputMode", 0).toInt();
 
   // Additional options
-  bool forceOptimization = settings.value("jpegoptim/force", false).toBool();
-  bool preserveTimes = settings.value("jpegoptim/preserveTimes", true).toBool();
-  bool retry = settings.value("jpegoptim/retry", false).toBool();
+  bool forceOptimization = getSetting("jpegoptim/force", false).toBool();
+  bool preserveTimes = getSetting("jpegoptim/preserveTimes", true).toBool();
+  bool retry = getSetting("jpegoptim/retry", false).toBool();
 
   // Performance
-  int maxWorkers = settings.value("jpegoptim/maxWorkers", 1).toInt();
+  int maxWorkers = getSetting("jpegoptim/maxWorkers", 1).toInt();
 
   // Build arguments
   QStringList args;

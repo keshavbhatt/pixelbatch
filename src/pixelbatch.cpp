@@ -314,6 +314,12 @@ void PixelBatch::initImageDetailPanel() {
   connect(m_imageDetailPanel, &ImageDetailPanel::customOutputPrefixCleared,
           m_taskWidget, &TaskWidget::clearTaskCustomOutputPrefix);
 
+  // Connect optimizer settings signals
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOptimizerSettingsChanged,
+          m_taskWidget, &TaskWidget::setTaskCustomOptimizerSettings);
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOptimizerSettingsCleared,
+          m_taskWidget, &TaskWidget::clearTaskCustomOptimizerSettings);
+
   m_imageDetailPanel->setMinimumWidth(300);
 
   m_imageDetailPanel->setVisible(false);

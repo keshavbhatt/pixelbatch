@@ -81,13 +81,11 @@ void SvgoWorker::optimize(ImageTask *task) {
     QFile::remove(dst);
   }
 
-  // Load settings
-  const QSettings &settings = Settings::instance().getSettings();
-
-  int precision = settings.value("svgo/precision", 3).toInt();
-  bool multipass = settings.value("svgo/multipass", true).toBool();
-  bool prettyPrint = settings.value("svgo/prettyPrint", false).toBool();
-  int indent = settings.value("svgo/indent", 2).toInt();
+  // Load settings (using getSetting which checks custom settings first, then falls back to global)
+  int precision = getSetting("svgo/precision", 3).toInt();
+  bool multipass = getSetting("svgo/multipass", true).toBool();
+  bool prettyPrint = getSetting("svgo/prettyPrint", false).toBool();
+  int indent = getSetting("svgo/indent", 2).toInt();
 
   // // Cleanup options
   // bool removeComments = settings.value("svgo/removeComments", true).toBool();

@@ -28,11 +28,15 @@ signals:
   void customOutputPrefixChanged(ImageTask *task, const QString &prefix);
   void customOutputDirCleared(ImageTask *task);
   void customOutputPrefixCleared(ImageTask *task);
+  void customOptimizerSettingsChanged(ImageTask *task, const QVariantMap &settings);
+  void customOptimizerSettingsCleared(ImageTask *task);
 
 private slots:
   void onChangeOutputDir();
   void onUseCustomOutputToggled(bool checked);
   void onOutputPrefixChanged(const QString &text);
+  void onSaveOptimizerSettings();
+  void onResetOptimizerSettings();
 
 private:
   void setupUI();
@@ -53,6 +57,9 @@ private:
   QLabel *m_formatLabel;
   QVBoxLayout *m_optimizerSettingsLayout;
   QWidget *m_currentOptimizerWidget;
+  QPushButton *m_saveOptimizerButton;
+  QPushButton *m_resetOptimizerButton;
+  QLabel *m_customSettingsIndicator;
 
   // Output settings
   QCheckBox *m_useCustomOutputCheckBox;

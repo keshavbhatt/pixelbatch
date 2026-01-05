@@ -3,12 +3,14 @@
 
 #include <QMetaType>
 #include <QString>
+#include <QVariantMap>
 
 struct ImageTask {
   QString imagePath;     // Source image path
   QString optimizedPath; // Destination (optimized) image path
   QString customOutputDir; // Custom output directory for this task (empty = use global default)
   QString customOutputPrefix; // Custom output prefix for this task (empty = use global default)
+  QVariantMap customOptimizerSettings; // Custom optimization settings for this task (empty = use global defaults)
 
   enum Status { Pending, Queued, Processing, Completed, Error };
 
@@ -45,6 +47,7 @@ struct ImageTask {
   // Helper to check if task uses custom output settings
   bool hasCustomOutputDir() const { return !customOutputDir.isEmpty(); }
   bool hasCustomOutputPrefix() const { return !customOutputPrefix.isEmpty(); }
+  bool hasCustomOptimizerSettings() const { return !customOptimizerSettings.isEmpty(); }
 };
 
 Q_DECLARE_METATYPE(ImageTask *)

@@ -37,6 +37,8 @@ public:
   void setTaskCustomOutputPrefix(ImageTask *task, const QString &prefix);
   void clearTaskCustomOutputDir(ImageTask *task);
   void clearTaskCustomOutputPrefix(ImageTask *task);
+  void setTaskCustomOptimizerSettings(ImageTask *task, const QVariantMap &settings);
+  void clearTaskCustomOptimizerSettings(ImageTask *task);
 
   void cancelAllProcessing();
 

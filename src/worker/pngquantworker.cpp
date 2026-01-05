@@ -68,21 +68,20 @@ void PngquantWorker::optimize(ImageTask *task) {
     }
 
     // Remove existing destination file if force is enabled
-    const QSettings &settings = Settings::instance().getSettings();
-    bool force = settings.value("pngquant/force", true).toBool();
+    bool force = getSetting("pngquant/force", true).toBool();
 
     if (force && QFile::exists(dst)) {
         QFile::remove(dst);
     }
 
-    // Load settings
-    int qualityMin = settings.value("pngquant/qualityMin", 65).toInt();
-    int qualityMax = settings.value("pngquant/qualityMax", 80).toInt();
-    int speed = settings.value("pngquant/speed", 4).toInt();
-    bool enableDithering = settings.value("pngquant/enableDithering", true).toBool();
-    int posterize = settings.value("pngquant/posterize", 0).toInt();
-    bool stripMetadata = settings.value("pngquant/stripMetadata", true).toBool();
-    bool skipIfLarger = settings.value("pngquant/skipIfLarger", true).toBool();
+    // Load settings (using getSetting which checks custom settings first, then falls back to global)
+    int qualityMin = getSetting("pngquant/qualityMin", 65).toInt();
+    int qualityMax = getSetting("pngquant/qualityMax", 80).toInt();
+    int speed = getSetting("pngquant/speed", 4).toInt();
+    bool enableDithering = getSetting("pngquant/enableDithering", true).toBool();
+    int posterize = getSetting("pngquant/posterize", 0).toInt();
+    bool stripMetadata = getSetting("pngquant/stripMetadata", true).toBool();
+    bool skipIfLarger = getSetting("pngquant/skipIfLarger", true).toBool();
 
     // Build arguments
     QStringList args;

@@ -12,7 +12,9 @@
 #include <QString>
 #include <QStringList>
 #include <QThread>
+#include <QVariantMap>
 #include <imagetask.h>
+#include <settings.h>
 
 struct ImageTask;
 class ImageWorker : public QObject {
@@ -21,6 +23,12 @@ class ImageWorker : public QObject {
 public:
   ImageWorker(QObject *parent = nullptr) : QObject(parent) {}
   virtual void optimize(ImageTask *task) = 0;
+
+  // Set custom settings for this worker instance (overrides global settings)
+  void setCustomSettings(const QVariantMap &settings) {
+    m_customSettings = settings;
+  }
+
   virtual ~ImageWorker() {
     // Kill any running processes when worker is destroyed
     qDebug() << "ImageWorker destructor - terminating" << m_runningProcesses.count() << "processes";
@@ -60,6 +68,17 @@ signals:
 
 protected:
   QList<QProcess*> m_runningProcesses;  // Track all processes
+  QVariantMap m_customSettings;  // Custom settings for this worker instance
+
+  // Helper to get setting value - checks custom settings first, then falls back to global QSettings
+  QVariant getSetting(const QString &key, const QVariant &defaultValue = QVariant()) const {
+    if (m_customSettings.contains(key)) {
+      return m_customSettings.value(key);
+    }
+    // Fall back to global settings
+    const QSettings &settings = Settings::instance().getSettings();
+    return settings.value(key, defaultValue);
+  }
 
   void executeProcess(const QString &program, const QStringList &arguments,
                       ImageTask *task) {

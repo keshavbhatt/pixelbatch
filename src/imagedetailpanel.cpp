@@ -8,6 +8,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QImageReader>
+#include <QMessageBox>
 
 ImageDetailPanel::ImageDetailPanel(QWidget *parent)
     : QWidget(parent), m_currentTask(nullptr), m_settings(Settings::instance()),
@@ -111,7 +112,16 @@ void ImageDetailPanel::setupUI() {
 
   // Optimizer Settings Section
   QGroupBox *settingsGroup = new QGroupBox(tr("Optimization Settings"));
-  m_optimizerSettingsLayout = new QVBoxLayout(settingsGroup);
+  QVBoxLayout *settingsGroupLayout = new QVBoxLayout(settingsGroup);
+
+  // Add indicator for custom settings
+  m_customSettingsIndicator = new QLabel(tr("⚙️ Using custom settings for this image"));
+  m_customSettingsIndicator->setStyleSheet("QLabel { color: #0066CC; font-weight: bold; padding: 5px; background-color: #E6F2FF; border-radius: 3px; }");
+  m_customSettingsIndicator->setVisible(false);
+  settingsGroupLayout->addWidget(m_customSettingsIndicator);
+
+  m_optimizerSettingsLayout = new QVBoxLayout();
+  settingsGroupLayout->addLayout(m_optimizerSettingsLayout);
 
   // Add placeholder label initially
   QLabel *noSettingsLabel =
@@ -119,6 +129,27 @@ void ImageDetailPanel::setupUI() {
   noSettingsLabel->setAlignment(Qt::AlignCenter);
   noSettingsLabel->setWordWrap(true);
   m_optimizerSettingsLayout->addWidget(noSettingsLabel);
+
+  // Add buttons for save/reset
+  QHBoxLayout *buttonsLayout = new QHBoxLayout();
+  m_saveOptimizerButton = new QPushButton(tr("Apply to This Image"));
+  m_saveOptimizerButton->setToolTip(tr("Save these settings for this image only (overrides global settings)"));
+  m_resetOptimizerButton = new QPushButton(tr("Reset to Global"));
+  m_resetOptimizerButton->setToolTip(tr("Clear custom settings and use global settings"));
+
+  buttonsLayout->addWidget(m_saveOptimizerButton);
+  buttonsLayout->addWidget(m_resetOptimizerButton);
+  settingsGroupLayout->addLayout(buttonsLayout);
+
+  // Initially disable buttons
+  m_saveOptimizerButton->setVisible(false);
+  m_resetOptimizerButton->setVisible(false);
+
+  // Connect buttons
+  connect(m_saveOptimizerButton, &QPushButton::clicked, this,
+          &ImageDetailPanel::onSaveOptimizerSettings);
+  connect(m_resetOptimizerButton, &QPushButton::clicked, this,
+          &ImageDetailPanel::onResetOptimizerSettings);
 
 
   contentLayout->addWidget(
@@ -151,6 +182,12 @@ void ImageDetailPanel::setImageTask(ImageTask *task) {
   updateImageInfo();
   updateOutputSettings();
   updateOptimizerSettings();
+
+  // Show/hide save/reset buttons and indicator based on whether task has custom settings
+  bool hasCustomSettings = task->hasCustomOptimizerSettings();
+  m_saveOptimizerButton->setVisible(true);
+  m_resetOptimizerButton->setVisible(hasCustomSettings);
+  m_customSettingsIndicator->setVisible(hasCustomSettings);
 }
 
 void ImageDetailPanel::clear() {
@@ -337,8 +374,20 @@ void ImageDetailPanel::loadOptimizerWidget() {
     m_currentOptimizerWidget = prefWidget;
     m_optimizerSettingsLayout->addWidget(m_currentOptimizerWidget);
 
-    // Make the widget enabled for viewing settings
+    // Make the widget enabled for viewing/editing settings
     m_currentOptimizerWidget->setEnabled(true);
+
+    // Disable auto-save to prevent changes from affecting global settings
+    ImageOptimizerPrefWidget *optimizerWidget = qobject_cast<ImageOptimizerPrefWidget*>(prefWidget);
+    if (optimizerWidget) {
+      optimizerWidget->setAutoSaveEnabled(false);
+
+      // Load custom settings if task has them, otherwise load global settings
+      if (m_currentTask->hasCustomOptimizerSettings()) {
+        optimizerWidget->loadCustomSettings(m_currentTask->customOptimizerSettings);
+        qDebug() << "Loaded custom settings into widget for task:" << m_currentTask->imagePath;
+      }
+    }
   } else {
     QLabel *noOptimizerLabel =
         new QLabel(tr("No optimizer available for this image format"));
@@ -463,3 +512,67 @@ void ImageDetailPanel::onOutputPrefixChanged(const QString &text) {
   }
 }
 
+void ImageDetailPanel::onSaveOptimizerSettings() {
+  if (!m_currentTask || !m_currentOptimizerWidget) {
+    return;
+  }
+
+  // Get current settings from the widget
+  ImageOptimizerPrefWidget *optimizerWidget = qobject_cast<ImageOptimizerPrefWidget*>(m_currentOptimizerWidget);
+  if (!optimizerWidget) {
+    return;
+  }
+
+  QVariantMap customSettings = optimizerWidget->getCurrentSettings();
+
+  if (customSettings.isEmpty()) {
+    QMessageBox::warning(this, tr("No Settings"),
+                        tr("Unable to read settings from the widget."));
+    return;
+  }
+
+  // Determine file type for logging
+  QFileInfo fileInfo(m_currentTask->imagePath);
+  QString extension = fileInfo.suffix().toLower();
+
+  qDebug() << "Saving custom settings for task:" << m_currentTask->imagePath;
+  qDebug() << "Settings:" << customSettings;
+
+  // Emit signal with the custom settings
+  emit customOptimizerSettingsChanged(m_currentTask, customSettings);
+
+  // Update UI
+  m_customSettingsIndicator->setVisible(true);
+  m_resetOptimizerButton->setVisible(true);
+
+  // Show confirmation
+  QMessageBox::information(this, tr("Settings Saved"),
+                          tr("Custom optimization settings saved for this image.\n\n"
+                             "These settings will be used instead of global settings when processing this image."));
+}
+
+void ImageDetailPanel::onResetOptimizerSettings() {
+  if (!m_currentTask) {
+    return;
+  }
+
+  // Ask for confirmation
+  QMessageBox::StandardButton reply = QMessageBox::question(
+      this, tr("Reset Settings"),
+      tr("Reset to global settings?\n\nThis will remove custom settings for this image."),
+      QMessageBox::Yes | QMessageBox::No);
+
+  if (reply == QMessageBox::Yes) {
+    // Emit signal to clear custom settings
+    emit customOptimizerSettingsCleared(m_currentTask);
+
+    // Update UI
+    m_customSettingsIndicator->setVisible(false);
+
+    // Reload the widget to show global settings
+    updateOptimizerSettings();
+
+    QMessageBox::information(this, tr("Settings Reset"),
+                            tr("Custom settings cleared. This image will now use global settings."));
+  }
+}
