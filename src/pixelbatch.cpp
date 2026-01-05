@@ -116,8 +116,14 @@ void PixelBatch::setupStatusBar() {
   statusBar()->setSizeGripEnabled(false);
 
   // init m_fielHandler
+  connect(m_fileHandler, &FileHandler::batchAdditionStarting, m_taskWidget,
+          &TaskWidget::onBatchAdditionStarting);
   connect(m_fileHandler, &FileHandler::addFileToTable, m_taskWidget,
           &TaskWidget::addFileToTable);
+
+  // Connect filesAdded signal to show consistent status message
+  connect(m_fileHandler, &FileHandler::filesAdded, m_taskWidget,
+          &TaskWidget::onFilesAddedBatch);
 
   // init m_statusBarAddButton
 
@@ -401,7 +407,15 @@ void PixelBatch::applySavedThemeAndStyle() {
 
 void PixelBatch::addFileFromCommandLine(const QString &filePath) {
   if (m_taskWidget) {
-    m_taskWidget->addFileToTable(filePath);
+    // Track the count before adding
+    m_taskWidget->onBatchAdditionStarting();
+
+    bool added = m_taskWidget->addFileToTable(filePath);
+
+    // Show status message if added
+    if (added) {
+      m_taskWidget->onFilesAddedBatch(1);
+    }
   }
 }
 

@@ -47,7 +47,9 @@ public slots:
   void openOriginalImageInImageViewerForSelectedTask();
   void compareImagesForSelectedTask();
 
-  void addFileToTable(const QString &filePath);
+  bool addFileToTable(const QString &filePath);
+  void onBatchAdditionStarting();
+  void onFilesAddedBatch(int requestedCount);
   void processImages();
   void removeFinishedOperations();
   void clearAllOperations();
@@ -95,6 +97,7 @@ private:
   QQueue<ImageTask *> m_imageTaskQueue;
   int m_activeTasks = 0;
   QList<QObject*> m_activeWorkers;  // Track active workers for cleanup
+  int m_pendingCountBeforeBatch = 0; // Track count before batch addition
 
   void removeTask(ImageTask *task);
   int findRowByImageTask(ImageTask *task);

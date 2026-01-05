@@ -108,8 +108,12 @@ void TaskWidget::dragMoveEvent(QDragMoveEvent *event) {
 
 void TaskWidget::dropEvent(QDropEvent *event) {
   if (event->mimeData()->hasUrls()) {
-    QStringList addedFiles;
+    // Save count before adding
+    auto countsBeforeAdd = getTaskStatusCounts();
+    int pendingBefore = countsBeforeAdd.pendingCount;
+
     QStringList skippedFiles;
+    QStringList duplicateFiles;
 
     foreach (const QUrl &url, event->mimeData()->urls()) {
       QFileInfo fileInfo(url.toLocalFile());
@@ -127,15 +131,25 @@ void TaskWidget::dropEvent(QDropEvent *event) {
         continue;
       }
 
-      this->addFileToTable(fileInfo.filePath());
-      addedFiles << fileInfo.fileName();
+      // Try to add the file
+      bool added = this->addFileToTable(fileInfo.filePath());
+      if (!added) {
+        duplicateFiles << fileInfo.fileName();
+      }
     }
 
-    // Provide feedback
-    if (!addedFiles.isEmpty()) {
-      updateStatusBarMessage(tr("Added %1 image(s)").arg(addedFiles.count()));
+    // Calculate how many were actually added
+    auto countsAfterAdd = getTaskStatusCounts();
+    int addedCount = countsAfterAdd.pendingCount - pendingBefore;
+
+    // Provide feedback with consistent status message
+    if (addedCount > 0) {
+      updateStatusBarMessage(tr("Added %1 image(s). %2")
+                             .arg(addedCount)
+                             .arg(getSummaryAndUpdateView()));
     }
 
+    // Show dialog for skipped/duplicate files
     if (!skippedFiles.isEmpty() && skippedFiles.count() <= 5) {
       QMessageBox::information(
           this, tr("Files Skipped"),
@@ -146,6 +160,18 @@ void TaskWidget::dropEvent(QDropEvent *event) {
       QMessageBox::information(this, tr("Files Skipped"),
                                tr("Skipped %1 unsupported or invalid file(s)")
                                    .arg(skippedFiles.count()));
+    }
+
+    if (!duplicateFiles.isEmpty() && duplicateFiles.count() <= 5) {
+      QMessageBox::information(
+          this, tr("Duplicate Files"),
+          tr("Skipped %1 duplicate file(s):\n%2")
+              .arg(duplicateFiles.count())
+              .arg(duplicateFiles.join("\n")));
+    } else if (!duplicateFiles.isEmpty()) {
+      QMessageBox::information(this, tr("Duplicate Files"),
+                               tr("Skipped %1 duplicate file(s)")
+                                   .arg(duplicateFiles.count()));
     }
 
     event->acceptProposedAction();
@@ -219,17 +245,15 @@ void TaskWidget::keyPressEvent(QKeyEvent *event) {
   QTableWidget::keyPressEvent(event);
 }
 
-void TaskWidget::addFileToTable(const QString &filePath) {
+bool TaskWidget::addFileToTable(const QString &filePath) {
 
   QFileInfo fileInfo(filePath);
 
   // Check for duplicates
   for (const ImageTask *existingTask : qAsConst(m_imageTasks)) {
     if (existingTask->imagePath == filePath) {
-      QMessageBox::information(
-          this, tr("Duplicate File"),
-          tr("The file '%1' is already in the list.").arg(fileInfo.fileName()));
-      return;
+      // Silently skip duplicates when adding multiple files
+      return false;
     }
   }
 
@@ -277,11 +301,11 @@ void TaskWidget::addFileToTable(const QString &filePath) {
   savingsItem->setToolTip(tr("Not yet optimized"));
   setItem(newRow, 4, savingsItem);
 
-  updateStatusBarMessage(getSummaryAndUpdateView());
-
   emit isProcessingChanged(false); // force update buttons
 
   updateTableHeader(true);
+
+  return true;
 }
 
 void TaskWidget::updateTableHeader(const bool &contentLoaded) {
@@ -872,5 +896,32 @@ void TaskWidget::clearTaskCustomOutputPrefix(ImageTask *task) {
       task->taskStatus == ImageTask::Queued ||
       task->taskStatus == ImageTask::Error) {
     task->optimizedPath = generateOutputPath(task);
+  }
+}
+
+void TaskWidget::onBatchAdditionStarting() {
+  // Save current pending count before batch addition starts
+  auto counts = getTaskStatusCounts();
+  m_pendingCountBeforeBatch = counts.pendingCount;
+}
+
+void TaskWidget::onFilesAddedBatch(int requestedCount) {
+  Q_UNUSED(requestedCount);
+
+  // Calculate how many files were actually added by comparing pending counts
+  auto counts = getTaskStatusCounts();
+  int addedCount = counts.pendingCount - m_pendingCountBeforeBatch;
+
+  // Reset for next batch
+  m_pendingCountBeforeBatch = 0;
+
+  // Show status message after files have been added
+  if (addedCount > 0) {
+    updateStatusBarMessage(tr("Added %1 image(s). %2")
+                           .arg(addedCount)
+                           .arg(getSummaryAndUpdateView()));
+  } else {
+    // No files were added (all were duplicates or invalid)
+    updateStatusBarMessage(getSummaryAndUpdateView());
   }
 }

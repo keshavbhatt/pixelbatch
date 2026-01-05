@@ -19,7 +19,9 @@ public slots:
   void addFiles(const QString &dir = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation));
 
 signals:
+  void batchAdditionStarting(); // Signal emitted before adding files
   void addFileToTable(const QString &fileName);
+  void filesAdded(int count); // Signal to notify how many files were added
 
 private:
   Settings &m_settings;

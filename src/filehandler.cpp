@@ -17,9 +17,15 @@ void FileHandler::addFiles(const QString &dir) {
 
 void FileHandler::addFilesToTable(QStringList fileNames)
 {
+    // Emit signal before starting to add files
+    emit batchAdditionStarting();
+
     for (const QString &fileName : qAsConst(fileNames)) {
         emit addFileToTable(fileName);
     }
+
+    // Emit signal with count of files to be added
+    emit filesAdded(fileNames.count());
 }
 
 
