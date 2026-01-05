@@ -721,6 +721,8 @@ void TaskWidget::updateTaskStatus(ImageTask *task,
     case ImageTask::Processing:
       tooltip = tr("Currently being optimized...");
       statusItem->setForeground(QBrush(QColor("#FF8800"))); // Orange
+      // Auto-scroll to the currently processing item so user can see progress
+      scrollToItem(statusItem, QAbstractItemView::PositionAtCenter);
       break;
     case ImageTask::Completed:
       tooltip = tr("Successfully optimized");
