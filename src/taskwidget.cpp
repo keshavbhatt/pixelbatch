@@ -233,17 +233,15 @@ void TaskWidget::addFileToTable(const QString &filePath) {
     }
   }
 
-  QString destination = m_settings.getOptimizedPath() +
-                        m_settings.getOutputFilePrefix() + fileInfo.fileName();
+  // Create a new task with temporary destination (will be updated via generateOutputPath)
+  ImageTask *imageTask = new ImageTask(filePath, "");
+  imageTask->taskStatus = ImageTask::Pending;
+  imageTask->optimizedPath = generateOutputPath(imageTask);
+  m_imageTasks.append(imageTask);
 
   // Create a new row
   int newRow = rowCount();
   insertRow(newRow);
-
-  // Insert ImageTask in m_imageTasks list
-  ImageTask *imageTask = new ImageTask(filePath, destination);
-  imageTask->taskStatus = ImageTask::Pending;
-  m_imageTasks.append(imageTask);
 
   // Insert file path
   QTableWidgetItem *fileItem = new QTableWidgetItem(filePath);
@@ -380,6 +378,10 @@ void TaskWidget::processNextBatch() {
     ImageTask *imageTask = m_imageTaskQueue.dequeue();
     m_activeTasks++;
     imageTask->taskStatus = ImageTask::Processing;
+
+    // Regenerate output path in case settings or custom path changed
+    imageTask->optimizedPath = generateOutputPath(imageTask);
+
     updateTaskStatus(imageTask);
     try {
       // Ensure destination dir exists
@@ -795,4 +797,74 @@ void TaskWidget::updateTaskOverlayWidget() {
 bool TaskWidget::hasSelection() {
   QList<QTableWidgetItem *> selectedItems = this->selectedItems();
   return !selectedItems.isEmpty();
+}
+
+QString TaskWidget::generateOutputPath(ImageTask *task) const {
+  if (!task) {
+    return QString();
+  }
+
+  QFileInfo fileInfo(task->imagePath);
+
+  // Use custom settings if set, otherwise use global settings
+  QString outputDir = task->hasCustomOutputDir()
+                      ? task->customOutputDir
+                      : m_settings.getOptimizedPath();
+  QString outputPrefix = task->hasCustomOutputPrefix()
+                         ? task->customOutputPrefix
+                         : m_settings.getOutputFilePrefix();
+
+  return outputDir + outputPrefix + fileInfo.fileName();
+}
+
+void TaskWidget::setTaskCustomOutputDir(ImageTask *task, const QString &dir) {
+  if (!task) return;
+
+  task->customOutputDir = dir;
+
+  // Update the optimized path if task hasn't been completed yet
+  if (task->taskStatus == ImageTask::Pending ||
+      task->taskStatus == ImageTask::Queued ||
+      task->taskStatus == ImageTask::Error) {
+    task->optimizedPath = generateOutputPath(task);
+  }
+}
+
+void TaskWidget::setTaskCustomOutputPrefix(ImageTask *task, const QString &prefix) {
+  if (!task) return;
+
+  task->customOutputPrefix = prefix;
+
+  // Update the optimized path if task hasn't been completed yet
+  if (task->taskStatus == ImageTask::Pending ||
+      task->taskStatus == ImageTask::Queued ||
+      task->taskStatus == ImageTask::Error) {
+    task->optimizedPath = generateOutputPath(task);
+  }
+}
+
+void TaskWidget::clearTaskCustomOutputDir(ImageTask *task) {
+  if (!task) return;
+
+  task->customOutputDir = QString();
+
+  // Update the optimized path if task hasn't been completed yet
+  if (task->taskStatus == ImageTask::Pending ||
+      task->taskStatus == ImageTask::Queued ||
+      task->taskStatus == ImageTask::Error) {
+    task->optimizedPath = generateOutputPath(task);
+  }
+}
+
+void TaskWidget::clearTaskCustomOutputPrefix(ImageTask *task) {
+  if (!task) return;
+
+  task->customOutputPrefix = QString();
+
+  // Update the optimized path if task hasn't been completed yet
+  if (task->taskStatus == ImageTask::Pending ||
+      task->taskStatus == ImageTask::Queued ||
+      task->taskStatus == ImageTask::Error) {
+    task->optimizedPath = generateOutputPath(task);
+  }
 }

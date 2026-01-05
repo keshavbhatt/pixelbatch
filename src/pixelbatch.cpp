@@ -239,6 +239,16 @@ void PixelBatch::initImageDetailPanel() {
     m_emptyStateWidget->setVisible(!hasSelection);
   });
 
+  // Connect output directory signals
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOutputDirChanged,
+          m_taskWidget, &TaskWidget::setTaskCustomOutputDir);
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOutputPrefixChanged,
+          m_taskWidget, &TaskWidget::setTaskCustomOutputPrefix);
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOutputDirCleared,
+          m_taskWidget, &TaskWidget::clearTaskCustomOutputDir);
+  connect(m_imageDetailPanel, &ImageDetailPanel::customOutputPrefixCleared,
+          m_taskWidget, &TaskWidget::clearTaskCustomOutputPrefix);
+
   m_imageDetailPanel->setMinimumWidth(300);
 
   m_imageDetailPanel->setVisible(false);

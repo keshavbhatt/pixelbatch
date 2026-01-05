@@ -7,6 +7,8 @@
 struct ImageTask {
   QString imagePath;     // Source image path
   QString optimizedPath; // Destination (optimized) image path
+  QString customOutputDir; // Custom output directory for this task (empty = use global default)
+  QString customOutputPrefix; // Custom output prefix for this task (empty = use global default)
 
   enum Status { Pending, Queued, Processing, Completed, Error };
 
@@ -39,6 +41,10 @@ struct ImageTask {
 
   ImageTask(const QString &src, const QString &dst)
       : imagePath(src), optimizedPath(dst), taskStatus(Pending) {}
+
+  // Helper to check if task uses custom output settings
+  bool hasCustomOutputDir() const { return !customOutputDir.isEmpty(); }
+  bool hasCustomOutputPrefix() const { return !customOutputPrefix.isEmpty(); }
 };
 
 Q_DECLARE_METATYPE(ImageTask *)

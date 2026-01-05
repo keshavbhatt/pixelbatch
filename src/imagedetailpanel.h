@@ -4,8 +4,10 @@
 #include "imagetask.h"
 #include "settings.h"
 
+#include <QCheckBox>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
@@ -21,12 +23,23 @@ public:
   void setImageTask(ImageTask *task);
   void clear();
 
+signals:
+  void customOutputDirChanged(ImageTask *task, const QString &dir);
+  void customOutputPrefixChanged(ImageTask *task, const QString &prefix);
+  void customOutputDirCleared(ImageTask *task);
+  void customOutputPrefixCleared(ImageTask *task);
+
+private slots:
+  void onChangeOutputDir();
+  void onUseCustomOutputToggled(bool checked);
+  void onOutputPrefixChanged(const QString &text);
 
 private:
   void setupUI();
   void updateImagePreview();
   void updateImageInfo();
   void updateOptimizerSettings();
+  void updateOutputSettings();
   void loadOptimizerWidget();
 
   ImageTask *m_currentTask;
@@ -41,6 +54,11 @@ private:
   QVBoxLayout *m_optimizerSettingsLayout;
   QWidget *m_currentOptimizerWidget;
 
+  // Output settings
+  QCheckBox *m_useCustomOutputCheckBox;
+  QLineEdit *m_outputDirLineEdit;
+  QLineEdit *m_outputPrefixLineEdit;
+  QPushButton *m_changeOutputDirButton;
 
   QPixmap m_originalPixmap;
 };

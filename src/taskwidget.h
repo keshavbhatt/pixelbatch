@@ -31,6 +31,11 @@ public:
   bool hasSelection();
   ImageTask *getSelectedImageTask() const;
 
+  void setTaskCustomOutputDir(ImageTask *task, const QString &dir);
+  void setTaskCustomOutputPrefix(ImageTask *task, const QString &prefix);
+  void clearTaskCustomOutputDir(ImageTask *task);
+  void clearTaskCustomOutputPrefix(ImageTask *task);
+
   void cancelAllProcessing();
 
 public slots:
@@ -99,6 +104,7 @@ private:
 
   void updateTaskOverlayWidget();
   QString generateSummary(const ImageTask::TaskStatusCounts &counts) const;
+  QString generateOutputPath(ImageTask *task) const;
 };
 
 #endif // TASKWIDGET_H
