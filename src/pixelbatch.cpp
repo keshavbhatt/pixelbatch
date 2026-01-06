@@ -6,8 +6,10 @@
 #include "thememanager.h"
 #include "ui_pixelbatch.h"
 
+#include <QCloseEvent>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QSettings>
 #include <QThread>
 
 PixelBatch::PixelBatch(QWidget *parent)
@@ -52,6 +54,8 @@ PixelBatch::PixelBatch(QWidget *parent)
   initMenuBar();
 
   initPreferencesWidget();
+
+  restoreWindowState(); // Restore saved window size and splitter state
 
   updateStatusBarButtons(); // keep it last
 }
@@ -302,6 +306,21 @@ void PixelBatch::initImageDetailPanel() {
     bool hasSelection = m_taskWidget->hasSelection();
     m_imageDetailPanel->setVisible(hasSelection);
     m_emptyStateWidget->setVisible(!hasSelection);
+
+    // If user selects an item and the detail panel is collapsed in splitter, expand it
+    if (hasSelection && m_mainSplitter) {
+      QList<int> sizes = m_mainSplitter->sizes();
+      if (sizes.size() == 2 && sizes[1] == 0) {
+        // Detail panel is collapsed, restore it to 30% of total width
+        int totalWidth = sizes[0] + sizes[1];
+        int leftPanelWidth = int(totalWidth * 0.7);
+        int rightPanelWidth = int(totalWidth * 0.3);
+        QList<int> newSizes;
+        newSizes << leftPanelWidth << rightPanelWidth;
+        m_mainSplitter->setSizes(newSizes);
+        qDebug() << "Restored collapsed detail panel to default size";
+      }
+    }
   });
 
   // Connect output directory signals
@@ -513,3 +532,61 @@ void PixelBatch::showProcessingCompletedDialog(
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.exec();
 }
+
+void PixelBatch::closeEvent(QCloseEvent *event) {
+  saveWindowState();
+  QMainWindow::closeEvent(event);
+}
+
+void PixelBatch::saveWindowState() {
+  QSettings settings;
+
+  // Save window geometry (size and position)
+  settings.setValue("MainWindow/geometry", saveGeometry());
+  settings.setValue("MainWindow/windowState", saveState());
+
+  // Save splitter state
+  if (m_mainSplitter) {
+    settings.setValue("MainWindow/splitterState", m_mainSplitter->saveState());
+    qDebug() << "Saved main window size:" << size()
+             << "and splitter sizes:" << m_mainSplitter->sizes();
+  }
+}
+
+void PixelBatch::restoreWindowState() {
+  QSettings settings;
+
+  // Restore window geometry (size and position)
+  QByteArray geometry = settings.value("MainWindow/geometry").toByteArray();
+  if (!geometry.isEmpty()) {
+    restoreGeometry(geometry);
+    qDebug() << "Restored main window geometry:" << size();
+  } else {
+    // First run - set default size
+    resize(1200, 700);
+    qDebug() << "First run - using default size: 1200x700";
+  }
+
+  // Restore window state (toolbar positions, etc.)
+  QByteArray windowState = settings.value("MainWindow/windowState").toByteArray();
+  if (!windowState.isEmpty()) {
+    restoreState(windowState);
+  }
+
+  // Restore splitter state
+  if (m_mainSplitter) {
+    QByteArray splitterState = settings.value("MainWindow/splitterState").toByteArray();
+    if (!splitterState.isEmpty()) {
+      m_mainSplitter->restoreState(splitterState);
+      qDebug() << "Restored splitter sizes:" << m_mainSplitter->sizes();
+    } else {
+      // First run - set default splitter ratio (70% - 30%)
+      QList<int> sizes;
+      int totalWidth = width();
+      sizes << int(totalWidth * 0.7) << int(totalWidth * 0.3);
+      m_mainSplitter->setSizes(sizes);
+      qDebug() << "First run - using default splitter ratio: 70%-30%";
+    }
+  }
+}
+

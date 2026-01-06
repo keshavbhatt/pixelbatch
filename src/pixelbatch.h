@@ -43,6 +43,9 @@ private slots:
   void donate();
   void showAbout();
 
+protected:
+  void closeEvent(QCloseEvent *event) override;
+
 private:
   Ui::PixelBatch *ui;
 
@@ -67,5 +70,7 @@ private:
   void initMenuBar();
   void initPreferencesWidget();
   void applySavedThemeAndStyle();
+  void saveWindowState();
+  void restoreWindowState();
 };
 #endif // PIXELBATCH_H
