@@ -5,7 +5,11 @@
 #include "svgoprefwidget.h"
 #include "worker/imageworkerfactory.h"
 #include <QDebug>
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QScrollArea>
+#include <QVBoxLayout>
 
 ImageFormatPrefWidgetFactory &ImageFormatPrefWidgetFactory::instance() {
   static ImageFormatPrefWidgetFactory instance;
@@ -29,13 +33,14 @@ void ImageFormatPrefWidgetFactory::openPrefWidgetFor(
       scrollArea->setWidget(widget);
       scrollArea->setWidgetResizable(true);
       scrollArea->setWindowTitle(optimizerName + " " + QObject::tr("Preferences"));
-      
+
       widget->loadSettings();
       scrollArea->show();
       qDebug() << "Opened preference widget for" << optimizerName;
     }
   } else {
     qDebug() << "No preference widget registered for optimizer:"
+
              << optimizerName;
   }
 }
@@ -66,6 +71,24 @@ QWidget *ImageFormatPrefWidgetFactory::createPrefWidgetFor(
   } else {
     qDebug() << "No preference widget registered for optimizer:"
              << optimizerName;
+  }
+
+  return nullptr;
+}
+
+ImageOptimizerPrefWidget *ImageFormatPrefWidgetFactory::createOptimizerWidget(
+    const ImageOptimizer &imageOptimizer, QWidget *parent) {
+  QString optimizerName = imageOptimizer.getName();
+
+  if (optimizerWidgetMap.contains(optimizerName)) {
+    ImageOptimizerPrefWidget *widget =
+        optimizerWidgetMap[optimizerName](parent);
+    if (widget) {
+      qDebug() << "Created optimizer widget for" << optimizerName;
+      return widget;
+    }
+  } else {
+    qDebug() << "No optimizer widget registered for:" << optimizerName;
   }
 
   return nullptr;

@@ -278,3 +278,55 @@ QVariantMap GifsiclePrefWidget::getCurrentSettings() const {
 void GifsiclePrefWidget::setAutoSaveEnabled(bool enabled) {
   m_autoSaveEnabled = enabled;
 }
+
+void GifsiclePrefWidget::restoreDefaults() {
+  // Block signals
+  ui->level1Radio->blockSignals(true);
+  ui->level2Radio->blockSignals(true);
+  ui->level3Radio->blockSignals(true);
+  ui->losslessRadio->blockSignals(true);
+  ui->lossyRadio->blockSignals(true);
+  ui->lossyLevelSlider->blockSignals(true);
+  ui->reduceColorsCheckBox->blockSignals(true);
+  ui->colorCountSpinBox->blockSignals(true);
+  ui->colorMethodComboBox->blockSignals(true);
+  ui->ditheringCheckBox->blockSignals(true);
+  ui->cropTransparencyCheckBox->blockSignals(true);
+  ui->interlaceCheckBox->blockSignals(true);
+  ui->threadsSpinBox->blockSignals(true);
+
+  // Set default values
+  ui->level2Radio->setChecked(true);  // Level 2 (balanced)
+  ui->losslessRadio->setChecked(true);  // Lossless
+  ui->lossyLevelSlider->setValue(80);  // Moderate lossy level
+  ui->reduceColorsCheckBox->setChecked(false);  // No color reduction
+  ui->colorCountSpinBox->setValue(256);  // Full color palette
+  ui->colorMethodComboBox->setCurrentIndex(0);  // Default method
+  ui->ditheringCheckBox->setChecked(true);  // Enable dithering
+  ui->cropTransparencyCheckBox->setChecked(true);  // Crop transparency
+  ui->interlaceCheckBox->setChecked(false);  // No interlacing
+  ui->threadsSpinBox->setValue(4);  // 4 threads
+
+  // Update controls state
+  updateLossyControls(0);  // 0 = lossless
+  updateColorReductionControls(false);
+  updateLossyLevelLabel(80);
+
+  // Unblock signals
+  ui->level1Radio->blockSignals(false);
+  ui->level2Radio->blockSignals(false);
+  ui->level3Radio->blockSignals(false);
+  ui->losslessRadio->blockSignals(false);
+  ui->lossyRadio->blockSignals(false);
+  ui->lossyLevelSlider->blockSignals(false);
+  ui->reduceColorsCheckBox->blockSignals(false);
+  ui->colorCountSpinBox->blockSignals(false);
+  ui->colorMethodComboBox->blockSignals(false);
+  ui->ditheringCheckBox->blockSignals(false);
+  ui->cropTransparencyCheckBox->blockSignals(false);
+  ui->interlaceCheckBox->blockSignals(false);
+  ui->threadsSpinBox->blockSignals(false);
+
+  // Save defaults to QSettings
+  saveSettings();
+}

@@ -242,3 +242,66 @@ QVariantMap SvgoPrefWidget::getCurrentSettings() const {
 void SvgoPrefWidget::setAutoSaveEnabled(bool enabled) {
   m_autoSaveEnabled = enabled;
 }
+
+void SvgoPrefWidget::restoreDefaults() {
+  // Block signals
+  ui->precisionSlider->blockSignals(true);
+  ui->multipassCheckBox->blockSignals(true);
+  ui->prettyPrintCheckBox->blockSignals(true);
+  ui->indentSpinBox->blockSignals(true);
+  ui->removeCommentsCheckBox->blockSignals(true);
+  ui->removeMetadataCheckBox->blockSignals(true);
+  ui->removeTitleCheckBox->blockSignals(true);
+  ui->removeDescCheckBox->blockSignals(true);
+  ui->removeEditorsDataCheckBox->blockSignals(true);
+  ui->removeHiddenCheckBox->blockSignals(true);
+  ui->removeEmptyCheckBox->blockSignals(true);
+  ui->mergePathsCheckBox->blockSignals(true);
+  ui->convertShapesCheckBox->blockSignals(true);
+  ui->removeDimensionsCheckBox->blockSignals(true);
+  ui->cleanupIdsCheckBox->blockSignals(true);
+  ui->inlineStylesCheckBox->blockSignals(true);
+
+  // Set default values
+  ui->precisionSlider->setValue(3);
+  ui->multipassCheckBox->setChecked(true);
+  ui->prettyPrintCheckBox->setChecked(false);
+  ui->indentSpinBox->setValue(2);
+  ui->removeCommentsCheckBox->setChecked(true);
+  ui->removeMetadataCheckBox->setChecked(true);
+  ui->removeTitleCheckBox->setChecked(false);
+  ui->removeDescCheckBox->setChecked(false);
+  ui->removeEditorsDataCheckBox->setChecked(true);
+  ui->removeHiddenCheckBox->setChecked(true);
+  ui->removeEmptyCheckBox->setChecked(true);
+  ui->mergePathsCheckBox->setChecked(true);
+  ui->convertShapesCheckBox->setChecked(true);
+  ui->removeDimensionsCheckBox->setChecked(false);
+  ui->cleanupIdsCheckBox->setChecked(true);
+  ui->inlineStylesCheckBox->setChecked(false);
+
+  // Update UI
+  updatePrecisionLabel(3);
+  ui->prettyPrintWidget->setEnabled(false);
+
+  // Unblock signals
+  ui->precisionSlider->blockSignals(false);
+  ui->multipassCheckBox->blockSignals(false);
+  ui->prettyPrintCheckBox->blockSignals(false);
+  ui->indentSpinBox->blockSignals(false);
+  ui->removeCommentsCheckBox->blockSignals(false);
+  ui->removeMetadataCheckBox->blockSignals(false);
+  ui->removeTitleCheckBox->blockSignals(false);
+  ui->removeDescCheckBox->blockSignals(false);
+  ui->removeEditorsDataCheckBox->blockSignals(false);
+  ui->removeHiddenCheckBox->blockSignals(false);
+  ui->removeEmptyCheckBox->blockSignals(false);
+  ui->mergePathsCheckBox->blockSignals(false);
+  ui->convertShapesCheckBox->blockSignals(false);
+  ui->removeDimensionsCheckBox->blockSignals(false);
+  ui->cleanupIdsCheckBox->blockSignals(false);
+  ui->inlineStylesCheckBox->blockSignals(false);
+
+  // Save defaults to QSettings
+  saveSettings();
+}

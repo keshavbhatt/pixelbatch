@@ -19,6 +19,9 @@ public:
                                 QWidget *parent = nullptr,
                                 bool wrapInScrollArea = true);
 
+  ImageOptimizerPrefWidget *createOptimizerWidget(const ImageOptimizer &imageOptimizer,
+                                                   QWidget *parent = nullptr);
+
   bool hasPrefWidgetFor(const ImageOptimizer &imageOptimizer) const;
 
 private:

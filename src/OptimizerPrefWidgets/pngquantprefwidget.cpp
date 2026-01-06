@@ -198,3 +198,42 @@ QVariantMap PngQuantPrefWidget::getCurrentSettings() const {
 void PngQuantPrefWidget::setAutoSaveEnabled(bool enabled) {
   m_autoSaveEnabled = enabled;
 }
+
+void PngQuantPrefWidget::restoreDefaults() {
+  // Block signals
+  ui->qualityMinSpinBox->blockSignals(true);
+  ui->qualityMaxSpinBox->blockSignals(true);
+  ui->speedSlider->blockSignals(true);
+  ui->ditheringCheckBox->blockSignals(true);
+  ui->posterizeSpinBox->blockSignals(true);
+  ui->stripMetadataCheckBox->blockSignals(true);
+  ui->skipIfLargerCheckBox->blockSignals(true);
+  ui->forceCheckBox->blockSignals(true);
+
+  // Set default values
+  ui->qualityMinSpinBox->setValue(65);
+  ui->qualityMaxSpinBox->setValue(80);
+  ui->speedSlider->setValue(4);
+  ui->ditheringCheckBox->setChecked(true);
+  ui->posterizeSpinBox->setValue(0);
+  ui->stripMetadataCheckBox->setChecked(true);
+  ui->skipIfLargerCheckBox->setChecked(true);
+  ui->forceCheckBox->setChecked(true);
+
+  // Update labels
+  updateQualityRangeLabel();
+  ui->speedValueLabel->setText("4 (Default)");
+
+  // Unblock signals
+  ui->qualityMinSpinBox->blockSignals(false);
+  ui->qualityMaxSpinBox->blockSignals(false);
+  ui->speedSlider->blockSignals(false);
+  ui->ditheringCheckBox->blockSignals(false);
+  ui->posterizeSpinBox->blockSignals(false);
+  ui->stripMetadataCheckBox->blockSignals(false);
+  ui->skipIfLargerCheckBox->blockSignals(false);
+  ui->forceCheckBox->blockSignals(false);
+
+  // Save defaults to QSettings
+  saveSettings();
+}

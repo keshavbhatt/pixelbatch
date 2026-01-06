@@ -206,3 +206,48 @@ QVariantMap JpegOptimPrefWidget::getCurrentSettings() const {
 void JpegOptimPrefWidget::setAutoSaveEnabled(bool enabled) {
   m_autoSaveEnabled = enabled;
 }
+
+void JpegOptimPrefWidget::restoreDefaults() {
+  // Block signals to prevent auto-save while loading
+  ui->maxQualitySpinBox->blockSignals(true);
+  ui->targetSizeSpinBox->blockSignals(true);
+  ui->thresholdSpinBox->blockSignals(true);
+  ui->metadataComboBox->blockSignals(true);
+  ui->autoModeRadio->blockSignals(true);
+  ui->progressiveRadio->blockSignals(true);
+  ui->normalRadio->blockSignals(true);
+  ui->forceCheckBox->blockSignals(true);
+  ui->preserveTimesCheckBox->blockSignals(true);
+  ui->retryCheckBox->blockSignals(true);
+  ui->workersSpinBox->blockSignals(true);
+
+  // Set default values (same as in loadSettings defaults)
+  ui->maxQualitySpinBox->setValue(100);  // Lossless by default
+  ui->targetSizeSpinBox->setValue(0);    // No target size
+  ui->thresholdSpinBox->setValue(0);     // No threshold
+  ui->metadataComboBox->setCurrentIndex(0);  // Keep all metadata
+  ui->autoModeRadio->setChecked(true);   // Auto mode
+  ui->forceCheckBox->setChecked(false);  // Don't force
+  ui->preserveTimesCheckBox->setChecked(true);  // Preserve timestamps
+  ui->retryCheckBox->setChecked(false);  // Don't retry
+  ui->workersSpinBox->setValue(1);       // Single worker
+
+  // Update quality label
+  updateQualityLabel(100);
+
+  // Unblock signals
+  ui->maxQualitySpinBox->blockSignals(false);
+  ui->targetSizeSpinBox->blockSignals(false);
+  ui->thresholdSpinBox->blockSignals(false);
+  ui->metadataComboBox->blockSignals(false);
+  ui->autoModeRadio->blockSignals(false);
+  ui->progressiveRadio->blockSignals(false);
+  ui->normalRadio->blockSignals(false);
+  ui->forceCheckBox->blockSignals(false);
+  ui->preserveTimesCheckBox->blockSignals(false);
+  ui->retryCheckBox->blockSignals(false);
+  ui->workersSpinBox->blockSignals(false);
+
+  // Save defaults to QSettings
+  saveSettings();
+}

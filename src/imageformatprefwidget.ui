@@ -43,6 +43,20 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="restoreDefaultsButton">
+     <property name="toolTip">
+      <string>Restore default settings for this optimizer</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/resources/icons/restart-line.png</normaloff>:/resources/icons/restart-line.png</iconset>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

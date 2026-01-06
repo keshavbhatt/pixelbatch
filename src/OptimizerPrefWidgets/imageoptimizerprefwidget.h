@@ -20,6 +20,9 @@ public:
 
   // Disable auto-save to global QSettings (used in detail panel)
   virtual void setAutoSaveEnabled(bool enabled) { Q_UNUSED(enabled); }
+
+  // Restore default settings (resets to hard-coded defaults)
+  virtual void restoreDefaults() {}
 };
 
 #endif // IMAGEOPTIMIZERPREFWIDGET_H

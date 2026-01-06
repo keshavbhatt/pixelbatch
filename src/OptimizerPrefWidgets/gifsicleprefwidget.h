@@ -21,6 +21,7 @@ public:
   void loadCustomSettings(const QVariantMap &settings) override;
   QVariantMap getCurrentSettings() const override;
   void setAutoSaveEnabled(bool enabled) override;
+  void restoreDefaults() override;
 
 private slots:
   void saveSettings();
