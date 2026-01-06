@@ -112,6 +112,11 @@ void GifsiclePrefWidget::loadSettings() {
 }
 
 void GifsiclePrefWidget::saveSettings() {
+  // Don't save to global settings if auto-save is disabled (used in detail panel)
+  if (!m_autoSaveEnabled) {
+    return;
+  }
+
   QSettings &settings = const_cast<QSettings&>(m_settings.getSettings());
 
   // Optimization level
@@ -171,3 +176,105 @@ void GifsiclePrefWidget::updateLossyLevelLabel(int value) {
   ui->lossyLevelValueLabel->setText(label);
 }
 
+void GifsiclePrefWidget::loadCustomSettings(const QVariantMap &settings) {
+  // Block signals to prevent auto-save while loading
+  ui->level1Radio->blockSignals(true);
+  ui->level2Radio->blockSignals(true);
+  ui->level3Radio->blockSignals(true);
+  ui->losslessRadio->blockSignals(true);
+  ui->lossyRadio->blockSignals(true);
+  ui->lossyLevelSlider->blockSignals(true);
+  ui->reduceColorsCheckBox->blockSignals(true);
+  ui->colorCountSpinBox->blockSignals(true);
+  ui->colorMethodComboBox->blockSignals(true);
+  ui->ditheringCheckBox->blockSignals(true);
+  ui->cropTransparencyCheckBox->blockSignals(true);
+  ui->interlaceCheckBox->blockSignals(true);
+  ui->threadsSpinBox->blockSignals(true);
+
+  // Load optimization level
+  int level = settings.value("gifsicle/optimizationLevel", 2).toInt();
+  if (level == 1) ui->level1Radio->setChecked(true);
+  else if (level == 3) ui->level3Radio->setChecked(true);
+  else ui->level2Radio->setChecked(true);
+
+  // Load compression type
+  int compressionType = settings.value("gifsicle/compressionType", 0).toInt();
+  if (compressionType == 1) ui->lossyRadio->setChecked(true);
+  else ui->losslessRadio->setChecked(true);
+
+  // Load lossy level
+  ui->lossyLevelSlider->setValue(settings.value("gifsicle/lossyLevel", 80).toInt());
+
+  // Load color reduction
+  ui->reduceColorsCheckBox->setChecked(settings.value("gifsicle/reduceColors", false).toBool());
+  ui->colorCountSpinBox->setValue(settings.value("gifsicle/colorCount", 256).toInt());
+  ui->colorMethodComboBox->setCurrentIndex(settings.value("gifsicle/colorMethod", 0).toInt());
+
+  // Load dithering
+  ui->ditheringCheckBox->setChecked(settings.value("gifsicle/enableDithering", true).toBool());
+
+  // Load additional options
+  ui->cropTransparencyCheckBox->setChecked(settings.value("gifsicle/cropTransparency", true).toBool());
+  ui->interlaceCheckBox->setChecked(settings.value("gifsicle/interlace", false).toBool());
+
+  // Load performance
+  ui->threadsSpinBox->setValue(settings.value("gifsicle/threads", 4).toInt());
+
+  // Update controls state
+  updateLossyControls(compressionType);
+  updateColorReductionControls(ui->reduceColorsCheckBox->isChecked());
+  updateLossyLevelLabel(ui->lossyLevelSlider->value());
+
+  // Unblock signals
+  ui->level1Radio->blockSignals(false);
+  ui->level2Radio->blockSignals(false);
+  ui->level3Radio->blockSignals(false);
+  ui->losslessRadio->blockSignals(false);
+  ui->lossyRadio->blockSignals(false);
+  ui->lossyLevelSlider->blockSignals(false);
+  ui->reduceColorsCheckBox->blockSignals(false);
+  ui->colorCountSpinBox->blockSignals(false);
+  ui->colorMethodComboBox->blockSignals(false);
+  ui->ditheringCheckBox->blockSignals(false);
+  ui->cropTransparencyCheckBox->blockSignals(false);
+  ui->interlaceCheckBox->blockSignals(false);
+  ui->threadsSpinBox->blockSignals(false);
+}
+
+QVariantMap GifsiclePrefWidget::getCurrentSettings() const {
+  QVariantMap settings;
+
+  // Optimization level
+  int level = 2;
+  if (ui->level1Radio->isChecked()) level = 1;
+  else if (ui->level3Radio->isChecked()) level = 3;
+  settings["gifsicle/optimizationLevel"] = level;
+
+  // Compression type
+  settings["gifsicle/compressionType"] = ui->lossyRadio->isChecked() ? 1 : 0;
+
+  // Lossy level
+  settings["gifsicle/lossyLevel"] = ui->lossyLevelSlider->value();
+
+  // Color reduction
+  settings["gifsicle/reduceColors"] = ui->reduceColorsCheckBox->isChecked();
+  settings["gifsicle/colorCount"] = ui->colorCountSpinBox->value();
+  settings["gifsicle/colorMethod"] = ui->colorMethodComboBox->currentIndex();
+
+  // Dithering
+  settings["gifsicle/enableDithering"] = ui->ditheringCheckBox->isChecked();
+
+  // Additional options
+  settings["gifsicle/cropTransparency"] = ui->cropTransparencyCheckBox->isChecked();
+  settings["gifsicle/interlace"] = ui->interlaceCheckBox->isChecked();
+
+  // Performance
+  settings["gifsicle/threads"] = ui->threadsSpinBox->value();
+
+  return settings;
+}
+
+void GifsiclePrefWidget::setAutoSaveEnabled(bool enabled) {
+  m_autoSaveEnabled = enabled;
+}

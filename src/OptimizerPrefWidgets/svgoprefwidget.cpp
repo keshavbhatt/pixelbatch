@@ -107,6 +107,11 @@ void SvgoPrefWidget::loadSettings() {
 }
 
 void SvgoPrefWidget::saveSettings() {
+  // Don't save to global settings if auto-save is disabled (used in detail panel)
+  if (!m_autoSaveEnabled) {
+    return;
+  }
+
   QSettings &settings = const_cast<QSettings&>(m_settings.getSettings());
 
   // Precision
@@ -152,3 +157,88 @@ void SvgoPrefWidget::updatePrecisionLabel(int value) {
   ui->precisionValueLabel->setText(label);
 }
 
+void SvgoPrefWidget::loadCustomSettings(const QVariantMap &settings) {
+  // Block signals to prevent auto-save while loading
+  ui->precisionSlider->blockSignals(true);
+  ui->multipassCheckBox->blockSignals(true);
+  ui->prettyPrintCheckBox->blockSignals(true);
+  ui->indentSpinBox->blockSignals(true);
+  ui->removeCommentsCheckBox->blockSignals(true);
+  ui->removeMetadataCheckBox->blockSignals(true);
+  ui->removeTitleCheckBox->blockSignals(true);
+  ui->removeDescCheckBox->blockSignals(true);
+  ui->removeEditorsDataCheckBox->blockSignals(true);
+  ui->removeHiddenCheckBox->blockSignals(true);
+  ui->removeEmptyCheckBox->blockSignals(true);
+  ui->mergePathsCheckBox->blockSignals(true);
+  ui->convertShapesCheckBox->blockSignals(true);
+  ui->removeDimensionsCheckBox->blockSignals(true);
+  ui->cleanupIdsCheckBox->blockSignals(true);
+  ui->inlineStylesCheckBox->blockSignals(true);
+
+  // Load from custom settings map
+  ui->precisionSlider->setValue(settings.value("svgo/precision", 3).toInt());
+  ui->multipassCheckBox->setChecked(settings.value("svgo/multipass", true).toBool());
+  ui->prettyPrintCheckBox->setChecked(settings.value("svgo/prettyPrint", false).toBool());
+  ui->indentSpinBox->setValue(settings.value("svgo/indent", 2).toInt());
+  ui->removeCommentsCheckBox->setChecked(settings.value("svgo/removeComments", true).toBool());
+  ui->removeMetadataCheckBox->setChecked(settings.value("svgo/removeMetadata", true).toBool());
+  ui->removeTitleCheckBox->setChecked(settings.value("svgo/removeTitle", false).toBool());
+  ui->removeDescCheckBox->setChecked(settings.value("svgo/removeDesc", false).toBool());
+  ui->removeEditorsDataCheckBox->setChecked(settings.value("svgo/removeEditorsData", true).toBool());
+  ui->removeHiddenCheckBox->setChecked(settings.value("svgo/removeHidden", true).toBool());
+  ui->removeEmptyCheckBox->setChecked(settings.value("svgo/removeEmpty", true).toBool());
+  ui->mergePathsCheckBox->setChecked(settings.value("svgo/mergePaths", true).toBool());
+  ui->convertShapesCheckBox->setChecked(settings.value("svgo/convertShapes", true).toBool());
+  ui->removeDimensionsCheckBox->setChecked(settings.value("svgo/removeDimensions", false).toBool());
+  ui->cleanupIdsCheckBox->setChecked(settings.value("svgo/cleanupIds", true).toBool());
+  ui->inlineStylesCheckBox->setChecked(settings.value("svgo/inlineStyles", false).toBool());
+
+  // Update precision label
+  updatePrecisionLabel(ui->precisionSlider->value());
+
+  // Unblock signals
+  ui->precisionSlider->blockSignals(false);
+  ui->multipassCheckBox->blockSignals(false);
+  ui->prettyPrintCheckBox->blockSignals(false);
+  ui->indentSpinBox->blockSignals(false);
+  ui->removeCommentsCheckBox->blockSignals(false);
+  ui->removeMetadataCheckBox->blockSignals(false);
+  ui->removeTitleCheckBox->blockSignals(false);
+  ui->removeDescCheckBox->blockSignals(false);
+  ui->removeEditorsDataCheckBox->blockSignals(false);
+  ui->removeHiddenCheckBox->blockSignals(false);
+  ui->removeEmptyCheckBox->blockSignals(false);
+  ui->mergePathsCheckBox->blockSignals(false);
+  ui->convertShapesCheckBox->blockSignals(false);
+  ui->removeDimensionsCheckBox->blockSignals(false);
+  ui->cleanupIdsCheckBox->blockSignals(false);
+  ui->inlineStylesCheckBox->blockSignals(false);
+}
+
+QVariantMap SvgoPrefWidget::getCurrentSettings() const {
+  QVariantMap settings;
+
+  settings["svgo/precision"] = ui->precisionSlider->value();
+  settings["svgo/multipass"] = ui->multipassCheckBox->isChecked();
+  settings["svgo/prettyPrint"] = ui->prettyPrintCheckBox->isChecked();
+  settings["svgo/indent"] = ui->indentSpinBox->value();
+  settings["svgo/removeComments"] = ui->removeCommentsCheckBox->isChecked();
+  settings["svgo/removeMetadata"] = ui->removeMetadataCheckBox->isChecked();
+  settings["svgo/removeTitle"] = ui->removeTitleCheckBox->isChecked();
+  settings["svgo/removeDesc"] = ui->removeDescCheckBox->isChecked();
+  settings["svgo/removeEditorsData"] = ui->removeEditorsDataCheckBox->isChecked();
+  settings["svgo/removeHidden"] = ui->removeHiddenCheckBox->isChecked();
+  settings["svgo/removeEmpty"] = ui->removeEmptyCheckBox->isChecked();
+  settings["svgo/mergePaths"] = ui->mergePathsCheckBox->isChecked();
+  settings["svgo/convertShapes"] = ui->convertShapesCheckBox->isChecked();
+  settings["svgo/removeDimensions"] = ui->removeDimensionsCheckBox->isChecked();
+  settings["svgo/cleanupIds"] = ui->cleanupIdsCheckBox->isChecked();
+  settings["svgo/inlineStyles"] = ui->inlineStylesCheckBox->isChecked();
+
+  return settings;
+}
+
+void SvgoPrefWidget::setAutoSaveEnabled(bool enabled) {
+  m_autoSaveEnabled = enabled;
+}

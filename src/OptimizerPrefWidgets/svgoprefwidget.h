@@ -18,6 +18,9 @@ public:
   ~SvgoPrefWidget();
 
   void loadSettings() override;
+  void loadCustomSettings(const QVariantMap &settings) override;
+  QVariantMap getCurrentSettings() const override;
+  void setAutoSaveEnabled(bool enabled) override;
 
 private slots:
   void saveSettings();
@@ -26,6 +29,7 @@ private slots:
 private:
   Ui::SvgoPrefWidget *ui;
   Settings &m_settings;
+  bool m_autoSaveEnabled = true;
 };
 
 #endif // SVGOPREFWIDGET_H

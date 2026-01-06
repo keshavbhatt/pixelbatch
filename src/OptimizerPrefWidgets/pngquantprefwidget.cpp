@@ -86,6 +86,11 @@ void PngQuantPrefWidget::loadSettings() {
 }
 
 void PngQuantPrefWidget::saveSettings() {
+  // Don't save to global settings if auto-save is disabled (used in detail panel)
+  if (!m_autoSaveEnabled) {
+    return;
+  }
+
   QSettings &settings = const_cast<QSettings&>(m_settings.getSettings());
 
   // Quality settings
@@ -126,3 +131,70 @@ void PngQuantPrefWidget::updateQualityRangeLabel() {
       QString("Quality Range: %1-%2%").arg(minQuality).arg(maxQuality));
 }
 
+void PngQuantPrefWidget::loadCustomSettings(const QVariantMap &settings) {
+  // Block signals to prevent auto-save while loading
+  ui->qualityMinSpinBox->blockSignals(true);
+  ui->qualityMaxSpinBox->blockSignals(true);
+  ui->speedSlider->blockSignals(true);
+  ui->ditheringCheckBox->blockSignals(true);
+  ui->posterizeSpinBox->blockSignals(true);
+  ui->stripMetadataCheckBox->blockSignals(true);
+  ui->skipIfLargerCheckBox->blockSignals(true);
+  ui->forceCheckBox->blockSignals(true);
+
+  // Load from custom settings map
+  ui->qualityMinSpinBox->setValue(settings.value("pngquant/qualityMin", 65).toInt());
+  ui->qualityMaxSpinBox->setValue(settings.value("pngquant/qualityMax", 80).toInt());
+  ui->speedSlider->setValue(settings.value("pngquant/speed", 4).toInt());
+  ui->ditheringCheckBox->setChecked(settings.value("pngquant/enableDithering", true).toBool());
+  ui->posterizeSpinBox->setValue(settings.value("pngquant/posterize", 0).toInt());
+  ui->stripMetadataCheckBox->setChecked(settings.value("pngquant/stripMetadata", true).toBool());
+  ui->skipIfLargerCheckBox->setChecked(settings.value("pngquant/skipIfLarger", true).toBool());
+  ui->forceCheckBox->setChecked(settings.value("pngquant/force", true).toBool());
+
+  // Update labels
+  updateQualityRangeLabel();
+  int speed = ui->speedSlider->value();
+  QString label;
+  if (speed == 1) {
+    label = "1 (Slowest/Best)";
+  } else if (speed <= 3) {
+    label = QString("%1 (Slow)").arg(speed);
+  } else if (speed == 4) {
+    label = "4 (Default)";
+  } else if (speed <= 7) {
+    label = QString("%1 (Fast)").arg(speed);
+  } else {
+    label = QString("%1 (Fastest/Rough)").arg(speed);
+  }
+  ui->speedValueLabel->setText(label);
+
+  // Unblock signals
+  ui->qualityMinSpinBox->blockSignals(false);
+  ui->qualityMaxSpinBox->blockSignals(false);
+  ui->speedSlider->blockSignals(false);
+  ui->ditheringCheckBox->blockSignals(false);
+  ui->posterizeSpinBox->blockSignals(false);
+  ui->stripMetadataCheckBox->blockSignals(false);
+  ui->skipIfLargerCheckBox->blockSignals(false);
+  ui->forceCheckBox->blockSignals(false);
+}
+
+QVariantMap PngQuantPrefWidget::getCurrentSettings() const {
+  QVariantMap settings;
+
+  settings["pngquant/qualityMin"] = ui->qualityMinSpinBox->value();
+  settings["pngquant/qualityMax"] = ui->qualityMaxSpinBox->value();
+  settings["pngquant/speed"] = ui->speedSlider->value();
+  settings["pngquant/enableDithering"] = ui->ditheringCheckBox->isChecked();
+  settings["pngquant/posterize"] = ui->posterizeSpinBox->value();
+  settings["pngquant/stripMetadata"] = ui->stripMetadataCheckBox->isChecked();
+  settings["pngquant/skipIfLarger"] = ui->skipIfLargerCheckBox->isChecked();
+  settings["pngquant/force"] = ui->forceCheckBox->isChecked();
+
+  return settings;
+}
+
+void PngQuantPrefWidget::setAutoSaveEnabled(bool enabled) {
+  m_autoSaveEnabled = enabled;
+}
