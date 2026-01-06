@@ -10,7 +10,8 @@ ImageFormatPrefWidget::ImageFormatPrefWidget(QWidget *parent,
                                              QString formatName,
                                              QList<ImageOptimizer> optimizers)
     : QWidget(parent), ui(new Ui::ImageFormatPrefWidget),
-      m_formatName(formatName), m_formatOptimizers(optimizers) {
+      m_formatName(formatName),
+      m_optimizer(optimizers.isEmpty() ? ImageOptimizer() : optimizers.at(0)) {
   ui->setupUi(this);
 
   ui->formatSettingsPushButton->setSizePolicy(QSizePolicy::Maximum,
@@ -25,26 +26,21 @@ ImageFormatPrefWidget::ImageFormatPrefWidget(QWidget *parent,
   ui->restoreDefaultsButton->setIcon(
       QIcon(":/resources/icons/restart-line.png"));
 
-  foreach (auto optimizer, formatOptimizers()) {
-    ui->optimizersComboBox->addItem(optimizer.getName());
-  }
-  connect(ui->optimizersComboBox,
-          QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-          [=](int index) { this->optimizerChanged(index); });
+  // Set format name and optimizer label
+  ui->formatName->setText(formatName);
+  ui->optimizerLabel->setText(m_optimizer.isValid() ? m_optimizer.getName() : tr("None"));
 
   connect(ui->formatSettingsPushButton, &QPushButton::clicked, this, [=]() {
-    auto optimizer = getOptimizerByName(ui->optimizersComboBox->currentText());
-    if (optimizer.isValid()) {
-      ImageFormatPrefWidgetFactory::instance().openPrefWidgetFor(optimizer);
+    if (m_optimizer.isValid()) {
+      ImageFormatPrefWidgetFactory::instance().openPrefWidgetFor(m_optimizer);
     } else {
-      qWarning() << "No Valid Optimizer found, cannot open Pref dialog.";
+      qWarning() << "No valid optimizer found, cannot open Pref dialog.";
     }
   });
 
   connect(ui->restoreDefaultsButton, &QPushButton::clicked, this, [=]() {
-    auto optimizer = getOptimizerByName(ui->optimizersComboBox->currentText());
-    if (optimizer.isValid()) {
-      QString optimizerName = optimizer.getName();
+    if (m_optimizer.isValid()) {
+      QString optimizerName = m_optimizer.getName();
 
       QMessageBox::StandardButton reply = QMessageBox::question(
         this,
@@ -56,7 +52,7 @@ ImageFormatPrefWidget::ImageFormatPrefWidget(QWidget *parent,
       if (reply == QMessageBox::Yes) {
         // Create a temporary widget to call restoreDefaults
         ImageOptimizerPrefWidget *widget =
-          ImageFormatPrefWidgetFactory::instance().createOptimizerWidget(optimizer);
+          ImageFormatPrefWidgetFactory::instance().createOptimizerWidget(m_optimizer);
         if (widget) {
           widget->restoreDefaults();
           delete widget;
@@ -69,45 +65,32 @@ ImageFormatPrefWidget::ImageFormatPrefWidget(QWidget *parent,
         }
       }
     } else {
-      qWarning() << "No Valid Optimizer found, cannot restore defaults.";
+      qWarning() << "No valid optimizer found, cannot restore defaults.";
     }
   });
 
-  bool hasWidget = !formatOptimizers().isEmpty() &&
-                   formatOptimizers().at(0).isValid() &&
-                   ImageFormatPrefWidgetFactory::instance().hasPrefWidgetFor(
-                       formatOptimizers().at(0));
+  bool hasWidget = m_optimizer.isValid() &&
+                   ImageFormatPrefWidgetFactory::instance().hasPrefWidgetFor(m_optimizer);
 
   ui->formatSettingsPushButton->setEnabled(hasWidget);
   ui->restoreDefaultsButton->setEnabled(hasWidget);
-  ui->formatName->setText(formatName);
 
-  updateFotmatSettingPBTooltip();
+  updateTooltips();
 }
 
-ImageOptimizer ImageFormatPrefWidget::getOptimizerByName(const QString &name) {
-  foreach (auto optimizer, m_formatOptimizers) {
-    if (name.toLower() == optimizer.getName().toLower()) {
-      return optimizer;
-    }
-  }
-  return ImageOptimizer();
+ImageOptimizer ImageFormatPrefWidget::getOptimizer() const {
+  return m_optimizer;
 }
 
 ImageFormatPrefWidget::~ImageFormatPrefWidget() { delete ui; }
 
 QString ImageFormatPrefWidget::getFormatName() const { return m_formatName; }
 
-QList<ImageOptimizer> ImageFormatPrefWidget::formatOptimizers() const {
-  return m_formatOptimizers;
-}
-
-void ImageFormatPrefWidget::optimizerChanged(int index) {
-  Q_UNUSED(index);
-  updateFotmatSettingPBTooltip();
-}
-
-void ImageFormatPrefWidget::updateFotmatSettingPBTooltip() {
-  ui->formatSettingsPushButton->setToolTip(
-      ui->optimizersComboBox->currentText() + " | " + tr("Preferences"));
+void ImageFormatPrefWidget::updateTooltips() {
+  if (m_optimizer.isValid()) {
+    ui->formatSettingsPushButton->setToolTip(
+        m_optimizer.getName() + " | " + tr("Preferences"));
+    ui->restoreDefaultsButton->setToolTip(
+        tr("Restore default settings for %1").arg(m_optimizer.getName()));
+  }
 }

@@ -34,7 +34,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="optimizersComboBox"/>
+    <widget class="QLabel" name="optimizerLabel">
+     <property name="text">
+      <string>Optimizer</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="formatSettingsPushButton">

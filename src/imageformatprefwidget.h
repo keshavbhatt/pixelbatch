@@ -19,16 +19,13 @@ public:
   ~ImageFormatPrefWidget();
 
   QString getFormatName() const;
-
-  QList<ImageOptimizer> formatOptimizers() const;
+  ImageOptimizer getOptimizer() const;
 
 private:
   Ui::ImageFormatPrefWidget *ui;
   QString m_formatName;
-  QList<ImageOptimizer> m_formatOptimizers;
-  void optimizerChanged(int index);
-  ImageOptimizer getOptimizerByName(const QString &name);
-  void updateFotmatSettingPBTooltip();
+  ImageOptimizer m_optimizer;
+  void updateTooltips();
 };
 
 #endif // IMAGEFORMATPREFWIDGET_H
