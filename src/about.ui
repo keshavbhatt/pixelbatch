@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>502</height>
+    <width>662</width>
+    <height>523</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -205,6 +205,10 @@ p, li { white-space: pre-wrap; }
              <property name="text">
               <string>Support Project</string>
              </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/resources/icons/heart-fill.png</normaloff>:/resources/icons/heart-fill.png</iconset>
+             </property>
             </widget>
            </item>
            <item>
@@ -214,6 +218,10 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="text">
               <string>Report Issue</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/resources/icons/bug-line.png</normaloff>:/resources/icons/bug-line.png</iconset>
              </property>
             </widget>
            </item>
@@ -229,6 +237,10 @@ p, li { white-space: pre-wrap; }
              <property name="text">
               <string>Source Code</string>
              </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/resources/icons/github-line.png</normaloff>:/resources/icons/github-line.png</iconset>
+             </property>
             </widget>
            </item>
            <item>
@@ -238,6 +250,10 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="text">
               <string>Website</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/resources/icons/global-line.png</normaloff>:/resources/icons/global-line.png</iconset>
              </property>
             </widget>
            </item>
@@ -250,6 +266,10 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="text">
             <string>Debug Info</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/resources/icons/terminal-box-line.png</normaloff>:/resources/icons/terminal-box-line.png</iconset>
            </property>
           </widget>
          </item>
@@ -269,6 +289,12 @@ p, li { white-space: pre-wrap; }
         </property>
         <item>
          <widget class="QTextBrowser" name="debugInfoText">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>

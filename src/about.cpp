@@ -167,12 +167,20 @@ void About::on_debugInfoButton_clicked() {
   if (ui->debugInfoText->isVisible()) {
     ui->debugInfoText->hide();
     ui->debugInfoButton->setText(tr("Show Debug Info"));
-    QTimer::singleShot(150, this, [=]() { this->adjustSize(); });
   } else {
     ui->debugInfoText->show();
     ui->debugInfoButton->setText(tr("Hide Debug Info"));
-    this->adjustSize();
   }
+
+  // Force layout to recalculate
+  ui->centerWidget->layout()->invalidate();
+  ui->centerWidget->layout()->activate();
+
+  // Update size with slight delay to allow layout to settle
+  QTimer::singleShot(0, this, [this]() {
+    adjustSize();
+    updateGeometry();
+  });
 }
 void About::onDonateClicked() { DesktopUtils::openUrl(donateLink); }
 
