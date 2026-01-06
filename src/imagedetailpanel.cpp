@@ -566,13 +566,15 @@ void ImageDetailPanel::onResetOptimizerSettings() {
     // Emit signal to clear custom settings
     emit customOptimizerSettingsCleared(m_currentTask);
 
-    // Update UI
+    // Update UI indicators
     m_customSettingsIndicator->setVisible(false);
+    m_resetOptimizerButton->setVisible(false);
 
-    // Reload the widget to show global settings
-    updateOptimizerSettings();
-
+    // Show confirmation
     QMessageBox::information(this, tr("Settings Reset"),
                             tr("Custom settings cleared. This image will now use global settings."));
+
+    // Reload the widget to show global settings (after dialog is closed to prevent UI glitch)
+    updateOptimizerSettings();
   }
 }
