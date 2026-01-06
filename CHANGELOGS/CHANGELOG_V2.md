@@ -42,6 +42,7 @@ Select specific images and perform batch actions.
 - Improved About dialog with icons, smooth resize, and ESC support
 - Consistent status messages when adding images
 - Status bar shows total image count and summary
+- Implement window state persistence
 
 ### Optimizer Preferences
 - Minimum dialog size (500×400)
