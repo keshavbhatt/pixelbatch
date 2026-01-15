@@ -32,6 +32,7 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+!build-flatpak.sh
 *.qm
 *.prl
 
