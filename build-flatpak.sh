@@ -46,14 +46,14 @@ check_requirements() {
 install_runtime() {
     print_msg "$BLUE" "Checking runtime and SDK..."
     
-    if ! flatpak list | grep -q "org.kde.Platform.*5\\.15-23\\.08"; then
+    if ! flatpak list | grep -q "org.kde.Platform.*5\.15-23\.08"; then
         print_msg "$YELLOW" "Installing KDE Platform runtime..."
         flatpak install -y flathub org.kde.Platform//5.15-23.08
     else
         print_msg "$GREEN" "✓ KDE Platform runtime already installed"
     fi
     
-    if ! flatpak list | grep -q "org.kde.Sdk.*5\\.15-23\\.08"; then
+    if ! flatpak list | grep -q "org.kde.Sdk.*5\.15-23\.08"; then
         print_msg "$YELLOW" "Installing KDE SDK..."
         flatpak install -y flathub org.kde.Sdk//5.15-23.08
     else
