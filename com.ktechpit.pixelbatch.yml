@@ -85,9 +85,11 @@ modules:
 
   # Main PixelBatch application
   - name: pixelbatch
-    buildsystem: qmake
-    config-opts:
-      - PREFIX=/app
+    buildsystem: simple
+    build-commands:
+      - qmake PREFIX=/app src/PixelBatch.pro
+      - make -j$FLATPAK_BUILDER_N_JOBS
+      - make install
     sources:
       - type: dir
         path: .
@@ -97,14 +99,5 @@ modules:
           - .gitignore
           - build
           - snap
-    post-install:
-      # Ensure desktop file and icons are in the correct location
-      - install -Dm644 dist/linux/com.ktechpit.pixelbatch.desktop /app/share/applications/com.ktechpit.pixelbatch.desktop
-      - install -Dm644 dist/linux/com.ktechpit.pixelbatch.metainfo.xml /app/share/metainfo/com.ktechpit.pixelbatch.metainfo.xml
-      - install -Dm644 dist/linux/hicolor/16x16/apps/com.ktechpit.pixelbatch.png /app/share/icons/hicolor/16x16/apps/com.ktechpit.pixelbatch.png
-      - install -Dm644 dist/linux/hicolor/32x32/apps/com.ktechpit.pixelbatch.png /app/share/icons/hicolor/32x32/apps/com.ktechpit.pixelbatch.png
-      - install -Dm644 dist/linux/hicolor/64x64/apps/com.ktechpit.pixelbatch.png /app/share/icons/hicolor/64x64/apps/com.ktechpit.pixelbatch.png
-      - install -Dm644 dist/linux/hicolor/128x128/apps/com.ktechpit.pixelbatch.png /app/share/icons/hicolor/128x128/apps/com.ktechpit.pixelbatch.png
-      - install -Dm644 dist/linux/hicolor/256x256/apps/com.ktechpit.pixelbatch.png /app/share/icons/hicolor/256x256/apps/com.ktechpit.pixelbatch.png
-      - install -Dm644 dist/linux/hicolor/scalable/apps/com.ktechpit.pixelbatch.svg /app/share/icons/hicolor/scalable/apps/com.ktechpit.pixelbatch.svg
-      - install -Dm644 dist/linux/hicolor/symbolic/apps/com.ktechpit.pixelbatch-symbolic.svg /app/share/icons/hicolor/symbolic/apps/com.ktechpit.pixelbatch-symbolic.svg
+          - .flatpak-builder
+          - repo
