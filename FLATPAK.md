@@ -80,8 +80,8 @@ The Flatpak bundles the following optimization tools:
    - Built from source using autotools
    - For JPEG optimization
 
-2. **pngquant** (v3.0.3)
-   - Built from source
+2. **pngquant** (v2.12.5)
+   - Built from source using autotools
    - For PNG optimization with lossy compression
 
 3. **gifsicle** (v1.95)
