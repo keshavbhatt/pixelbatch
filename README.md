@@ -181,6 +181,10 @@ flatpak run com.ktechpit.pixelbatch
 If you want to build and test the Flatpak package locally:
 
 ```bash
+# Easy way - use the build script
+./build-flatpak.sh all
+
+# Manual way
 # Install flatpak-builder
 sudo apt-get install flatpak-builder
 
@@ -190,8 +194,14 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # Install KDE runtime and SDK
 flatpak install flathub org.kde.Platform//5.15-23.08 org.kde.Sdk//5.15-23.08
 
-# Build the Flatpak
+# Build and install the Flatpak
 flatpak-builder --force-clean --user --install build-dir com.ktechpit.pixelbatch.yml
+
+# Run the locally built Flatpak
+flatpak run com.ktechpit.pixelbatch
+```
+
+For more details on Flatpak packaging, see [FLATPAK.md](FLATPAK.md).
 
 # Run the locally built Flatpak
 flatpak run com.ktechpit.pixelbatch
