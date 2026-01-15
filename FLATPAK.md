@@ -23,7 +23,7 @@ sudo apt-get install flatpak-builder
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 # Install KDE runtime and SDK
-flatpak install flathub org.kde.Platform//5.15-23.08 org.kde.Sdk//5.15-23.08
+flatpak install flathub org.kde.Platform//5.15-25.08 org.kde.Sdk//5.15-25.08
 ```
 
 ### Build and Install
@@ -57,8 +57,8 @@ flatpak build-bundle repo pixelbatch.flatpak com.ktechpit.pixelbatch
 
 ### Runtime and SDK
 
-- **Runtime**: `org.kde.Platform` version `5.15-23.08`
-- **SDK**: `org.kde.Sdk` version `5.15-23.08`
+- **Runtime**: `org.kde.Platform` version `5.15-25.08`
+- **SDK**: `org.kde.Sdk` version `5.15-25.08`
 
 The KDE runtime provides Qt5 libraries and other dependencies needed by PixelBatch.
 

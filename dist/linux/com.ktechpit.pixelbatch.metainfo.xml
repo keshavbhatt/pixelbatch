@@ -55,6 +55,25 @@
   </provides>
   <url type="homepage">https://github.com/keshavbhatt/pixelbatch</url>
   <url type="bugtracker">https://github.com/keshavbhatt/pixelbatch/issues</url>
+  <url type="vcs-browser">https://github.com/keshavbhatt/pixelbatch</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-1.png</image>
+      <caption>Main interface with batch image optimization</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-2.png</image>
+      <caption>Image processing in action</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-3.png</image>
+      <caption>Settings and configuration options</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-4.png</image>
+      <caption>Dark theme interface</caption>
+    </screenshot>
+  </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="1.0.0" date="2025-11-06">
