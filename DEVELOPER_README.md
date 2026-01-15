@@ -65,9 +65,11 @@ PixelBatch/
 │       ├── icon.png
 │       └── icon.svg
 │
-├── LICENSE                       # GNU GPL v3 license
-├── README.md                     # User-facing README
-├── TODO.txt                      # Development TODOs
+├── com.ktechpit.pixelbatch.yml  # Flatpak manifest
+├── flathub.json                 # Flathub configuration
+├── LICENSE                      # GNU GPL v3 license
+├── README.md                    # User-facing README
+├── TODO.txt                     # Development TODOs
 └── DEVELOPER_README.md          # This file
 ```
 
@@ -362,6 +364,54 @@ Version information is embedded at compile time:
 - pngquant (v3.0.3+ recommended)
 - gifsicle (v1.95+)
 - SVGO (v4.0.0+)
+
+### Packaging
+
+#### Flatpak
+
+PixelBatch supports Flatpak packaging for easy distribution on Linux. The Flatpak manifest (`com.ktechpit.pixelbatch.yml`) uses the KDE runtime for Qt5 support.
+
+**Building Flatpak locally:**
+
+```bash
+# Install flatpak-builder if not already installed
+sudo apt-get install flatpak-builder
+
+# Add Flathub repository
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Install KDE runtime and SDK
+flatpak install flathub org.kde.Platform//5.15-23.08 org.kde.Sdk//5.15-23.08
+
+# Build the Flatpak from the repository root
+flatpak-builder --force-clean --user --install build-dir com.ktechpit.pixelbatch.yml
+
+# Run the Flatpak
+flatpak run com.ktechpit.pixelbatch
+```
+
+**Flatpak manifest structure:**
+- **Runtime:** org.kde.Platform 5.15-23.08 (provides Qt5 libraries)
+- **Permissions:** Home directory access, removable media, X11/Wayland support
+- **Bundled tools:** jpegoptim, pngquant, gifsicle, Node.js, and SVGO
+- **Build method:** qmake with PREFIX=/app
+
+#### Snap
+
+PixelBatch also supports Snap packaging. See `snap/snapcraft.yaml` for the Snap configuration.
+
+**Building Snap locally:**
+
+```bash
+# Install snapcraft
+sudo snap install snapcraft --classic
+
+# Build the snap
+snapcraft
+
+# Install locally
+sudo snap install --dangerous pixelbatch_*.snap
+```
 
 ### JPEG Optimization Settings
 

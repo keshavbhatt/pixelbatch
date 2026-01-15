@@ -58,3 +58,8 @@ _codeql_detected_source_root
 # Build artifacts
 src/pixelbatch
 src/.qmake.stash
+
+# Flatpak build artifacts
+.flatpak-builder/
+repo/
+*.flatpak

@@ -166,6 +166,38 @@ sudo make install
 snap install pixelbatch
 ```
 
+### Flatpak Package
+
+```bash
+# Install from Flathub (coming soon)
+flatpak install flathub com.ktechpit.pixelbatch
+
+# Run the application
+flatpak run com.ktechpit.pixelbatch
+```
+
+#### Building Flatpak Locally
+
+If you want to build and test the Flatpak package locally:
+
+```bash
+# Install flatpak-builder
+sudo apt-get install flatpak-builder
+
+# Add Flathub repository (if not already added)
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Install KDE runtime and SDK
+flatpak install flathub org.kde.Platform//5.15-23.08 org.kde.Sdk//5.15-23.08
+
+# Build the Flatpak
+flatpak-builder --force-clean --user --install build-dir com.ktechpit.pixelbatch.yml
+
+# Run the locally built Flatpak
+flatpak run com.ktechpit.pixelbatch
+```
+
+
 ## 🚀 Quick Start
 
 ### Basic Usage
