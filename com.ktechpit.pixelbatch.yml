@@ -33,11 +33,7 @@ modules:
 
   # pngquant for PNG optimization
   - name: pngquant
-    buildsystem: simple
-    build-commands:
-      - ./configure --prefix=/app
-      - make -j$FLATPAK_BUILDER_N_JOBS
-      - make install
+    buildsystem: autotools
     sources:
       - type: archive
         url: https://pngquant.org/pngquant-3.0.3-src.tar.gz
