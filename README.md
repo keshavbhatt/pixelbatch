@@ -204,7 +204,6 @@ flatpak run com.ktechpit.pixelbatch
 For more details on Flatpak packaging, see [FLATPAK.md](FLATPAK.md).
 
 ## 🚀 Quick Start
-## 🚀 Quick Start
 
 ### Basic Usage
 
