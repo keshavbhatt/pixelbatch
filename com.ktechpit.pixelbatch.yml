@@ -79,7 +79,8 @@ modules:
       - npm install -g --prefix=/app svgo@4.0.0
       - ln -sf /app/lib/node_modules/svgo/bin/svgo /app/bin/svgo
     sources:
-      # Empty package.json to satisfy npm
+      # Empty package.json required by npm
+      # Using data URL is the standard Flatpak approach for small generated files
       - type: file
         url: data:application/json;base64,e30=  # Empty JSON object: {}
         dest-filename: package.json
