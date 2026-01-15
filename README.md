@@ -203,11 +203,7 @@ flatpak run com.ktechpit.pixelbatch
 
 For more details on Flatpak packaging, see [FLATPAK.md](FLATPAK.md).
 
-# Run the locally built Flatpak
-flatpak run com.ktechpit.pixelbatch
-```
-
-
+## 🚀 Quick Start
 ## 🚀 Quick Start
 
 ### Basic Usage

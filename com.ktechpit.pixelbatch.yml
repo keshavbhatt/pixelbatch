@@ -59,7 +59,7 @@ modules:
   - name: nodejs
     buildsystem: simple
     build-commands:
-      - ./configure --prefix=/app --shared
+      - ./configure --prefix=/app
       - make -j$FLATPAK_BUILDER_N_JOBS
       - make install
     sources:
@@ -79,8 +79,9 @@ modules:
       - npm install -g --prefix=/app svgo@4.0.0
       - ln -sf /app/lib/node_modules/svgo/bin/svgo /app/bin/svgo
     sources:
+      # Empty package.json to satisfy npm
       - type: file
-        url: data:application/json;base64,e30=
+        url: data:application/json;base64,e30=  # Empty JSON object: {}
         dest-filename: package.json
 
   # Main PixelBatch application
