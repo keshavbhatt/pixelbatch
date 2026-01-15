@@ -32,6 +32,7 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+!build-flatpak.sh
 *.qm
 *.prl
 
@@ -58,3 +59,8 @@ _codeql_detected_source_root
 # Build artifacts
 src/pixelbatch
 src/.qmake.stash
+
+# Flatpak build artifacts
+.flatpak-builder/
+repo/
+*.flatpak
