@@ -4,11 +4,12 @@
   <id>com.ktechpit.pixelbatch</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <developer_name>PixelBatch Development Team</developer_name>
+  <developer id="com.ktechpit"<name>PixelBatch Development Team</name></developer>
   <name>PixelBatch</name>
   <summary>Batch Image Optimization Tool</summary>
   <description>
-    <p>PixelBatch is a powerful batch image optimization application that helps you reduce file sizes while maintaining quality. Perfect for web developers, photographers, and content creators.</p>
+    <p>PixelBatch is a powerful batch image optimization application that helps you reduce file sizes while maintaining quality. 
+      Perfect for web developers, photographers, and content creators.</p>
     <p>Key features of PixelBatch:</p>
     <ul>
       <li>Multi-format support: JPEG, PNG, GIF, and SVG optimization</li>
@@ -23,32 +24,6 @@
       <li>Re-processing support: Test different settings easily</li>
     </ul>
   </description>
-  <keywords>
-      <keyword translate="no">PixelBatch</keyword>
-      <keyword>Image</keyword>
-      <keyword>Optimization</keyword>
-      <keyword>Compress</keyword>
-      <keyword>JPEG</keyword>
-      <keyword>PNG</keyword>
-      <keyword>GIF</keyword>
-      <keyword>SVG</keyword>
-      <keyword>Batch</keyword>
-      <keyword>Optimizer</keyword>
-      <keyword>jpegoptim</keyword>
-      <keyword>pngquant</keyword>
-      <keyword>gifsicle</keyword>
-      <keyword>svgo</keyword>
-      <keyword>Lossless</keyword>
-      <keyword>Lossy</keyword>
-      <keyword>Graphics</keyword>
-      <keyword>Photo</keyword>
-      <keyword>Web</keyword>
-  </keywords>
-  <categories>
-    <category>Graphics</category>
-    <category>Utility</category>
-    <category>Qt</category>
-  </categories>
   <launchable type="desktop-id">com.ktechpit.pixelbatch.desktop</launchable>
   <provides>
     <binary>pixelbatch</binary>
@@ -56,6 +31,7 @@
   <url type="homepage">https://github.com/keshavbhatt/pixelbatch</url>
   <url type="bugtracker">https://github.com/keshavbhatt/pixelbatch/issues</url>
   <url type="vcs-browser">https://github.com/keshavbhatt/pixelbatch</url>
+  <content_rating type="oars-1.1" />
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-1.png</image>
@@ -74,7 +50,6 @@
       <caption>Dark theme interface</caption>
     </screenshot>
   </screenshots>
-  <content_rating type="oars-1.1" />
   <releases>
     <release version="1.0.0" date="2025-11-06">
       <description>
@@ -93,4 +68,3 @@
     </release>
   </releases>
 </component>
-
