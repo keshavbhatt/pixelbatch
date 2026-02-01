@@ -4,7 +4,9 @@
   <id>com.ktechpit.pixelbatch</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <developer id="com.ktechpit"<name>PixelBatch Development Team</name></developer>
+  <developer id="com.ktechpit">
+    <name>Keshav Bhatt</name>
+  </developer>
   <name>PixelBatch</name>
   <summary>Batch Image Optimization Tool</summary>
   <description>
@@ -32,6 +34,10 @@
   <url type="bugtracker">https://github.com/keshavbhatt/pixelbatch/issues</url>
   <url type="vcs-browser">https://github.com/keshavbhatt/pixelbatch</url>
   <content_rating type="oars-1.1" />
+  <branding>
+    <color type="primary" scheme_preference="light">#3daee9</color>
+    <color type="primary" scheme_preference="dark">#3daee9</color>
+  </branding>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/keshavbhatt/pixelbatch/main/screenshots/PixelBatch-Linux-1.png</image>
