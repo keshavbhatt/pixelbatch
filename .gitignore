@@ -1,5 +1,6 @@
 src/build
 .idea
+node_modules
 
 # C++ objects and libs
 *.slo
