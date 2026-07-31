@@ -9,6 +9,8 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QProcess>
+
+#include "desktoputils.h"
 #include <QString>
 #include <QStringList>
 #include <QThread>
@@ -125,6 +127,7 @@ protected:
 
     qDebug() << "Starting process for" << task->imagePath << "with program"
              << program << "and arguments" << arguments;
+    process->setProcessEnvironment(DesktopUtils::childProcessEnvironment());
     process->start(program, arguments);
 
     if (!process->waitForStarted()) {

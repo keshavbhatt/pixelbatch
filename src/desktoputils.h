@@ -1,10 +1,14 @@
 #ifndef DESKTOPUTILS_H
 #define DESKTOPUTILS_H
 
+#include <QProcessEnvironment>
 #include <QString>
 
 class DesktopUtils {
 public:
+  // Environment child processes should run with (snap-safe; see .cpp)
+  static QProcessEnvironment childProcessEnvironment();
+
   // Open URL (web links, file:// URLs, etc.)
   static bool openUrl(const QString &url);
 

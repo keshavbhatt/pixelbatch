@@ -1,11 +1,12 @@
 name: pixelbatch
+base: core24
 version: '2.0.0'
 summary: Batch Image Optimization Tool
 description: |
-  PixelBatch is a powerful batch image optimization application that helps you 
-  reduce file sizes while maintaining quality. Perfect for web developers, 
+  PixelBatch is a powerful batch image optimization application that helps you
+  reduce file sizes while maintaining quality. Perfect for web developers,
   photographers, and content creators.
-  
+
   Features:
   - Multi-format support: JPEG, PNG, GIF, and SVG optimization
   - Professional optimizers: jpegoptim, pngquant, gifsicle, and SVGO
@@ -15,7 +16,7 @@ description: |
   - Format-specific settings: Fine-tune optimization for each image type
   - Dark and Light themes with Qt Creator-inspired color schemes
   - Professional UI with comprehensive preferences
-  
+
   Supported optimizers:
   - jpegoptim: JPEG lossless and lossy compression
   - pngquant: PNG lossy compression with excellent quality
@@ -31,131 +32,69 @@ contact: https://github.com/keshavbhatt/pixelbatch/issues
 grade: stable
 confinement: strict
 icon: snap/gui/icon.svg
-base: core22
 compression: lzo
 
-architectures:
-  - build-on: [amd64]
-    build-for: [amd64]
-
-environment:
-  SNAP_DESKTOP_RUNTIME: $SNAP/qt5-core22
+platforms:
+  amd64:
+  arm64:
 
 apps:
   pixelbatch:
-    command: bin/desktop-launch $SNAP/usr/bin/pixelbatch
-    environment:
-       IS_SNAP: "1"
-       LANG: en_US.UTF-8
-       NO_AT_BRIDGE: "1"
-       # Extend PATH to include optimizer tools (don't override desktop-launch PATH)
-       PATH: $SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
+    command: usr/bin/pixelbatch
+    extensions: [kde-neon-6]
     desktop: usr/share/applications/com.ktechpit.pixelbatch.desktop
+    environment:
+      # Extend PATH so the app finds the bundled optimizer tools
+      PATH: $SNAP/usr/bin:$SNAP/usr/local/bin:$PATH
     plugs:
-        - desktop
-        - desktop-legacy
-        - gsettings
-        - gtk-3-themes
-        - icon-themes
-        - sound-themes
-        - home
-        - network
-        - opengl
-        - removable-media
-        - unity7
-        - x11
-        - wayland
-
-plugs:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
-  qt5-core22:
-    interface: content
-    target: $SNAP/qt5-core22
-    default-provider: qt5-core22
+      - gsettings
+      - home
+      - network
+      - opengl
+      - removable-media
+      - unity7
+      - wayland
+      - x11
 
 parts:
-   build-src:
-     plugin: nil
-     source: .
-     source-subdir: src/
+  application:
+    plugin: cmake
+    source: .
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=Release
+    stage-packages:
+      # Image optimizer tools
+      - jpegoptim
+      - pngquant
+      - gifsicle
+      # Libraries specifically needed by optimizer tools
+      - libjpeg-turbo8
+      - libpng16-16
+      - libgif7
+    override-build: |
+      craftctl default
+      sed -i 's|^Icon=.*|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/com.ktechpit.pixelbatch.svg|' ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
 
-     build-packages:
-        - build-essential
-        - qtbase5-dev
-        - libqt5svg5-dev
-        - libgl1-mesa-dev
+  svgo:
+    plugin: npm
+    source: .
+    npm-include-node: true
+    npm-node-version: "18.19.0"
+    override-prime: |
+      craftctl default
 
-     stage-packages:
-        # Image optimizer tools
-        - jpegoptim
-        - pngquant
-        - gifsicle
+      # Create symlink to svgo executable in usr/bin
+      mkdir -p ${CRAFT_PRIME}/usr/bin
 
-        # Libraries specifically needed by optimizer tools
-        - libjpeg-turbo8
-        - libpng16-16
-        - libgif7
-
-     override-build: |
-            craftctl default
-            
-            # Build the application
-            qmake PREFIX=${CRAFT_PART_INSTALL}/usr src
-            make -j$(nproc)
-            make install
-
-     override-prime: |
-            craftctl default
-            
-            # Fix desktop file icon path
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' \
-                ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.pixelbatch.desktop
-            
-            # Ensure optimizer tools are executable
-            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/jpegoptim || true
-            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/pngquant || true
-            chmod +x ${CRAFT_PART_INSTALL}/usr/bin/gifsicle || true
-
-   svgo:
-     plugin: npm
-     source: .
-     npm-include-node: true
-     npm-node-version: "18.19.0"
-     override-prime: |
-            craftctl default
-            
-            # Create symlink to svgo executable in usr/bin
-            mkdir -p ${CRAFT_PRIME}/usr/bin
-            
-            # Find svgo and create symlink (it's installed as a dependency)
-            if [ -f ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ]; then
-                ln -sf ../../lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo
-            elif [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
-                ln -sf ../../lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo
-            elif [ -f ${CRAFT_PRIME}/bin/svgo ]; then
-                ln -sf ../bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
-                chmod +x ${CRAFT_PRIME}/bin/svgo
-            fi
-
-   desktop-launch:
-     plugin: nil
-     source: https://github.com/keshavbhatt/qt5-core22.git
-     after: [build-src]
-     override-build: |
-            craftctl default
-            mkdir -p ${CRAFT_PART_INSTALL}/bin/
-            cp -rf ${CRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${CRAFT_PART_INSTALL}/bin/
-            chmod +x ${CRAFT_PART_INSTALL}/bin/desktop-launch
+      # Find svgo and create symlink (it's installed as a dependency)
+      if [ -f ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ]; then
+          ln -sf ../../lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+          chmod +x ${CRAFT_PRIME}/lib/node_modules/pixelbatch-svgo/node_modules/svgo/bin/svgo
+      elif [ -f ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo ]; then
+          ln -sf ../../lib/node_modules/svgo/bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+          chmod +x ${CRAFT_PRIME}/lib/node_modules/svgo/bin/svgo
+      elif [ -f ${CRAFT_PRIME}/bin/svgo ]; then
+          ln -sf ../bin/svgo ${CRAFT_PRIME}/usr/bin/svgo
+          chmod +x ${CRAFT_PRIME}/bin/svgo
+      fi

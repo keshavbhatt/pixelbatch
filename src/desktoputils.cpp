@@ -5,8 +5,23 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QThread>
 #include <QUrl>
+
+// Environment for child processes (xdg-open, dbus-send, optimizer tools).
+// Outside a snap, drop the library overrides a dev run exports for the app
+// itself — host tools crash when forced onto the snap runtime's libraries
+// (e.g. /bin/sh against core24's libreadline). Inside a snap, children must
+// keep the snap environment untouched.
+QProcessEnvironment DesktopUtils::childProcessEnvironment() {
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  if (!env.contains("SNAP")) {
+    env.remove("LD_LIBRARY_PATH");
+    env.remove("QT_PLUGIN_PATH");
+  }
+  return env;
+}
 
 bool DesktopUtils::openUrl(const QString &url) {
   // Try xdg-open first (works better in snap confinement)
@@ -50,6 +65,7 @@ bool DesktopUtils::openFolderAndSelectFile(const QString &filePath) {
 
   // Method 1: Try dbus call to file manager (works on many Linux DEs)
   QProcess dbusProcess;
+  dbusProcess.setProcessEnvironment(childProcessEnvironment());
   dbusProcess.start("dbus-send", QStringList()
                                      << "--session"
                                      << "--print-reply"
@@ -102,7 +118,10 @@ bool DesktopUtils::openWithXdgOpen(const QString &target) {
 
   // Use xdg-open to open the target
   QProcess process;
-  process.startDetached("xdg-open", QStringList() << target);
+  process.setProcessEnvironment(childProcessEnvironment());
+  process.setProgram("xdg-open");
+  process.setArguments(QStringList() << target);
+  process.startDetached();
 
   // Give it a moment to start
   QThread::msleep(100);

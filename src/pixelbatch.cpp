@@ -7,7 +7,6 @@
 #include "ui_pixelbatch.h"
 
 #include <QCloseEvent>
-#include <QDesktopWidget>
 #include <QScreen>
 #include <QSettings>
 #include <QThread>
@@ -178,7 +177,7 @@ void PixelBatch::initMenuBar() {
   fileMenu->addAction(addImagesAction);
 
   QAction *settingsAction = new QAction(tr("Preferences"), fileMenu);
-  settingsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+  settingsAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
   connect(settingsAction, &QAction::triggered, this, &PixelBatch::openSettings);
   fileMenu->addAction(settingsAction);
 
@@ -193,13 +192,13 @@ void PixelBatch::initMenuBar() {
   // EDIT MENU
   QAction *removeAllFinishedTasksAction =
       new QAction(tr("Remove Finished Tasks"), editMenu);
-  removeAllFinishedTasksAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+  removeAllFinishedTasksAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
   connect(removeAllFinishedTasksAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::removeFinishedOperations);
   editMenu->addAction(removeAllFinishedTasksAction);
 
   QAction *removeAllTasksAction = new QAction(tr("Remove All Tasks"), editMenu);
-  removeAllTasksAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+  removeAllTasksAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
   connect(removeAllTasksAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::clearAllOperations);
   editMenu->addAction(removeAllTasksAction);
@@ -210,7 +209,7 @@ void PixelBatch::initMenuBar() {
       new QAction(tr("Show Checkboxes"), selectionMenu);
   toggleCheckboxesAction->setCheckable(true);
   toggleCheckboxesAction->setChecked(false);
-  toggleCheckboxesAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  toggleCheckboxesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_E));
   connect(toggleCheckboxesAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::toggleCheckboxVisibility);
   selectionMenu->addAction(toggleCheckboxesAction);
@@ -218,13 +217,13 @@ void PixelBatch::initMenuBar() {
   selectionMenu->addSeparator();
 
   QAction *checkAllAction = new QAction(tr("Check All"), selectionMenu);
-  checkAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A));
+  checkAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_A));
   connect(checkAllAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::checkAll);
   selectionMenu->addAction(checkAllAction);
 
   QAction *uncheckAllAction = new QAction(tr("Uncheck All"), selectionMenu);
-  uncheckAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_D));
+  uncheckAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_D));
   connect(uncheckAllAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::uncheckAll);
   selectionMenu->addAction(uncheckAllAction);
@@ -234,7 +233,7 @@ void PixelBatch::initMenuBar() {
   QAction *processCheckedAction =
       new QAction(tr("Process Checked Items"), selectionMenu);
   processCheckedAction->setShortcut(
-      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
+      QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
   connect(processCheckedAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::processCheckedImages);
   selectionMenu->addAction(processCheckedAction);
@@ -248,7 +247,7 @@ void PixelBatch::initMenuBar() {
   QAction *removeCheckedAction =
       new QAction(tr("Remove Checked Items"), selectionMenu);
   removeCheckedAction->setShortcut(
-      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R));
+      QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_R));
   connect(removeCheckedAction, &QAction::triggered, m_taskWidget,
           &TaskWidget::removeCheckedItems);
   selectionMenu->addAction(removeCheckedAction);
@@ -436,8 +435,8 @@ void PixelBatch::addImages() {
 
 void PixelBatch::openSettings() {
   if (m_preferencesWidget && m_preferencesWidget->isVisible() == false) {
-    int screenNumber = qApp->desktop()->screenNumber(this);
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    // Qt 6: QDesktopWidget is gone; the widget knows its own screen
+    QRect screenRect = screen()->geometry();
     if (!screenRect.contains(m_preferencesWidget->pos())) {
       m_preferencesWidget->move(screenRect.center() -
                                 m_preferencesWidget->rect().center());
@@ -459,8 +458,7 @@ void PixelBatch::showAbout() {
   aboutDialog->setAttribute(Qt::WA_DeleteOnClose);
 
   // Center on screen
-  int screenNumber = qApp->desktop()->screenNumber(this);
-  QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+  QRect screenRect = screen()->geometry();
   aboutDialog->move(screenRect.center() - aboutDialog->rect().center());
 
   aboutDialog->show();
