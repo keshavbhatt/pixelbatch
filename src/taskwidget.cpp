@@ -92,8 +92,10 @@ void TaskWidget::dragEnterEvent(QDragEnterEvent *event) {
     bool hasValidImage = false;
     foreach (const QUrl &url, event->mimeData()->urls()) {
       QFileInfo fileInfo(url.toLocalFile());
-      if (QImageReader::supportedImageFormats().contains(
-              fileInfo.suffix().toLower().toUtf8())) {
+      // Accept what our optimizers support (SVG has no QImageReader plugin
+      // by default, and the factory matches extensions case-insensitively)
+      if (ImageWorkerFactory::instance().getImageTypeByExtension(
+              fileInfo.suffix()) != ImageType::Unsupported) {
         hasValidImage = true;
         break;
       }
@@ -125,8 +127,8 @@ void TaskWidget::dropEvent(QDropEvent *event) {
       QFileInfo fileInfo(url.toLocalFile());
 
       // Check if file is a supported image format
-      if (!QImageReader::supportedImageFormats().contains(
-              fileInfo.suffix().toLower().toUtf8())) {
+      if (ImageWorkerFactory::instance().getImageTypeByExtension(
+              fileInfo.suffix()) == ImageType::Unsupported) {
         skippedFiles << fileInfo.fileName();
         continue;
       }

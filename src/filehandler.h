@@ -26,7 +26,8 @@ signals:
 private:
   Settings &m_settings;
 
-    void saveLasrOpenedImageDirPath(QStringList fileNames);
+  static QString supportedImagesFilter();
+  void saveLasrOpenedImageDirPath(QStringList fileNames);
   void addFilesToTable(QStringList fileNames);
 };
 

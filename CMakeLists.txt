@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(pixelbatch
-    VERSION 2.0
+    VERSION 2.1
     DESCRIPTION "Batch image optimization tool"
     HOMEPAGE_URL "https://github.com/keshavbhatt/pixelbatch"
     LANGUAGES CXX
