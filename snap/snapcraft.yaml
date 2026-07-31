@@ -81,6 +81,12 @@ parts:
     source: .
     npm-include-node: true
     npm-node-version: "18.19.0"
+    build-environment:
+      # The kde-neon-6 extension points PATH at the Qt SDK snap, whose
+      # bundled node/npm hijack the npm plugin and abort (SDK libnode
+      # can't find its externalized builtins). Put the plugin's own
+      # downloaded node (extracted into the part install dir) first again.
+      - PATH: "${CRAFT_PART_INSTALL}/bin:${PATH}"
     override-prime: |
       craftctl default
 
